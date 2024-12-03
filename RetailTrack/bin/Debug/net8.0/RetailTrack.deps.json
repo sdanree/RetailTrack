@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "RetailTrack/1.0.0": {
+        "runtime": {
+          "RetailTrack.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RetailTrack/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
