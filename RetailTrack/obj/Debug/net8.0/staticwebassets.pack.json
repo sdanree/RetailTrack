@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\3e96a90a-6b77-40ff-b849-8a9fedd28c16.jpg",
+      "PackagePath": "staticwebassets\\img\\3e96a90a-6b77-40ff-b849-8a9fedd28c16.jpg"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\logo.png",
+      "PackagePath": "staticwebassets\\img\\logo.png"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\mono_trabajando.jpg",
+      "PackagePath": "staticwebassets\\img\\mono_trabajando.jpg"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.RetailTrack.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.RetailTrack.props",
+      "PackagePath": "build\\RetailTrack.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.RetailTrack.props",
+      "PackagePath": "buildMultiTargeting\\RetailTrack.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.RetailTrack.props",
+      "PackagePath": "buildTransitive\\RetailTrack.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -7,13 +7,10 @@ C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\RetailTrack.pdb
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Humanizer.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.Razor.Language.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.CodeAnalysis.Razor.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
@@ -31,7 +28,6 @@ C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.Composition.Convent
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.Composition.Hosting.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.Composition.Runtime.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.Composition.TypedParts.dll
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.Security.Permissions.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
@@ -99,3 +95,12 @@ C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\refint\RetailTrack.dll
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.pdb
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.genruntimeconfig.cache
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\ref\RetailTrack.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\RetailTrack.staticwebassets.runtime.json
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets.build.json
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets.development.json
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets\msbuild.RetailTrack.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets\msbuild.build.RetailTrack.props
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.RetailTrack.props
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.RetailTrack.props
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\staticwebassets.pack.json
+C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\scopedcss\bundle\RetailTrack.styles.css
