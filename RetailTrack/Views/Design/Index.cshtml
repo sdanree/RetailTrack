@@ -1,0 +1,29 @@
+@model IEnumerable<RetailTrack.Models.Products.Design>
+
+<h2>Lista de Diseños</h2>
+<a href="/Home/Index" class="btn btn-primary mb-3">Home</a>
+<a href="/Design/Create" class="btn btn-primary mb-3">Crear Diseño</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Imagen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var design in Model)
+        {
+            <tr>
+                <td>@design.Name</td>
+                <td>@design.Description</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(design.ImageUrl))
+                    {
+                        <img src="@design.ImageUrl" alt="Imagen" width="100" />
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

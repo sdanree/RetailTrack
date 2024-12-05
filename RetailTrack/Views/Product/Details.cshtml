@@ -1,0 +1,12 @@
+@model RetailTrack.Models.Products.Product
+
+<h1>Detalles del Producto</h1>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text"><strong>Talle:</strong> @Model.Size</p>
+        <p class="card-text"><strong>Estado:</strong> @Model.Status</p>
+        <p class="card-text"><strong>Cantidad Solicitada:</strong> @Model.QuantityRequested</p>
+        <a href="/Product" class="btn btn-secondary">Volver</a>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+@model List<RetailTrack.Models.Products.Product>
+
+<h1>Lista de Productos</h1>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+<a href="/Product/Create" class="btn btn-primary mb-3">Crear Producto</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Talle</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Size</td>
+                <td>@product.Status</td>
+                <td>
+                    <a href="/Product/Details/@product.Id" class="btn btn-info btn-sm">Detalles</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

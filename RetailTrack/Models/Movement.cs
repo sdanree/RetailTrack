@@ -1,21 +1,23 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace RetailTrack.Models
 {
-    // Enum para los tipos de movimiento
-    public enum MovementType
-    {
-        PorCobrar, // Movimiento generado al confirmar el alta de un producto
-        Vendido    // Movimiento generado cuando un producto se vende
-    }
-
     public class Movement
     {
         // Propiedades del movimiento
+        [Key]
         public Guid Id { get; private set; } // Identificador único del movimiento
+        [Required]
         public MovementType Type { get; private set; } // Tipo de movimiento
+        [Required]
         public decimal FinalPrice { get; private set; } // Precio final del movimiento
+        [Required]
+        [MaxLength(10)]
         public string Currency { get; private set; } // Moneda del movimiento
+        [Required]
         public DateTime Timestamp { get; private set; } // Fecha y hora del movimiento
 
         // Constructor

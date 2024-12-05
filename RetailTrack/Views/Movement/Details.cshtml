@@ -1,0 +1,12 @@
+@model RetailTrack.Models.Movement
+
+<h1>Detalles del Movimiento</h1>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Type</h5>
+        <p class="card-text"><strong>Precio Final:</strong> @Model.FinalPrice</p>
+        <p class="card-text"><strong>Moneda:</strong> @Model.Currency</p>
+        <p class="card-text"><strong>Fecha:</strong> @Model.Timestamp</p>
+        <a href="/Movement" class="btn btn-secondary">Volver</a>
+    </div>
+</div>

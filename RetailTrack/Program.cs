@@ -1,27 +1,44 @@
-﻿using RetailTrack.Models;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
+using RetailTrack.Data; 
+using RetailTrack.Services;
 
-class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Configura el DbContext con MySQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    .EnableSensitiveDataLogging()
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    );
+
+// Otros servicios
+builder.Services.AddScoped<ProductService>(); 
+builder.Services.AddScoped<MovementService>();
+builder.Services.AddScoped<DesignService>();
+
+builder.Services.AddControllersWithViews();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+var app = builder.Build();
+
+// Middleware para registrar todas las solicitudes en consola
+app.Use(async (context, next) =>
 {
-    static void Main()
-    {
-        // Crear un diseño
-        var design = new Design("Clásico", "Diseño elegante en negro", "https://example.com/design-image.jpg");
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    await next();
+});
 
-        // Crear un producto con diseño y talles específicos
-        var product = new Product("Vestido", "Vestido de noche", 20, ProductSize.M, ProductStatus.Pending, design);
+//app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
 
-        // Agregar materiales al producto
-        product.AddMaterial(new Material("Tela", 30.00m, 2));
-        product.AddMaterial(new Material("Botones", 5.00m, 6));
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-        // Mostrar información del producto
-        Console.WriteLine(product);
-
-        // Mostrar materiales
-        foreach (var material in product.Materials)
-        {
-            Console.WriteLine(material);
-        }
-    }
-}
+app.Run();

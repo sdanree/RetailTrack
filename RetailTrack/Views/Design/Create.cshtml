@@ -1,0 +1,24 @@
+@model RetailTrack.Models.Products.Design
+
+<h2>Nuevo Diseño</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Name">Nombre</label>
+        <input type="text" name="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description">Descripción</label>
+        <textarea name="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Image">Subir Imagen</label>
+        <input type="file" name="Image" id="Image" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
