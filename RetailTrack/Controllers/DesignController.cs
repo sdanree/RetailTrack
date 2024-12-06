@@ -58,7 +58,7 @@ namespace RetailTrack.Controllers
             else
             {
                 // Si no se subió ninguna imagen, asigna un valor predeterminado
-                design.ImageUrl = "img/mono_trabajando.jpeg"; // Asegúrate de tener una imagen predeterminada en esta ruta
+                design.ImageUrl = "img/mono_trabajando.jpeg"; 
             }
 
             var success = await _designService.AddDesignAsync(design);

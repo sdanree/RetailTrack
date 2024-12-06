@@ -6,10 +6,12 @@ namespace RetailTrack.Services
     public class ProductService
     {
         private readonly ApplicationDbContext _context;
+        private readonly DesignService _designService;
 
-        public ProductService(ApplicationDbContext context)
+        public ProductService(ApplicationDbContext context, DesignService designService)
         {
             _context = context;
+            _designService = designService;
         }
 
         // Obtener todos los productos
@@ -24,13 +26,12 @@ namespace RetailTrack.Services
             return _context.Products.FirstOrDefault(p => p.Id == id) ?? throw new Exception("Producto no encontrado");
         }
 
-
-        // Crear un nuevo producto
-        public void AddProduct(Product product)
+        public async Task AddProductAsync(Product product)
         {
             _context.Products.Add(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
+
 
         // Actualizar un producto existente
         public void UpdateProduct(Product product)

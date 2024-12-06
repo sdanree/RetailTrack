@@ -1,12 +1,43 @@
-@model RetailTrack.Models.Products.Product
+@model RetailTrack.ViewModels.ProductDetailsViewModel
 
-<h1>Detalles del Producto</h1>
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">@Model.Name</h5>
-        <p class="card-text"><strong>Talle:</strong> @Model.Size</p>
-        <p class="card-text"><strong>Estado:</strong> @Model.Status</p>
-        <p class="card-text"><strong>Cantidad Solicitada:</strong> @Model.QuantityRequested</p>
-        <a href="/Product" class="btn btn-secondary">Volver</a>
-    </div>
+<h2>Detalles del Producto</h2>
+
+<div>
+    <h4>Producto</h4>
+    <dl class="row">
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Product.Name</dd>
+
+        <dt class="col-sm-2">Descripción</dt>
+        <dd class="col-sm-10">@Model.Product.Description</dd>
+
+        <dt class="col-sm-2">Talle</dt>
+        <dd class="col-sm-10">@Model.Product.Size</dd>
+
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">@Model.Product.Status</dd>
+
+        <dt class="col-sm-2">Cantidad</dt>
+        <dd class="col-sm-10">@Model.Product.QuantityRequested</dd>
+
+        @if (Model.Design != null)
+        {
+            <dt class="col-sm-2">Diseño</dt>
+            <dd class="col-sm-10">
+                <p>@Model.Design.Name</p>
+                <p>@Model.Design.Description</p>
+                @if (!string.IsNullOrEmpty(Model.Design.ImageUrl))
+                {
+                    <img src="@Model.Design.ImageUrl" alt="Diseño" width="100" />
+                }
+            </dd>
+        }
+        else
+        {
+            <dt class="col-sm-2">Diseño</dt>
+            <dd class="col-sm-10">No hay diseño asociado.</dd>
+        }
+    </dl>
 </div>
+
+<a href="/Product/Index" class="btn btn-primary">Volver a la lista</a>

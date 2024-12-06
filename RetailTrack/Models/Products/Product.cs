@@ -12,7 +12,7 @@ namespace RetailTrack.Models.Products
         // Propiedades básicas del producto
         [Key]
         public Guid Id { get; private set; } // Identificador único del producto
-        [Required(ErrorMessage = "El nombre es obligatorio")]
+
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         [MaxLength(500)]
@@ -24,10 +24,8 @@ namespace RetailTrack.Models.Products
         public List<Material> Materials { get; set; } = new List<Material>();
 
         // Diseño asociado al producto
-        [Required(ErrorMessage = "El diseño es obligatorio")]
         [ForeignKey("DesingId")]
         public Guid DesignId { get; set; } 
-        public Design Design { get; set; } = null!;
 
         // Talle del producto
         [Required]
@@ -41,16 +39,7 @@ namespace RetailTrack.Models.Products
         public List<Movement> Movements { get; private set; } = new List<Movement>();
 
         // Constructor
-        public Product(string name, string description, int quantityRequested, ProductSize size, ProductStatus status)
-        {
-            Name = name;
-            Description = description;
-            QuantityRequested = quantityRequested;
-            Size = size;
-            Status = status;
-            Materials = new List<Material>();
-        }
-
+        public Product(){}
 
         // Confirmar alta de producto
         public void ConfirmCreation(decimal finalPrice, string currency)
@@ -75,8 +64,8 @@ namespace RetailTrack.Models.Products
         }
 
         public override string ToString()
-        {
-            return $"{Name} - Talle: {Size} - Estado: {Status} - Cantidad Solicitada: {QuantityRequested} - ${Price:F2} - Diseño: {Design?.Name ?? "N/A"}";
+        { 
+            return $"{Name} - Talle: {Size} - Estado: {Status} - Cantidad Solicitada: {QuantityRequested} - ${Price:F2}";
         }
     }
 }

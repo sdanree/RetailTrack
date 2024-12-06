@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RetailTrack.Models.Products;
 using RetailTrack.Services;
+using RetailTrack.ViewModels;
 
 namespace RetailTrack.Controllers
 {
@@ -16,9 +17,9 @@ namespace RetailTrack.Controllers
             _designService  = designService;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-
             var products = _productService.GetAllProducts();
             return View(products);
         }
@@ -27,42 +28,51 @@ namespace RetailTrack.Controllers
         {
             var designs = await _designService.GetAllDesignsAsync() ?? new List<Design>();
             ViewBag.Designs = new SelectList(designs, "Id", "Name");
-            
+
             return View();
         }
 
-        [HttpPost]
+       [HttpPost]
         public async Task<IActionResult> Create(Product product)
         {
-            if (ModelState.IsValid)
-            {
-                _productService.AddProduct(product);
-                TempData["Message"] = "Producto creado con éxito.";
-                return RedirectToAction("Index");
-            }
-
             if (!ModelState.IsValid)
             {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
+                var designs = await _designService.GetAllDesignsAsync() ?? new List<Design>();
+                ViewBag.Designs = new SelectList(designs, "Id", "Name");
+                return View(product);
             }
 
-            // Asegúrate de esperar la lista de diseños
-            var designs = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            ViewBag.Designs = new SelectList(designs, "Id", "Name");
-
-            return View(product);
+            await _productService.AddProductAsync(product);
+            TempData["Message"] = "Producto creado con éxito.";
+            return RedirectToAction("Index");
         }
 
-
-        public IActionResult Details(Guid id)
+        public async Task<IActionResult> Details(Guid id)
         {
+            // Obtener el producto por su ID
             var product = _productService.GetProductById(id);
-            if (product == null) return NotFound();
-            return View(product);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Cargar el diseño asociado basado en el DesignId
+            var design = product.DesignId != Guid.Empty
+                ? await _designService.GetDesignByIdAsync(product.DesignId)
+                : null;
+
+            // Crear un ViewModel para combinar Producto y Diseño
+            var viewModel = new ProductDetailsViewModel
+            {
+                Product = product,
+                Design = design
+            };
+
+            return View(viewModel);
         }
+
+
 
         public IActionResult Delete(Guid id)
         {
