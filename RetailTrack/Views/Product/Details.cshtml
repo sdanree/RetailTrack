@@ -3,41 +3,56 @@
 <h2>Detalles del Producto</h2>
 
 <div>
-    <h4>Producto</h4>
-    <dl class="row">
-        <dt class="col-sm-2">Nombre</dt>
-        <dd class="col-sm-10">@Model.Product.Name</dd>
+    <table class="table">
+        <tr>
+            <th> Nombre </th>
+            <th> @Model.Product.Name</th>
+        </tr>
+        <tr>
+            <th> Descripción </th>
+            <th> @Model.Product.Description</th>
+        </tr>
+         <tr>
+            <th> Talle </th>
+            <th> @Model.Product.Size</th>
+        </tr>           
+         <tr>
+            <th> Estado </th>
+            <th> @Model.Product.Status</th>
+        </tr>          
+         <tr>
+            <th> Cantidad </th>
+            <th> @Model.Product.QuantityRequested</th>
+        </tr>                       
+         <tr>
+            <th> Cantidad </th>
+            <th> @Model.Product.QuantityRequested</th>
+        </tr>                       
+        <tr>
+            <th>Diseño</th>
+        </tr>
+            @if (Model.Design != null)
+            {
+                <tr>    
+                    <th>@Model.Design.Name</th>
+                    <th>@Model.Design.Description</th>
+                    @if (!string.IsNullOrEmpty(Model.Design.ImageUrl))
+                    {
+                        <th>
+                            <img src="@Url.Content($"~/{Model.Design.ImageUrl}")" alt="Diseño" width="100" />
+                        </th>
+                    }
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <th>No hay diseño asociado.</th>
+                </tr>
+            }        
+        </tr>
+    </table>
 
-        <dt class="col-sm-2">Descripción</dt>
-        <dd class="col-sm-10">@Model.Product.Description</dd>
-
-        <dt class="col-sm-2">Talle</dt>
-        <dd class="col-sm-10">@Model.Product.Size</dd>
-
-        <dt class="col-sm-2">Estado</dt>
-        <dd class="col-sm-10">@Model.Product.Status</dd>
-
-        <dt class="col-sm-2">Cantidad</dt>
-        <dd class="col-sm-10">@Model.Product.QuantityRequested</dd>
-
-        @if (Model.Design != null)
-        {
-            <dt class="col-sm-2">Diseño</dt>
-            <dd class="col-sm-10">
-                <p>@Model.Design.Name</p>
-                <p>@Model.Design.Description</p>
-                @if (!string.IsNullOrEmpty(Model.Design.ImageUrl))
-                {
-                    <img src="@Model.Design.ImageUrl" alt="Diseño" width="100" />
-                }
-            </dd>
-        }
-        else
-        {
-            <dt class="col-sm-2">Diseño</dt>
-            <dd class="col-sm-10">No hay diseño asociado.</dd>
-        }
-    </dl>
 </div>
 
 <a href="/Product/Index" class="btn btn-primary">Volver a la lista</a>

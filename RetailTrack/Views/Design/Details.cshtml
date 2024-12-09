@@ -5,6 +5,9 @@
     <div class="card-body">
         <h5 class="card-title">@Model.Name</h5>
         <p class="card-text"><strong>Descripcion:</strong> @Model.Description</p>
-       <a href="/Desing" class="btn btn-secondary">Volver</a>
+        <p class="card-text"><strong>Precio:</strong> $@Model.Price.ToString("F1")</p>
+        <p class="card-text"><strong>Comision:</strong> $@Model.Comision.ToString("F1")</p>
+        <img src="@Url.Content($"~/{Model.ImageUrl}")" alt="Diseño" width="100" />                
+       <a href="/Design" class="btn btn-secondary">Volver</a>
     </div>
 </div>

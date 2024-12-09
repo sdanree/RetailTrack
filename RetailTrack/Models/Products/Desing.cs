@@ -16,20 +16,15 @@ namespace RetailTrack.Models.Products
         [MaxLength(500)]
         public string? Description { get; set; }
 
+        public decimal Comision { get; set; }
+
+        [Required]
+        public decimal Price { get; set; }
+        
         public string? ImageUrl { get; set; }
         
         public Design(){}
-        /*
-        public Design(string name, string description, string imageUrl)
-        {
-         
-            Id = Guid.NewGuid();
-            Name = name;
-            Description = description;
-            ImageUrl = imageUrl;
-        
-        }
-        */
+
         public override string ToString()
         {
             return $"{Name}: {Description}";

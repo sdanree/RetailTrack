@@ -16,11 +16,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ProductService>(); 
 builder.Services.AddScoped<MovementService>();
 builder.Services.AddScoped<DesignService>();
+builder.Services.AddScoped<MaterialTypeService>();
+builder.Services.AddScoped<MaterialService>();
 
 builder.Services.AddControllersWithViews();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();

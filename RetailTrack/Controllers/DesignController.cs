@@ -72,5 +72,21 @@ namespace RetailTrack.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Details(Guid id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var design = await _designService.GetDesignByIdAsync(id);
+
+            if (design == null)
+            {
+                return NotFound();
+            }
+
+            return View(design);
+        }
     }
 }

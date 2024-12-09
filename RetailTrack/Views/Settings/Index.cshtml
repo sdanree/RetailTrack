@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Settings - Index";
+}
+
+<h1>Settings</h1>
+<p>Haz clic en el botón para inicializar los datos.</p>
+
+<form asp-controller="Settings" asp-action="InitializeData" method="post">
+    <button type="submit" class="btn btn-primary">Inicializar Datos</button>
+</form>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RetailTrack.Data;
 
@@ -11,9 +12,11 @@ using RetailTrack.Data;
 namespace RetailTrack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209191629_AddMaterialAndMaterialTypeModels")]
+    partial class AddMaterialAndMaterialTypeModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,9 +61,6 @@ namespace RetailTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<decimal>("Comision")
-                        .HasColumnType("decimal(65,30)");
-
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
@@ -71,9 +71,6 @@ namespace RetailTrack.Migrations
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
