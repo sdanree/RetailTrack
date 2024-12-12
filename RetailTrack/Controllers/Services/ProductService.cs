@@ -1,5 +1,8 @@
 using RetailTrack.Data;
 using RetailTrack.Models.Products;
+using RetailTrack.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace RetailTrack.Services
 {
@@ -10,37 +13,113 @@ namespace RetailTrack.Services
 
         public ProductService(ApplicationDbContext context, DesignService designService)
         {
-            _context = context;
-            _designService = designService;
+            _context        = context;
+            _designService  = designService;
         }
 
-        // Obtener todos los productos
-        public List<Product> GetAllProducts()
+         public List<Product> GetAllProducts()
         {
-            return _context.Products.ToList();
+            return _context.Products
+                .Include(p => p.Size)
+                .Include(p => p.Status)
+                .Include(p => p.Material)
+                    .ThenInclude(m => m.MaterialType)
+                .Include(p => p.Design)
+                .AsNoTracking()
+                .ToList();
         }
 
-        // Obtener un producto por ID
         public Product? GetProductById(Guid id)
         {
-            return _context.Products.FirstOrDefault(p => p.Id == id) ?? throw new Exception("Producto no encontrado");
+            return _context.Products
+                .Include(p => p.Size)
+                .Include(p => p.Status)
+                .Include(p => p.Material)
+                    .ThenInclude(m => m.MaterialType)
+                .Include(p => p.Design)
+                .AsNoTracking()
+                .FirstOrDefault(p => p.Id == id);
         }
 
         public async Task AddProductAsync(Product product)
         {
+            // Validar y establecer el estado de ProductStatus
+            if (product.Status != null)
+            {
+                var trackedStatus = _context.ChangeTracker.Entries<ProductStatus>()
+                    .FirstOrDefault(e => e.Entity.Status_Id == product.Status.Status_Id);
+
+                if (trackedStatus != null)
+                {
+                    trackedStatus.State = EntityState.Unchanged;
+                }
+                else
+                {
+                    _context.Entry(product.Status).State = EntityState.Unchanged;
+                }
+            }
+
+            // Validar y establecer el estado de ProductSize
+            if (product.Size != null)
+            {
+                var trackedSize = _context.ChangeTracker.Entries<ProductSize>()
+                    .FirstOrDefault(e => e.Entity.Size_Id == product.Size.Size_Id);
+
+                if (trackedSize != null)
+                {
+                    trackedSize.State = EntityState.Unchanged;
+                }
+                else
+                {
+                    _context.Entry(product.Size).State = EntityState.Unchanged;
+                }
+            }
+
+            // Validar y establecer el estado de Material
+            if (product.Material != null)
+            {
+                var trackedMaterial = _context.ChangeTracker.Entries<Material>()
+                    .FirstOrDefault(e => e.Entity.Id == product.Material.Id);
+
+                if (trackedMaterial != null)
+                {
+                    trackedMaterial.State = EntityState.Unchanged;
+                }
+                else
+                {
+                    _context.Entry(product.Material).State = EntityState.Unchanged;
+                }
+            }
+
+            // Validar y establecer el estado de Design
+            if (product.Design != null)
+            {
+                var trackedDesign = _context.ChangeTracker.Entries<Design>()
+                    .FirstOrDefault(e => e.Entity.Id == product.Design.Id);
+
+                if (trackedDesign != null)
+                {
+                    trackedDesign.State = EntityState.Unchanged;
+                }
+                else
+                {
+                    _context.Entry(product.Design).State = EntityState.Unchanged;
+                }
+            }
+
+            // Agregar el producto y guardar cambios
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
 
 
-        // Actualizar un producto existente
+
         public void UpdateProduct(Product product)
         {
             _context.Products.Update(product);
             _context.SaveChanges();
         }
 
-        // Eliminar un producto
         public void DeleteProduct(Guid id)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == id);
@@ -50,5 +129,51 @@ namespace RetailTrack.Services
                 _context.SaveChanges();
             }
         }
+
+        public async Task<List<ProductSize>> GetAllProductSizesAsync()
+        {
+            return await _context.ProductSizes.ToListAsync();
+        }
+
+        public async Task<ProductSize?> GetProductSizeByIdAsync(int sizeId)
+        {
+            return await _context.ProductSizes
+                .AsNoTracking() 
+                .FirstOrDefaultAsync(s => s.Size_Id == sizeId);
+        }
+
+        public async Task<ProductStatus?> GetProductStatusByIdAsync(int statusId)
+        {
+            return await _context.ProductStatuses
+                .AsNoTracking() 
+                .FirstOrDefaultAsync(s => s.Status_Id == statusId);
+        }
+
+        public async Task<MaterialType?> GetMaterialTypeByIdAsync(Guid materialTypeId)
+        {
+            return await _context.MaterialTypes //.ToListAsync();
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == materialTypeId);
+        }
+
+        public async Task<List<MaterialType>> GetAllMaterialTypesAsync()
+        {
+            return await _context.MaterialTypes.ToListAsync();
+        }
+
+        public async Task<List<Material>> GetMaterialsByTypeAsync(Guid materialTypeId)
+        {
+            return await _context.Materials
+                .Where(m => m.MaterialTypeId == materialTypeId)
+                .ToListAsync();
+        }
+
+        public async Task<Material?> GetMaterialByIdAsync(Guid materialId)
+        {
+            return await _context.Materials
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == materialId);
+        }
+
     }
 }

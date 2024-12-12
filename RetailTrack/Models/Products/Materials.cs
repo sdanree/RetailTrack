@@ -27,13 +27,14 @@ namespace RetailTrack.Models.Products
 
         public Material(string name, decimal cost, int stock, Guid materialTypeId)
         {
-            Id = Guid.NewGuid(); // Generar ID único
-            Name = name;
-            Cost = cost;
-            Stock = stock;
-            MaterialTypeId = materialTypeId;
+            Id              = Guid.NewGuid(); // Generar ID único
+            Name            = name;
+            Cost            = cost;
+            Stock           = stock;
+            MaterialTypeId  = materialTypeId;
         }
 
-        public Material(){}        
+        public Material(){}     
+
     }
 }

@@ -2,57 +2,46 @@
 
 <h2>Detalles del Producto</h2>
 
-<div>
-    <table class="table">
-        <tr>
-            <th> Nombre </th>
-            <th> @Model.Product.Name</th>
-        </tr>
-        <tr>
-            <th> Descripción </th>
-            <th> @Model.Product.Description</th>
-        </tr>
-         <tr>
-            <th> Talle </th>
-            <th> @Model.Product.Size</th>
-        </tr>           
-         <tr>
-            <th> Estado </th>
-            <th> @Model.Product.Status</th>
-        </tr>          
-         <tr>
-            <th> Cantidad </th>
-            <th> @Model.Product.QuantityRequested</th>
-        </tr>                       
-         <tr>
-            <th> Cantidad </th>
-            <th> @Model.Product.QuantityRequested</th>
-        </tr>                       
-        <tr>
-            <th>Diseño</th>
-        </tr>
-            @if (Model.Design != null)
-            {
-                <tr>    
-                    <th>@Model.Design.Name</th>
-                    <th>@Model.Design.Description</th>
-                    @if (!string.IsNullOrEmpty(Model.Design.ImageUrl))
-                    {
-                        <th>
-                            <img src="@Url.Content($"~/{Model.Design.ImageUrl}")" alt="Diseño" width="100" />
-                        </th>
-                    }
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <th>No hay diseño asociado.</th>
-                </tr>
-            }        
-        </tr>
-    </table>
-
+<div class="form-group">
+    <label>Nombre:</label>
+    <p>@Model.Name</p>
 </div>
 
-<a href="/Product/Index" class="btn btn-primary">Volver a la lista</a>
+<div class="form-group">
+    <label>Estado:</label>
+    <p>@Model.Status</p>
+</div>
+
+<div class="form-group">
+    <label>Descripción:</label>
+    <p>@Model.Description</p>
+</div>
+
+<div class="form-group">
+    <label>Cantidad:</label>
+    <p>@Model.QuantityRequested</p>
+</div>
+
+<div class="form-group">
+    <label>Talle:</label>
+    <p>@Model.Size</p>
+</div>
+
+<div class="form-group">
+    <label>Diseño:</label>
+    <p>@Model.Design</p>
+</div>
+
+<div class="form-group">
+    <label>Tipo Material:</label>
+    <p>@Model.MaterialType</p>
+</div>
+
+<div class="form-group">
+    <label>Material:</label>
+    <p>@Model.Material</p>
+</div>
+
+
+
+<a href="@Url.Action("Index", "Product")" class="btn btn-primary">Volver</a>

@@ -5,8 +5,20 @@
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\2db9c4ec-bdce-4ec9-ac32-dd0379a3f129.jpg",
+      "PackagePath": "staticwebassets\\img\\2db9c4ec-bdce-4ec9-ac32-dd0379a3f129.jpg"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\3e96a90a-6b77-40ff-b849-8a9fedd28c16.jpg",
       "PackagePath": "staticwebassets\\img\\3e96a90a-6b77-40ff-b849-8a9fedd28c16.jpg"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\58f89a2a-7244-43eb-b982-cffbd26a84ef.jpg",
+      "PackagePath": "staticwebassets\\img\\58f89a2a-7244-43eb-b982-cffbd26a84ef.jpg"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\home.png",
+      "PackagePath": "staticwebassets\\img\\home.png"
     },
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\logo.png",
@@ -15,6 +27,14 @@
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\mono_trabajando.jpg",
       "PackagePath": "staticwebassets\\img\\mono_trabajando.jpg"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetMaterial.js",
+      "PackagePath": "staticwebassets\\js\\GetMaterial.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetMaterials.js",
+      "PackagePath": "staticwebassets\\js\\GetMaterials.js"
     },
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\site.js",

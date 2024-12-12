@@ -15,6 +15,9 @@ namespace RetailTrack.Data
         public DbSet<MaterialType> MaterialTypes { get; set; }    
         public DbSet<Material> Materials { get; set; }
         public DbSet<Movement> Movements { get; set; }
+        public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<ProductStatus> ProductStatuses { get; set; }
+        public DbSet<MovementType> MovementTypes { get; set; }        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

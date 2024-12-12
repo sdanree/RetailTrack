@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RetailTrack.Data;
 
@@ -11,9 +12,11 @@ using RetailTrack.Data;
 namespace RetailTrack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210014205_UpdateProductAndMovement")]
+    partial class UpdateProductAndMovement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,12 +153,17 @@ namespace RetailTrack.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("char(36)");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MaterialTypeId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Materials");
                 });
@@ -183,13 +191,11 @@ namespace RetailTrack.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
                     b.Property<Guid>("DesignId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("MaterialId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
@@ -210,10 +216,6 @@ namespace RetailTrack.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DesignId");
-
-                    b.HasIndex("MaterialId");
 
                     b.HasIndex("ProductSizeId");
 
@@ -245,23 +247,15 @@ namespace RetailTrack.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RetailTrack.Models.Products.Product", null)
+                        .WithMany("Materials")
+                        .HasForeignKey("ProductId");
+
                     b.Navigation("MaterialType");
                 });
 
             modelBuilder.Entity("RetailTrack.Models.Products.Product", b =>
                 {
-                    b.HasOne("RetailTrack.Models.Products.Design", "Design")
-                        .WithMany()
-                        .HasForeignKey("DesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RetailTrack.Models.Products.Material", "Material")
-                        .WithMany()
-                        .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("RetailTrack.Models.ProductSize", "Size")
                         .WithMany()
                         .HasForeignKey("ProductSizeId")
@@ -273,10 +267,6 @@ namespace RetailTrack.Migrations
                         .HasForeignKey("ProductStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Design");
-
-                    b.Navigation("Material");
 
                     b.Navigation("Size");
 
@@ -290,6 +280,8 @@ namespace RetailTrack.Migrations
 
             modelBuilder.Entity("RetailTrack.Models.Products.Product", b =>
                 {
+                    b.Navigation("Materials");
+
                     b.Navigation("Movements");
                 });
 #pragma warning restore 612, 618

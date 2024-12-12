@@ -1,26 +1,25 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace RetailTrack.Models
 {
-    public enum ProductSize
+    public class ProductSize
     {
-        XS,
-        S,
-        M,
-        L,
-        XL,
-        XXL
+        [Key]
+        public int Size_Id { get; set; }
+        public string Size_Name { get; set; } = string.Empty;
     }
 
-    public enum ProductStatus
+    public class ProductStatus
     {
-        Pending,
-        ReadyToMake,
-        Made,
-        Sold
+        [Key]
+        public int Status_Id { get; set; }
+        public string Status_Name { get; set; } = string.Empty;
     }
 
-    public enum MovementType
+    public class MovementType
     {
-        PorCobrar,
-        Vendido
+        [Key]
+        public int Movement_Id { get; set; }
+        public string Movement_Name { get; set; } = string.Empty;
     }
 }

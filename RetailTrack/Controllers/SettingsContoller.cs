@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RetailTrack.Models;
 using RetailTrack.Models.Products;
 using RetailTrack.Services;
 using RetailTrack.Data;
@@ -25,7 +26,6 @@ namespace RetailTrack.Controllers
         [Route("Settings/InitializeData")]
         public async Task<IActionResult> InitializeData()
         {
-            Console.WriteLine("Algo no anda!!!!");
             _logger.LogInformation("InitializeData _ before");
             try
             {
@@ -44,13 +44,41 @@ namespace RetailTrack.Controllers
 
         private async Task SeedDataAsync()
         {
-            Console.WriteLine("SeedDataAsync _ Algo no anda!!!!");
             _logger.LogInformation("SeedDataAsync _ before");            
             // Limpia las tablas
+            _context.Products.RemoveRange(_context.Products);
+            _context.ProductSizes.RemoveRange(_context.ProductSizes);
+            _context.ProductStatuses.RemoveRange(_context.ProductStatuses);
             _context.Materials.RemoveRange(_context.Materials);
             _context.MaterialTypes.RemoveRange(_context.MaterialTypes);
             _context.Designs.RemoveRange(_context.Designs);
             await _context.SaveChangesAsync();
+
+            // Init. ProductSize 
+            var productSizes = new List<ProductSize>
+            {
+                new ProductSize { Size_Id = 1, Size_Name = "S" },
+                new ProductSize { Size_Id = 2, Size_Name = "M" },
+                new ProductSize { Size_Id = 3, Size_Name = "L" },
+                new ProductSize { Size_Id = 4, Size_Name = "XL" },
+                new ProductSize { Size_Id = 5, Size_Name = "XXL" },
+                new ProductSize { Size_Id = 6, Size_Name = "XXXL" },
+                new ProductSize { Size_Id = 7, Size_Name = "1 año" },
+                new ProductSize { Size_Id = 8, Size_Name = "2 años" },
+                new ProductSize { Size_Id = 9, Size_Name = "3 años" }
+            };
+
+            // Init. ProductStatus
+            var productStatuses = new List<ProductStatus>
+            {
+                new ProductStatus { Status_Id = 1, Status_Name = "pedido" },
+                new ProductStatus { Status_Id = 2, Status_Name = "taller" },
+                new ProductStatus { Status_Id = 3, Status_Name = "estampado" },
+                new ProductStatus { Status_Id = 4, Status_Name = "Planchado" },
+                new ProductStatus { Status_Id = 5, Status_Name = "empacado" },
+                new ProductStatus { Status_Id = 6, Status_Name = "entregado" },
+                new ProductStatus { Status_Id = 7, Status_Name = "proovedor" }
+            };
 
             // Init. MaterialTypes & Materials
             var materialTypes = new List<MaterialType>
@@ -259,6 +287,8 @@ namespace RetailTrack.Controllers
             };
 
             // Add new data
+            await _context.ProductSizes.AddRangeAsync(productSizes);
+            await _context.ProductStatuses.AddRangeAsync(productStatuses);
             await _context.MaterialTypes.AddRangeAsync(materialTypes);
             await _context.Designs.AddRangeAsync(DesingsList);
             await _context.SaveChangesAsync();

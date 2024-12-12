@@ -1,18 +1,16 @@
-@model List<RetailTrack.Models.Products.Product>
+@model IEnumerable<RetailTrack.ViewModels.ProductDetailsViewModel>
 
-<h1>Lista de Productos</h1>
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-success">@TempData["Message"]</div>
-}
-<a href="/Home/Index" class="btn btn-primary mb-3">Home</a>
-<a href="/Product/Create" class="btn btn-primary mb-3">Crear Producto</a>
-
-<table class="table table-striped">
+<h2>Lista de Productos</h2>
+<a href="@Url.Action("Create", "Product")" class="btn btn-primary">Nuevo Producto</a>
+<table class="table">
     <thead>
         <tr>
             <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Diseño</th>
             <th>Talle</th>
+            <th>Tipo producto</th>
+            <th>Material</th>
             <th>Estado</th>
             <th>Acciones</th>
         </tr>
@@ -22,10 +20,14 @@
         {
             <tr>
                 <td>@product.Name</td>
+                <td>@product.QuantityRequested</td>
+                <td>@product.Design</td>
                 <td>@product.Size</td>
+                <td>@product.MaterialType</td>
+                <td>@product.Material</td>
                 <td>@product.Status</td>
                 <td>
-                    <a href="/Product/Details/@product.Id" class="btn btn-info btn-sm">Detalles</a>
+                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info">Ver</a>
                 </td>
             </tr>
         }
