@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RetailTrack.Models.Products;
+using RetailTrack.Models;
 using RetailTrack.Services;
 using RetailTrack.Data;
 

@@ -1,0 +1,26 @@
+@model MaterialViewModel
+
+<h2>Crear Material</h2>
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Material.Name"></label>
+        <input asp-for="Material.Name" class="form-control" />
+        <span asp-validation-for="Material.Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Material.Cost"></label>
+        <input asp-for="Material.Cost" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="Material.Cost" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Material.Stock"></label>
+        <input asp-for="Material.Stock" type="number" class="form-control" />
+        <span asp-validation-for="Material.Stock" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Material.MaterialTypeId"></label>
+        <select asp-for="Material.MaterialTypeId" class="form-control" asp-items="Model.MaterialTypes"></select>
+        <span asp-validation-for="Material.MaterialTypeId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

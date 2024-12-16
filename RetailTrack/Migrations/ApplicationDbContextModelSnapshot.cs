@@ -22,6 +22,82 @@ namespace RetailTrack.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("RetailTrack.Models.Design", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Comision")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Designs");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Material", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<Guid>("MaterialTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("SizeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialTypeId");
+
+                    b.HasIndex("SizeId");
+
+                    b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.MaterialType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MaterialTypes");
+                });
+
             modelBuilder.Entity("RetailTrack.Models.Movement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -71,112 +147,24 @@ namespace RetailTrack.Migrations
                     b.ToTable("MovementTypes");
                 });
 
-            modelBuilder.Entity("RetailTrack.Models.ProductSize", b =>
+            modelBuilder.Entity("RetailTrack.Models.PaymentMethod", b =>
                 {
-                    b.Property<int>("Size_Id")
+                    b.Property<int>("PaymentMethodId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Size_Id"));
-
-                    b.Property<string>("Size_Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Size_Id");
-
-                    b.ToTable("ProductSizes");
-                });
-
-            modelBuilder.Entity("RetailTrack.Models.ProductStatus", b =>
-                {
-                    b.Property<int>("Status_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Status_Id"));
-
-                    b.Property<string>("Status_Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Status_Id");
-
-                    b.ToTable("ProductStatuses");
-                });
-
-            modelBuilder.Entity("RetailTrack.Models.Products.Design", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Comision")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Designs");
-                });
-
-            modelBuilder.Entity("RetailTrack.Models.Products.Material", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<Guid>("MaterialTypeId")
-                        .HasColumnType("char(36)");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PaymentMethodId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
+                    b.HasKey("PaymentMethodId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("MaterialTypeId");
-
-                    b.ToTable("Materials");
+                    b.ToTable("PaymentMethods");
                 });
 
-            modelBuilder.Entity("RetailTrack.Models.Products.MaterialType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MaterialTypes");
-                });
-
-            modelBuilder.Entity("RetailTrack.Models.Products.Product", b =>
+            modelBuilder.Entity("RetailTrack.Models.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,9 +188,6 @@ namespace RetailTrack.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<int>("ProductSizeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProductStatusId")
                         .HasColumnType("int");
 
@@ -215,11 +200,174 @@ namespace RetailTrack.Migrations
 
                     b.HasIndex("MaterialId");
 
-                    b.HasIndex("ProductSizeId");
-
                     b.HasIndex("ProductStatusId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.ProductStatus", b =>
+                {
+                    b.Property<int>("Status_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Status_Id"));
+
+                    b.Property<string>("Status_Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Status_Id");
+
+                    b.ToTable("ProductStatuses");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Provider", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("BusinessName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("RUT")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Provider");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Receipt", b =>
+                {
+                    b.Property<Guid>("ReceiptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("ReceiptAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("ReceiptDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("ReceiptId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("Receipts");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.ReceiptDetail", b =>
+                {
+                    b.Property<Guid>("ReceiptId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("DetailId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SizeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("ReceiptId", "MaterialId");
+
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("SizeId");
+
+                    b.ToTable("ReceiptDetails");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.ReceiptPayment", b =>
+                {
+                    b.Property<Guid>("ReceiptId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<Guid>("ReceiptPaymentId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ReceiptId", "PaymentMethodId");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.ToTable("ReceiptPayments");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Size", b =>
+                {
+                    b.Property<int>("Size_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Size_Id"));
+
+                    b.Property<string>("Size_Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Size_Id");
+
+                    b.ToTable("Sizes");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Material", b =>
+                {
+                    b.HasOne("RetailTrack.Models.MaterialType", "MaterialType")
+                        .WithMany("Materials")
+                        .HasForeignKey("MaterialTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RetailTrack.Models.Size", "Size")
+                        .WithMany()
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MaterialType");
+
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("RetailTrack.Models.Movement", b =>
@@ -230,41 +378,24 @@ namespace RetailTrack.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RetailTrack.Models.Products.Product", null)
+                    b.HasOne("RetailTrack.Models.Product", null)
                         .WithMany("Movements")
                         .HasForeignKey("ProductId");
 
                     b.Navigation("Type");
                 });
 
-            modelBuilder.Entity("RetailTrack.Models.Products.Material", b =>
+            modelBuilder.Entity("RetailTrack.Models.Product", b =>
                 {
-                    b.HasOne("RetailTrack.Models.Products.MaterialType", "MaterialType")
-                        .WithMany("Materials")
-                        .HasForeignKey("MaterialTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MaterialType");
-                });
-
-            modelBuilder.Entity("RetailTrack.Models.Products.Product", b =>
-                {
-                    b.HasOne("RetailTrack.Models.Products.Design", "Design")
+                    b.HasOne("RetailTrack.Models.Design", "Design")
                         .WithMany()
                         .HasForeignKey("DesignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RetailTrack.Models.Products.Material", "Material")
+                    b.HasOne("RetailTrack.Models.Material", "Material")
                         .WithMany()
                         .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RetailTrack.Models.ProductSize", "Size")
-                        .WithMany()
-                        .HasForeignKey("ProductSizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -278,19 +409,91 @@ namespace RetailTrack.Migrations
 
                     b.Navigation("Material");
 
-                    b.Navigation("Size");
-
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("RetailTrack.Models.Products.MaterialType", b =>
+            modelBuilder.Entity("RetailTrack.Models.Receipt", b =>
+                {
+                    b.HasOne("RetailTrack.Models.Provider", "Provider")
+                        .WithMany("Receipts")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Provider");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.ReceiptDetail", b =>
+                {
+                    b.HasOne("RetailTrack.Models.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RetailTrack.Models.Receipt", "Receipt")
+                        .WithMany("Details")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RetailTrack.Models.Size", "Size")
+                        .WithMany()
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+
+                    b.Navigation("Receipt");
+
+                    b.Navigation("Size");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.ReceiptPayment", b =>
+                {
+                    b.HasOne("RetailTrack.Models.PaymentMethod", "PaymentMethod")
+                        .WithMany("Receipts")
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RetailTrack.Models.Receipt", "Receipt")
+                        .WithMany("Payments")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.MaterialType", b =>
                 {
                     b.Navigation("Materials");
                 });
 
-            modelBuilder.Entity("RetailTrack.Models.Products.Product", b =>
+            modelBuilder.Entity("RetailTrack.Models.PaymentMethod", b =>
+                {
+                    b.Navigation("Receipts");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Product", b =>
                 {
                     b.Navigation("Movements");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Provider", b =>
+                {
+                    b.Navigation("Receipts");
+                });
+
+            modelBuilder.Entity("RetailTrack.Models.Receipt", b =>
+                {
+                    b.Navigation("Details");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

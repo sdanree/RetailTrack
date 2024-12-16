@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RetailTrack.Models;
-using RetailTrack.Models.Products;
 using RetailTrack.Services;
 using RetailTrack.ViewModels;
 using System;
@@ -15,31 +14,27 @@ namespace RetailTrack.Controllers
     {
         private readonly ProductService _productService;
         private readonly DesignService _designService;
+        private readonly SizeService _sizeService;
 
-        public ProductController(ProductService productService, DesignService designService)
+        public ProductController(ProductService productService, DesignService designService, SizeService sizeService)
         {
             _productService = productService;
-            _designService = designService;
+            _designService  = designService;
+            _sizeService    = sizeService;        
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             // Obtener los datos necesarios para el formulario
-            var designs = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            var sizes = await _productService.GetAllProductSizesAsync() ?? new List<ProductSize>();
-            var materialTypes = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
-
-            Console.WriteLine($"Diseños cargados: {designs.Count}");
-            Console.WriteLine($"Talles cargados: {sizes.Count}");
-            Console.WriteLine($"Tipos de materiales cargados: {materialTypes.Count}");
+            var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
+            var materialTypes   = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
 
             // Crear el ViewModel con los datos cargados
             var viewModel = new ProductCreateViewModel
             {
-                Designs = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name }),
-                Sizes = sizes.Select(s => new SelectListItem { Value = s.Size_Id.ToString(), Text = s.Size_Name }),
-                MaterialTypes = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name })
+                Designs         = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name }),
+                MaterialTypes   = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name })
             };
 
             return View(viewModel);
@@ -77,15 +72,6 @@ namespace RetailTrack.Controllers
                 }
             }
 
-            if (product.ProductSizeId > 0)
-            {
-                product.Size = await _productService.GetProductSizeByIdAsync(product.ProductSizeId);
-                if (product.Size == null)
-                {
-                    ModelState.AddModelError("ProductSizeId", "El talle seleccionado no es válido.");
-                }
-            }
-
             if (product.ProductStatusId > 0)
             {
                 product.Status = await _productService.GetProductStatusByIdAsync(product.ProductStatusId);
@@ -95,10 +81,8 @@ namespace RetailTrack.Controllers
                 }
             }
 
-            // Si la descripción está nula, asignar cadena vacía
             product.Description ??= string.Empty;
 
-            // Validar el ModelState después de todas las validaciones
             if (!ModelState.IsValid)
             {
                 Console.WriteLine("Fallo el modelo. Recargando listas...");
@@ -116,10 +100,8 @@ namespace RetailTrack.Controllers
                 return View(viewModel);
             }
 
-            // Agregar el producto al servicio
             await _productService.AddProductAsync(product);
 
-            // Confirmar éxito y redirigir
             TempData["Message"] = "Producto creado con éxito.";
             return RedirectToAction("Index");
         }
@@ -128,12 +110,10 @@ namespace RetailTrack.Controllers
 
         private async Task RecargarListas(ProductCreateViewModel viewModel)
         {
-            var designs = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            var sizes = await _productService.GetAllProductSizesAsync() ?? new List<ProductSize>();
-            var materialTypes = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
+            var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
+            var materialTypes   = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
 
-            viewModel.Designs = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name });
-            viewModel.Sizes = sizes.Select(s => new SelectListItem { Value = s.Size_Id.ToString(), Text = s.Size_Name });
+            viewModel.Designs       = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name });
             viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name });
 
             if (!string.IsNullOrEmpty(viewModel.MaterialTypeId))
@@ -168,15 +148,14 @@ namespace RetailTrack.Controllers
 
             var viewModel = products.Select(product => new ProductDetailsViewModel
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                QuantityRequested = product.QuantityRequested,
-                Size = product.Size?.Size_Name,
-                Design = product.Design?.Name,
-                Material = product.Material?.Name,
-                MaterialType = product.Material?.MaterialType?.Name,
-                Status = product.Status?.Status_Name
+                Id                  = product.Id,
+                Name                = product.Name,
+                Description         = product.Description,
+                QuantityRequested   = product.QuantityRequested,
+                Design              = product.Design?.Name,
+                Material            = product.Material?.Name,
+                MaterialType        = product.Material?.MaterialType?.Name,
+                Status              = product.Status?.Status_Name
             }).ToList();
 
             return View(viewModel);
@@ -193,15 +172,14 @@ namespace RetailTrack.Controllers
 
             var viewModel = new ProductDetailsViewModel
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                QuantityRequested = product.QuantityRequested,
-                Size = product.Size?.Size_Name,
-                Design = product.Design?.Name,
-                Material = product.Material?.Name,
-                MaterialType = product.Material?.MaterialType?.Name,
-                Status = product.Status?.Status_Name
+                Id                  = product.Id,
+                Name                = product.Name,
+                Description         = product.Description,
+                QuantityRequested   = product.QuantityRequested,
+                Design              = product.Design?.Name,
+                Material            = product.Material?.Name,
+                MaterialType        = product.Material?.MaterialType?.Name,
+                Status              = product.Status?.Status_Name
             };
 
             return View(viewModel);

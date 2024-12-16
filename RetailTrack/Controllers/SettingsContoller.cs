@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using RetailTrack.Models;
-using RetailTrack.Models.Products;
 using RetailTrack.Services;
 using RetailTrack.Data;
 
@@ -13,8 +12,8 @@ namespace RetailTrack.Controllers
 
         public SettingsController(ApplicationDbContext context, ILogger<SettingsController> logger)
         {
-            _context = context;
-            _logger = logger;
+            _context    = context;
+            _logger     = logger;
         }
 
         public IActionResult Index()
@@ -47,25 +46,26 @@ namespace RetailTrack.Controllers
             _logger.LogInformation("SeedDataAsync _ before");            
             // Limpia las tablas
             _context.Products.RemoveRange(_context.Products);
-            _context.ProductSizes.RemoveRange(_context.ProductSizes);
+            _context.Sizes.RemoveRange(_context.Sizes);
             _context.ProductStatuses.RemoveRange(_context.ProductStatuses);
             _context.Materials.RemoveRange(_context.Materials);
             _context.MaterialTypes.RemoveRange(_context.MaterialTypes);
             _context.Designs.RemoveRange(_context.Designs);
+            _context.PaymentMethods.RemoveRange(_context.PaymentMethods);
             await _context.SaveChangesAsync();
 
             // Init. ProductSize 
-            var productSizes = new List<ProductSize>
+            var Sizes = new List<Size>
             {
-                new ProductSize { Size_Id = 1, Size_Name = "S" },
-                new ProductSize { Size_Id = 2, Size_Name = "M" },
-                new ProductSize { Size_Id = 3, Size_Name = "L" },
-                new ProductSize { Size_Id = 4, Size_Name = "XL" },
-                new ProductSize { Size_Id = 5, Size_Name = "XXL" },
-                new ProductSize { Size_Id = 6, Size_Name = "XXXL" },
-                new ProductSize { Size_Id = 7, Size_Name = "1 año" },
-                new ProductSize { Size_Id = 8, Size_Name = "2 años" },
-                new ProductSize { Size_Id = 9, Size_Name = "3 años" }
+                new Size { Size_Id = 1, Size_Name = "S" },
+                new Size { Size_Id = 2, Size_Name = "M" },
+                new Size { Size_Id = 3, Size_Name = "L" },
+                new Size { Size_Id = 4, Size_Name = "XL" },
+                new Size { Size_Id = 5, Size_Name = "XXL" },
+                new Size { Size_Id = 6, Size_Name = "XXXL" },
+                new Size { Size_Id = 7, Size_Name = "1 año" },
+                new Size { Size_Id = 8, Size_Name = "2 años" },
+                new Size { Size_Id = 9, Size_Name = "3 años" }
             };
 
             // Init. ProductStatus
@@ -286,11 +286,22 @@ namespace RetailTrack.Controllers
                 new Design { Name = "Golf bordado", Description = "", Comision = 0, Price = 850, ImageUrl = "" },
             };
 
+            // Init. PaymentMethod
+            var paymentMethods = new List<PaymentMethod>
+            {
+                new PaymentMethod { PaymentMethodId = 1, Name = "Trans Itau" },
+                new PaymentMethod { PaymentMethodId = 2, Name = "Trans Otro" },
+                new PaymentMethod { PaymentMethodId = 3, Name = "MP" },
+                new PaymentMethod { PaymentMethodId = 4, Name = "PayPal" },
+                new PaymentMethod { PaymentMethodId = 5, Name = "Efectivo" }
+            };
+
             // Add new data
-            await _context.ProductSizes.AddRangeAsync(productSizes);
+            await _context.Sizes.AddRangeAsync(Sizes);
             await _context.ProductStatuses.AddRangeAsync(productStatuses);
             await _context.MaterialTypes.AddRangeAsync(materialTypes);
             await _context.Designs.AddRangeAsync(DesingsList);
+            await _context.PaymentMethods.AddRangeAsync(paymentMethods);
             await _context.SaveChangesAsync();
         }
 

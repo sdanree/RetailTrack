@@ -1,9 +1,9 @@
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
-namespace RetailTrack.Models.Products
+namespace RetailTrack.Models
 {
     public class Design
     {
@@ -20,10 +20,8 @@ namespace RetailTrack.Models.Products
 
         [Required]
         public decimal Price { get; set; }
-        
+
         public string? ImageUrl { get; set; }
-        
-        public Design(){}
 
         public override string ToString()
         {

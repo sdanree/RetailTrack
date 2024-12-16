@@ -30,8 +30,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVzaWduXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Proyectos/fabricaRopa/RetailTrack/Views/GoodsReceipt/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZHNSZWNlaXB0XENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/fabricaRopa/RetailTrack/Views/GoodsReceipt/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZHNSZWNlaXB0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Proyectos/fabricaRopa/RetailTrack/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/fabricaRopa/RetailTrack/Views/Material/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWF0ZXJpYWxcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/fabricaRopa/RetailTrack/Views/Material/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWF0ZXJpYWxcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/fabricaRopa/RetailTrack/Views/Material/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWF0ZXJpYWxcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Proyectos/fabricaRopa/RetailTrack/Views/Movement/Create.cshtml]

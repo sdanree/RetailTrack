@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
-using RetailTrack.Models.Products;
+using RetailTrack.Models;
 using System.Collections.Generic;
 
 namespace RetailTrack.ViewModels

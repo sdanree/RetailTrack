@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RetailTrack.Models.Products;
+using RetailTrack.Models;
 using RetailTrack.Services;
 
 namespace RetailTrack.Controllers
@@ -11,8 +11,8 @@ namespace RetailTrack.Controllers
 
         public DesignController(DesignService designService, IWebHostEnvironment environment)
         {
-            _designService = designService;
-            _environment = environment;
+            _designService  = designService;
+            _environment    = environment;
         }
 
         [HttpGet]

@@ -2490,6 +2490,7 @@
       "Microsoft.EntityFrameworkCore >= 8.0.2",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.2",
       "Microsoft.EntityFrameworkCore.Relational >= 8.0.2",
+      "Newtonsoft.Json >= 13.0.3",
       "Pomelo.EntityFrameworkCore.MySql >= 8.0.2"
     ]
   },
@@ -2552,6 +2553,10 @@
           "Microsoft.EntityFrameworkCore.Relational": {
             "target": "Package",
             "version": "[8.0.2, )"
+          },
+          "Newtonsoft.Json": {
+            "target": "Package",
+            "version": "[13.0.3, )"
           },
           "Pomelo.EntityFrameworkCore.MySql": {
             "target": "Package",

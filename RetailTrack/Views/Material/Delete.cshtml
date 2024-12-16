@@ -1,0 +1,9 @@
+@model RetailTrack.Models.Material
+
+<h2>Eliminar Material</h2>
+<p>¿Estás seguro de que deseas eliminar el material <strong>@Model.Name</strong>?</p>
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="@Url.Action("Index", "Material")" class="btn btn-secondary">Cancelar</a>
+</form>

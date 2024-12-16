@@ -1,0 +1,117 @@
+<div class="container">
+    <h2>Registrar Orden de Compra</h2>
+    <form action="@Url.Action("AddItem", "Receipt")" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="MaterialTypeId">Tipo de Material:</label>
+                <select id="MaterialTypeId" name="MaterialTypeId" class="form-control" onchange="getMaterialsByType(this.value)">
+                    <option value="">Seleccione un tipo de material</option>
+                    @foreach (var materialType in Model.MaterialTypes)
+                    {
+                        <option value="@materialType.Value">@materialType.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="Materials">Material:</label>
+                <select id="Materials" name="ReceiptDetail.MaterialId" class="form-control">
+                    <option value="">Seleccione un material</option>
+                    @foreach (var material in Model.Materials)
+                    {
+                        <option value="@material.Value">@material.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label for="SizeId">Talle:</label>
+                <select id="SizeId" name="ReceiptDetail.SizeId" class="form-control">
+                    <option value="">Seleccione un tamaño</option>
+                    @foreach (var size in Model.Sizes)
+                    {
+                        <option value="@size.Value">@size.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="Quantity">Cantidad:</label>
+                <input type="number" id="Quantity" name="ReceiptDetail.Quantity" class="form-control" min="1" />
+            </div>
+            <div class="col-md-3">
+                <label for="UnitCost">Costo Unitario:</label>
+                <input type="number" id="UnitCost" name="ReceiptDetail.UnitCost" class="form-control" step="0.01" />
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12 text-right">
+                <button type="submit" class="btn btn-primary">Agregar Material</button>
+            </div>
+        </div>
+    </form>
+
+    <div id="payments">
+        <h3>Métodos de Pago</h3>
+        <form action="@Url.Action("AddPayment", "Receipt")" method="post">
+            <div class="form-group">
+                <label for="NewPayment.PaymentMethodId">Método de Pago:</label>
+                <select asp-for="NewPayment.PaymentMethodId" asp-items="Model.PaymentMethods" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label for="NewPayment.Percentage">Porcentaje:</label>
+                <input asp-for="NewPayment.Percentage" class="form-control" type="number" min="0" max="100" />
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar Método de Pago</button>
+        </form>
+
+        <h4>Métodos de Pago Agregados</h4>
+        <ul>
+            @foreach (var payment in Model.Payments)
+            {
+                <li>
+                    @payment.PaymentMethodName - @payment.Percentage% del total
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="mt-5">
+        <h3>Lista de Materiales</h3>
+        @if (Model.Items != null && Model.Items.Count > 0)
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Material</th>
+                        <th>Tamaño</th>
+                        <th>Cantidad</th>
+                        <th>Costo Unitario</th>
+                        <th>Costo Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.MaterialTypeName</td>
+                            <td>@item.MaterialName</td>
+                            <td>@item.SizeName</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.UnitCost.ToString("F2")</td>
+                            <td>@(item.Quantity * item.UnitCost).ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No hay materiales agregados.</p>
+        }
+
+        <form action="@Url.Action("Create", "Receipt")" method="post">
+            <button type="submit" class="btn btn-success">Registrar Orden</button>
+        </form>
+    </div>
+</div>

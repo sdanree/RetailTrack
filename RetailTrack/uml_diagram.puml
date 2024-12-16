@@ -1,0 +1,115 @@
+@startuml
+class Design {
+    + Id: Guid
+    + Name: string?
+    + Description: string?
+    + Comision: decimal
+    + Price: decimal
+    + ImageUrl: string?
+    - ToString(): string
+}
+
+class Receipt {
+    + ReceiptId: Guid
+    + ReceiptAmount: decimal
+    + ReceiptDate: DateTime
+    + PaymentMethods: List<PaymentMethod>
+    + Details: List<ReceiptDetail>
+    + Provider: Provider
+}
+
+class ReceiptDetail {
+    + DetailId: Guid
+    + ReceiptId: Guid
+    + MaterialId: Guid
+    + Quantity: int
+    + UnitCost: decimal
+    + TotalCost: decimal
+    + SizeId: int
+    + Material: Material
+    + Size: Size
+}
+
+class Provider {
+    + Id: Guid
+    + Name: string
+    + Description: string?
+    + Phone: string
+    + BusinessName: string
+    + RUT: string
+    + Address: string
+}
+
+class Material {
+    + Id: Guid
+    + Name: string
+    + Cost: decimal
+    + Stock: int
+    + MaterialTypeId: Guid
+    + MaterialType: MaterialType
+    + SizeId: int
+    + Size: Size
+}
+
+class MaterialType {
+    + Id: Guid
+    + Name: string
+    + Materials: ICollection<Material>
+}
+
+class Product {
+    + Id: Guid
+    + Name: string
+    + Description: string?
+    + Price: decimal
+    + QuantityRequested: int
+    + MaterialId: Guid
+    + DesignId: Guid
+    + ProductStatusId: int
+    + Movements: List<Movement>
+    - ConfirmCreation(): void
+    - MarkAsSold(): void
+}
+
+class Size {
+    + Size_Id: int
+    + Size_Name: string
+}
+
+class ProductStatus {
+    + Status_Id: int
+    + Status_Name: string
+}
+
+class Movement {
+    + Id: Guid
+    + MovementTypeId: int
+    + FinalPrice: decimal
+    + Currency: string
+    + Timestamp: DateTime
+    - UpdateType(): void
+}
+
+class MovementType {
+    + Movement_Id: int
+    + Movement_Name: string
+}
+
+class PaymentMethod {
+    + PaymentMethod_Id: int
+    + PaymentMethod_Name: string
+}
+
+Receipt "1" --> "*" ReceiptDetail
+Receipt "1" --> "*" PaymentMethod
+Receipt "1" --> "1" Provider
+ReceiptDetail "1" --> "1" Material
+ReceiptDetail "1" --> "1" Size
+Material "1" --> "1" MaterialType
+Material "1" --> "1" Size
+Product "1" --> "1" Material
+Product "1" --> "1" Design
+Product "1" --> "1" ProductStatus
+Product "1" --> "*" Movement
+Movement "1" --> "1" MovementType
+@enduml

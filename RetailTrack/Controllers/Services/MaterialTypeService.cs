@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RetailTrack.Data;
-using RetailTrack.Models.Products;
+using RetailTrack.Models;
 
 public class MaterialTypeService
 {

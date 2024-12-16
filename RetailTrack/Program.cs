@@ -10,7 +10,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine, LogLevel.Information)
-    );
+);
 
 // Otros servicios
 builder.Services.AddScoped<ProductService>(); 
@@ -18,8 +18,18 @@ builder.Services.AddScoped<MovementService>();
 builder.Services.AddScoped<DesignService>();
 builder.Services.AddScoped<MaterialTypeService>();
 builder.Services.AddScoped<MaterialService>();
+builder.Services.AddScoped<ReceiptService>();
 
 builder.Services.AddControllersWithViews();
+
+// Configura la sesión
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de vida de la sesión
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -47,6 +57,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Agrega el middleware para habilitar la sesión
+app.UseSession();
 
 app.UseAuthorization();
 

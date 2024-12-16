@@ -1,5 +1,4 @@
 using RetailTrack.Data;
-using RetailTrack.Models.Products;
 using RetailTrack.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,6 @@ namespace RetailTrack.Services
          public List<Product> GetAllProducts()
         {
             return _context.Products
-                .Include(p => p.Size)
                 .Include(p => p.Status)
                 .Include(p => p.Material)
                     .ThenInclude(m => m.MaterialType)
@@ -32,7 +30,6 @@ namespace RetailTrack.Services
         public Product? GetProductById(Guid id)
         {
             return _context.Products
-                .Include(p => p.Size)
                 .Include(p => p.Status)
                 .Include(p => p.Material)
                     .ThenInclude(m => m.MaterialType)
@@ -56,22 +53,6 @@ namespace RetailTrack.Services
                 else
                 {
                     _context.Entry(product.Status).State = EntityState.Unchanged;
-                }
-            }
-
-            // Validar y establecer el estado de ProductSize
-            if (product.Size != null)
-            {
-                var trackedSize = _context.ChangeTracker.Entries<ProductSize>()
-                    .FirstOrDefault(e => e.Entity.Size_Id == product.Size.Size_Id);
-
-                if (trackedSize != null)
-                {
-                    trackedSize.State = EntityState.Unchanged;
-                }
-                else
-                {
-                    _context.Entry(product.Size).State = EntityState.Unchanged;
                 }
             }
 
@@ -128,18 +109,6 @@ namespace RetailTrack.Services
                 _context.Products.Remove(product);
                 _context.SaveChanges();
             }
-        }
-
-        public async Task<List<ProductSize>> GetAllProductSizesAsync()
-        {
-            return await _context.ProductSizes.ToListAsync();
-        }
-
-        public async Task<ProductSize?> GetProductSizeByIdAsync(int sizeId)
-        {
-            return await _context.ProductSizes
-                .AsNoTracking() 
-                .FirstOrDefaultAsync(s => s.Size_Id == sizeId);
         }
 
         public async Task<ProductStatus?> GetProductStatusByIdAsync(int statusId)

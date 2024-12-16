@@ -1,0 +1,60 @@
+@model MaterialIndexViewModel
+
+<h2>Lista de Materiales</h2>
+
+<!-- Filtros -->
+<form method="get" class="mb-3">
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="materialTypeId">Tipo de Material</label>
+            <select id="materialTypeId" name="materialTypeId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var type in Model.MaterialTypes)
+                {
+                    <option value="@type.Value" @(type.Value == Model.SelectedMaterialTypeId ? "selected" : "")>
+                        @type.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="nameFilter">Nombre</label>
+            <input type="text" id="nameFilter" name="name" value="@Model.NameFilter" class="form-control" placeholder="Buscar por nombre" />
+        </div>
+        <div class="form-group col-md-4 align-self-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="@Url.Action("Index", "Material")" class="btn btn-secondary">Limpiar</a>
+        </div>
+    </div>
+</form>
+
+<a href="@Url.Action("Create", "Material")" class="btn btn-success">Agregar Material</a>
+
+<!-- Tabla -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tipo de Material</th>        
+            <th>Nombre</th>
+            <th>Costo</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var material in Model.Materials)
+        {
+            <tr>
+                <td>@material.MaterialType?.Name</td>
+                <td>@material.Name</td>
+                <td>$@material.Cost.ToString("F1")</td>
+                <td>@material.Stock</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Material", new { id = material.Id })" class="btn btn-primary">Editar</a>
+                    <a href="@Url.Action("Delete", "Material", new { id = material.Id })" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
