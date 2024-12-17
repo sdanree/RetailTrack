@@ -1,57 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RetailTrack.Models;
+using RetailTrack.ViewModels;
+using RetailTrack.Services;
 using System.Linq;
 using System.Threading.Tasks;
 
 public class MaterialController : Controller
 {
     private readonly MaterialService _materialService;
-
-    public MaterialController(MaterialService materialService)
+    private readonly SizeService _sizeService;
+    public MaterialController(MaterialService materialService, SizeService sizeService)
     {
         _materialService = materialService;
+        _sizeService     = sizeService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Index(string? materialTypeId, string? name)
-    {
-        // Obtener todos los materiales
-        var materials = await _materialService.GetAllMaterialsAsync();
-
-        // Aplicar filtro por tipo de material
-        if (!string.IsNullOrWhiteSpace(materialTypeId) && Guid.TryParse(materialTypeId, out var typeId))
-        {
-            materials = materials.Where(m => m.MaterialTypeId == typeId).ToList();
-        }
-
-        // Aplicar filtro por nombre
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            materials = materials.Where(m => m.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
-
-        // Obtener los tipos de materiales para el filtro
-        var materialTypes = await _materialService.GetAllMaterialTypesAsync();
-
-        // Crear el ViewModel
-        var viewModel = new MaterialIndexViewModel
-        {
-            Materials = materials,
-            MaterialTypes = materialTypes.Select(mt => new SelectListItem
-            {
-                Value = mt.Id.ToString(),
-                Text = mt.Name
-            }),
-            SelectedMaterialTypeId = materialTypeId,
-            NameFilter = name
-        };
-
-        return View(viewModel);
-    }
-
-
-    // Crear Material - Vista
+    // GET: Crear Material - Vista
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -64,33 +29,38 @@ public class MaterialController : Controller
                 Text = mt.Name
             })
         };
-
         return View(viewModel);
     }
 
-    // Crear Material - Acción
+    // POST: Crear Material - Acción
     [HttpPost]
     public async Task<IActionResult> Create(MaterialViewModel viewModel)
     {
         if (!ModelState.IsValid)
         {
-            // Recargar los tipos de materiales en caso de error
             var materialTypes = await _materialService.GetAllMaterialTypesAsync();
             viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem
             {
                 Value = mt.Id.ToString(),
                 Text = mt.Name
             });
-
             return View(viewModel);
         }
 
-        await _materialService.AddMaterialAsync(viewModel.Material);
+        var material = new Material
+        {
+            Id = Guid.NewGuid(),
+            Name = viewModel.Name,
+            MaterialTypeId = viewModel.MaterialTypeId,
+            SizeId = viewModel.SizeId
+        };
+
+        await _materialService.AddMaterialAsync(material);
         TempData["Message"] = "Material creado con éxito.";
         return RedirectToAction("Index");
     }
 
-    // Editar Material - Vista
+    // GET: Editar Material - Vista
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
@@ -103,59 +73,72 @@ public class MaterialController : Controller
         var materialTypes = await _materialService.GetAllMaterialTypesAsync();
         var viewModel = new MaterialViewModel
         {
-            Material = material,
+            Name = material.Name,
+            MaterialTypeId = material.MaterialTypeId,
+            SizeId = material.SizeId,
             MaterialTypes = materialTypes.Select(mt => new SelectListItem
             {
                 Value = mt.Id.ToString(),
-                Text = mt.Name,
-                Selected = mt.Id == material.MaterialTypeId
+                Text = mt.Name
             })
         };
 
         return View(viewModel);
     }
 
-    // Editar Material - Acción
+    // POST: Editar Material - Acción
     [HttpPost]
-    public async Task<IActionResult> Edit(MaterialViewModel viewModel)
+    public async Task<IActionResult> Edit(Guid id, MaterialViewModel viewModel)
     {
         if (!ModelState.IsValid)
         {
-            // Recargar los tipos de materiales en caso de error
             var materialTypes = await _materialService.GetAllMaterialTypesAsync();
             viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem
             {
                 Value = mt.Id.ToString(),
                 Text = mt.Name
             });
-
             return View(viewModel);
         }
 
-        await _materialService.UpdateMaterialAsync(viewModel.Material);
-        TempData["Message"] = "Material actualizado con éxito.";
-        return RedirectToAction("Index");
-    }
-
-    // Eliminar Material - Confirmación
-    [HttpGet]
-    public async Task<IActionResult> Delete(Guid id)
-    {
         var material = await _materialService.GetMaterialByIdAsync(id);
         if (material == null)
         {
             return NotFound();
         }
 
-        return View(material);
-    }
+        // Actualizar las propiedades
+        material.Name = viewModel.Name;
+        material.MaterialTypeId = viewModel.MaterialTypeId;
+        material.SizeId = viewModel.SizeId;
 
-    // Eliminar Material - Acción
-    [HttpPost, ActionName("Delete")]
-    public async Task<IActionResult> DeleteConfirmed(Guid id)
-    {
-        await _materialService.DeleteMaterialAsync(id);
-        TempData["Message"] = "Material eliminado con éxito.";
+        await _materialService.UpdateMaterialAsync(material);
+        TempData["Message"] = "Material actualizado con éxito.";
         return RedirectToAction("Index");
     }
+
+    [HttpGet]
+    public async Task<IActionResult> CreatePartial()
+    {
+        var materialTypes   = await _materialService.GetAllMaterialTypesAsync();
+        var sizes           = await _sizeService.GetAllSizesAsync();
+        
+        var viewModel = new MaterialViewModel(); 
+        viewModel.Sizes = sizes.Select(sz => new SelectListItem
+        {
+            Value = sz.Size_Id.ToString(),
+            Text = sz.Size_Name
+        });
+
+        viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem
+        {
+            Value = mt.Id.ToString(),
+            Text = mt.Name
+        });
+      
+      
+      
+        return PartialView("_CreateMaterialPartial", viewModel);
+    }
+
 }

@@ -2,6 +2,231 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "bootstrap/5.3.3": {
+        "type": "package",
+        "contentFiles": {
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.rtl.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.rtl.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.rtl.min.css": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/css/bootstrap.rtl.min.css.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.bundle.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.bundle.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.bundle.min.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.bundle.min.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.esm.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.esm.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.esm.min.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.esm.min.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.min.js": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/any/wwwroot/js/bootstrap.min.js.map": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
@@ -53,6 +278,52 @@
           "Microsoft.AspNetCore.App"
         ]
       },
+      "Microsoft.AspNetCore.Mvc.Razor.Extensions/6.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Razor.Language": "6.0.0",
+          "Microsoft.CodeAnalysis.Razor": "6.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Mvc.Razor.Extensions.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Mvc.Razor.Extensions.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation/8.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.Razor.Extensions": "6.0.0",
+          "Microsoft.CodeAnalysis.Razor": "6.0.0",
+          "Microsoft.Extensions.DependencyModel": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ],
+        "build": {
+          "buildTransitive/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.targets": {}
+        }
+      },
+      "Microsoft.AspNetCore.Razor.Language/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Razor.Language.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Razor.Language.dll": {}
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
         "type": "package",
         "compile": {
@@ -82,7 +353,7 @@
           "System.Text.Encoding.CodePages": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/_._": {
+          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.dll": {
             "related": ".pdb;.xml"
           }
         },
@@ -139,7 +410,7 @@
           "Microsoft.CodeAnalysis.Common": "[4.5.0]"
         },
         "compile": {
-          "lib/netcoreapp3.1/_._": {
+          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.CSharp.dll": {
             "related": ".pdb;.xml"
           }
         },
@@ -248,6 +519,20 @@
           "lib/netcoreapp3.1/zh-Hant/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll": {
             "locale": "zh-Hant"
           }
+        }
+      },
+      "Microsoft.CodeAnalysis.Razor/6.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Razor.Language": "6.0.0",
+          "Microsoft.CodeAnalysis.CSharp": "4.0.0",
+          "Microsoft.CodeAnalysis.Common": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.CodeAnalysis.Razor.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.CodeAnalysis.Razor.dll": {}
         }
       },
       "Microsoft.CodeAnalysis.Workspaces.Common/4.5.0": {
@@ -508,7 +793,7 @@
           "System.Text.Json": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/_._": {
+          "lib/net8.0/Microsoft.Extensions.DependencyModel.dll": {
             "related": ".xml"
           }
         },
@@ -688,7 +973,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/_._": {
+          "lib/net6.0/System.Collections.Immutable.dll": {
             "related": ".xml"
           }
         },
@@ -827,7 +1112,7 @@
           "System.Collections.Immutable": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/_._": {
+          "lib/net6.0/System.Reflection.Metadata.dll": {
             "related": ".xml"
           }
         },
@@ -843,7 +1128,7 @@
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/_._": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
             "related": ".xml"
           }
         },
@@ -862,7 +1147,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/_._": {
+          "lib/net6.0/System.Text.Encoding.CodePages.dll": {
             "related": ".xml"
           }
         },
@@ -884,7 +1169,7 @@
       "System.Text.Encodings.Web/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/_._": {
+          "lib/net8.0/System.Text.Encodings.Web.dll": {
             "related": ".xml"
           }
         },
@@ -909,7 +1194,7 @@
           "System.Text.Encodings.Web": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/_._": {
+          "lib/net8.0/System.Text.Json.dll": {
             "related": ".xml"
           }
         },
@@ -941,6 +1226,106 @@
     }
   },
   "libraries": {
+    "bootstrap/5.3.3": {
+      "sha512": "iQohLXwneNPDyW4x24mKQ90qGwT5WTtNl3KybL0koTluJPjKYxFCU/NTLHsJiWR2n7VmnwcpAgr8TR42KNmPOg==",
+      "type": "package",
+      "path": "bootstrap/5.3.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bootstrap.5.3.3.nupkg.sha512",
+        "bootstrap.nuspec",
+        "bootstrap.png",
+        "content/Content/bootstrap-grid.css",
+        "content/Content/bootstrap-grid.css.map",
+        "content/Content/bootstrap-grid.min.css",
+        "content/Content/bootstrap-grid.min.css.map",
+        "content/Content/bootstrap-grid.rtl.css",
+        "content/Content/bootstrap-grid.rtl.css.map",
+        "content/Content/bootstrap-grid.rtl.min.css",
+        "content/Content/bootstrap-grid.rtl.min.css.map",
+        "content/Content/bootstrap-reboot.css",
+        "content/Content/bootstrap-reboot.css.map",
+        "content/Content/bootstrap-reboot.min.css",
+        "content/Content/bootstrap-reboot.min.css.map",
+        "content/Content/bootstrap-reboot.rtl.css",
+        "content/Content/bootstrap-reboot.rtl.css.map",
+        "content/Content/bootstrap-reboot.rtl.min.css",
+        "content/Content/bootstrap-reboot.rtl.min.css.map",
+        "content/Content/bootstrap-utilities.css",
+        "content/Content/bootstrap-utilities.css.map",
+        "content/Content/bootstrap-utilities.min.css",
+        "content/Content/bootstrap-utilities.min.css.map",
+        "content/Content/bootstrap-utilities.rtl.css",
+        "content/Content/bootstrap-utilities.rtl.css.map",
+        "content/Content/bootstrap-utilities.rtl.min.css",
+        "content/Content/bootstrap-utilities.rtl.min.css.map",
+        "content/Content/bootstrap.css",
+        "content/Content/bootstrap.css.map",
+        "content/Content/bootstrap.min.css",
+        "content/Content/bootstrap.min.css.map",
+        "content/Content/bootstrap.rtl.css",
+        "content/Content/bootstrap.rtl.css.map",
+        "content/Content/bootstrap.rtl.min.css",
+        "content/Content/bootstrap.rtl.min.css.map",
+        "content/Scripts/bootstrap.bundle.js",
+        "content/Scripts/bootstrap.bundle.js.map",
+        "content/Scripts/bootstrap.bundle.min.js",
+        "content/Scripts/bootstrap.bundle.min.js.map",
+        "content/Scripts/bootstrap.esm.js",
+        "content/Scripts/bootstrap.esm.js.map",
+        "content/Scripts/bootstrap.esm.min.js",
+        "content/Scripts/bootstrap.esm.min.js.map",
+        "content/Scripts/bootstrap.js",
+        "content/Scripts/bootstrap.js.map",
+        "content/Scripts/bootstrap.min.js",
+        "content/Scripts/bootstrap.min.js.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-grid.rtl.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-reboot.rtl.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap-utilities.rtl.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap.min.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap.rtl.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap.rtl.css.map",
+        "contentFiles/any/any/wwwroot/css/bootstrap.rtl.min.css",
+        "contentFiles/any/any/wwwroot/css/bootstrap.rtl.min.css.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.bundle.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.bundle.js.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.bundle.min.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.bundle.min.js.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.esm.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.esm.js.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.esm.min.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.esm.min.js.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.js.map",
+        "contentFiles/any/any/wwwroot/js/bootstrap.min.js",
+        "contentFiles/any/any/wwwroot/js/bootstrap.min.js.map"
+      ]
+    },
     "Humanizer.Core/2.14.1": {
       "sha512": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "type": "package",
@@ -991,6 +1376,51 @@
         "lib/net8.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.xml",
         "microsoft.aspnetcore.mvc.newtonsoftjson.8.0.0.nupkg.sha512",
         "microsoft.aspnetcore.mvc.newtonsoftjson.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Mvc.Razor.Extensions/6.0.0": {
+      "sha512": "M0h+ChPgydX2xY17agiphnAVa/Qh05RAP8eeuqGGhQKT10claRBlLNO6d2/oSV8zy0RLHzwLnNZm5xuC/gckGA==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.mvc.razor.extensions/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Mvc.Razor.Extensions.dll",
+        "microsoft.aspnetcore.mvc.razor.extensions.6.0.0.nupkg.sha512",
+        "microsoft.aspnetcore.mvc.razor.extensions.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation/8.0.0": {
+      "sha512": "HyLDtyWwpavSEFBOL0qOdymY8f+VwN5QhhE7gj3wBw53j9EA0ZcYkbfTvkhvMeV9PavgCcMIe4sAsBGEE/YnNA==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.mvc.razor.runtimecompilation/8.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "build/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.targets",
+        "buildTransitive/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.targets",
+        "lib/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll",
+        "lib/net8.0/Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.xml",
+        "microsoft.aspnetcore.mvc.razor.runtimecompilation.8.0.0.nupkg.sha512",
+        "microsoft.aspnetcore.mvc.razor.runtimecompilation.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Razor.Language/6.0.0": {
+      "sha512": "yCtBr1GSGzJrrp1NJUb4ltwFYMKHw/tJLnIDvg9g/FnkGIEzmE19tbCQqXARIJv5kdtBgsoVIdGLL+zmjxvM/A==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.razor.language/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Razor.Language.dll",
+        "microsoft.aspnetcore.razor.language.6.0.0.nupkg.sha512",
+        "microsoft.aspnetcore.razor.language.nuspec"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
@@ -1398,6 +1828,20 @@
         "lib/netstandard2.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll",
         "microsoft.codeanalysis.csharp.workspaces.4.5.0.nupkg.sha512",
         "microsoft.codeanalysis.csharp.workspaces.nuspec"
+      ]
+    },
+    "Microsoft.CodeAnalysis.Razor/6.0.0": {
+      "sha512": "uqdzuQXxD7XrJCbIbbwpI/LOv0PBJ9VIR0gdvANTHOfK5pjTaCir+XcwvYvBZ5BIzd0KGzyiamzlEWw1cK1q0w==",
+      "type": "package",
+      "path": "microsoft.codeanalysis.razor/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/netstandard2.0/Microsoft.CodeAnalysis.Razor.dll",
+        "microsoft.codeanalysis.razor.6.0.0.nupkg.sha512",
+        "microsoft.codeanalysis.razor.nuspec"
       ]
     },
     "Microsoft.CodeAnalysis.Workspaces.Common/4.5.0": {
@@ -2487,11 +2931,13 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 8.0.0",
+      "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation >= 8.0.0",
       "Microsoft.EntityFrameworkCore >= 8.0.2",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.2",
       "Microsoft.EntityFrameworkCore.Relational >= 8.0.2",
       "Newtonsoft.Json >= 13.0.3",
-      "Pomelo.EntityFrameworkCore.MySql >= 8.0.2"
+      "Pomelo.EntityFrameworkCore.MySql >= 8.0.2",
+      "bootstrap >= 5.3.3"
     ]
   },
   "packageFolders": {
@@ -2513,6 +2959,7 @@
         "net8.0"
       ],
       "sources": {
+        "https://api.nuget.org/v3/index.json": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2540,6 +2987,10 @@
             "target": "Package",
             "version": "[8.0.0, )"
           },
+          "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation": {
+            "target": "Package",
+            "version": "[8.0.0, )"
+          },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
             "version": "[8.0.2, )"
@@ -2561,6 +3012,10 @@
           "Pomelo.EntityFrameworkCore.MySql": {
             "target": "Package",
             "version": "[8.0.2, )"
+          },
+          "bootstrap": {
+            "target": "Package",
+            "version": "[5.3.3, )"
           }
         },
         "imports": [

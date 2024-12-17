@@ -49,11 +49,6 @@ namespace RetailTrack.Services
             return await _context.PaymentMethods.ToListAsync();
         }
 
-        public async Task<List<Size>> GetAllSizesAsync()
-        {
-            return await _context.Sizes.ToListAsync();
-        }
-
         public async Task<List<Receipt>> GetAllReceiptsAsync()
         {
             return await _context.Receipts

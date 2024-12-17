@@ -19,8 +19,11 @@ builder.Services.AddScoped<DesignService>();
 builder.Services.AddScoped<MaterialTypeService>();
 builder.Services.AddScoped<MaterialService>();
 builder.Services.AddScoped<ReceiptService>();
+builder.Services.AddScoped<SizeService>();
 
-builder.Services.AddControllersWithViews();
+// Configura Razor Runtime Compilation
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation();
 
 // Configura la sesión
 builder.Services.AddDistributedMemoryCache();

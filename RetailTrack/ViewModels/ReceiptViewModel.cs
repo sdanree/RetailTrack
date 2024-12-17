@@ -60,4 +60,32 @@ namespace RetailTrack.ViewModels
         public string PaymentMethodName { get; set; } = string.Empty;
         public decimal Percentage { get; set; }
     }
+
+    public class ReceiptCreateViewModel
+    {
+        public IEnumerable<SelectListItem> MaterialTypes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Materials { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Sizes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<PaymentViewModel> Payments { get; set; } = new List<PaymentViewModel>();
+        public List<ReceiptItemViewModel> Items { get; set; } = new List<ReceiptItemViewModel>();
+
+        // Campos del formulario de Receipt
+        public int PaymentMethodId { get; set; }
+        public int Percentage { get; set; }
+    }    
+
+    public class PaymentViewModel
+    {
+        public string PaymentMethodName { get; set; }
+        public int Percentage { get; set; }
+    }
+
+    public class ReceiptItemViewModel
+    {
+        public string MaterialTypeName { get; set; }
+        public string MaterialName { get; set; }
+        public string SizeName { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitCost { get; set; }
+    }        
 }

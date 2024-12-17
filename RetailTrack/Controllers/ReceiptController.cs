@@ -12,14 +12,14 @@ using Newtonsoft.Json;
 
 namespace RetailTrack.Controllers
 {
-    public class GoodsReceiptController : Controller
+    public class ReceiptController : Controller
     {
         private readonly MaterialService _materialService;
         private readonly ReceiptService _Receiptservice;
         private readonly ProductService _productService;
         private readonly SizeService _sizeService;
 
-        public GoodsReceiptController(MaterialService materialService, ReceiptService Receiptservice, ProductService productService, SizeService sizeService)
+        public ReceiptController(MaterialService materialService, ReceiptService Receiptservice, ProductService productService, SizeService sizeService)
         {
             _materialService    = materialService;
             _Receiptservice     = Receiptservice;
@@ -30,11 +30,32 @@ namespace RetailTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var viewModel = await BuildCreateViewModel();
-            // Recuperar items de la sesión si ya existen
-            viewModel.Items = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
+            var materialTypes = await _materialService.GetAllMaterialTypesAsync();
+            var materials = await _materialService.GetAllMaterialsAsync();
+            var sizes = await _sizeService.GetAllSizesAsync();
+
+            var viewModel = new ReceiptCreateViewModel
+            {
+                MaterialTypes = materialTypes.Select(mt => new SelectListItem
+                {
+                    Value = mt.Id.ToString(),
+                    Text = mt.Name
+                }),
+                Materials = materials.Select(m => new SelectListItem
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Name
+                }),
+                Sizes = sizes.Select(s => new SelectListItem
+                {
+                    Value = s.Size_Id.ToString(),
+                    Text = s.Size_Name
+                })
+            };
+
             return View(viewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddItem(ReceiptViewModel viewModel)
@@ -94,7 +115,7 @@ namespace RetailTrack.Controllers
                 return View(viewModel);
             }
 
-            var goodsReceipt = new Receipt
+            var receipt = new Receipt
             {
                 ReceiptDate = DateTime.Now
             };
@@ -113,7 +134,7 @@ namespace RetailTrack.Controllers
                 Percentage = p.Percentage / 100
             }).ToList();
 
-            await _Receiptservice.AddReceiptAsync(goodsReceipt, details, payments);
+            await _Receiptservice.AddReceiptAsync(receipt, details, payments);
 
             HttpContext.Session.Remove("ReceiptItems");
             HttpContext.Session.Remove("ReceiptPayments");
@@ -214,7 +235,7 @@ namespace RetailTrack.Controllers
         {
             var materialTypes   = await _materialService.GetAllMaterialTypesAsync();
             var paymentMethods  = await _Receiptservice.GetAllPaymentMethodsAsync();
-            var sizes           = await _Receiptservice.GetAllSizesAsync();
+            var sizes           = await _sizeService.GetAllSizesAsync();
 
             viewModel.MaterialTypes     = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name });
             viewModel.PaymentMethods    = paymentMethods.Select(pm => new SelectListItem { Value = pm.PaymentMethodId.ToString(), Text = pm.Name });
@@ -227,7 +248,7 @@ namespace RetailTrack.Controllers
         {
             var materialTypes   = await _materialService.GetAllMaterialTypesAsync();
             var paymentMethods  = await _Receiptservice.GetAllPaymentMethodsAsync();
-            var sizes           = await _Receiptservice.GetAllSizesAsync();
+            var sizes           = await _sizeService.GetAllSizesAsync();
 
             return new ReceiptViewModel
             {
