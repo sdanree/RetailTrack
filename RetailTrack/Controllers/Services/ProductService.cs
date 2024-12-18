@@ -125,11 +125,6 @@ namespace RetailTrack.Services
                 .FirstOrDefaultAsync(m => m.Id == materialTypeId);
         }
 
-        public async Task<List<MaterialType>> GetAllMaterialTypesAsync()
-        {
-            return await _context.MaterialTypes.ToListAsync();
-        }
-
         public async Task<List<Material>> GetMaterialsByTypeAsync(Guid materialTypeId)
         {
             return await _context.Materials

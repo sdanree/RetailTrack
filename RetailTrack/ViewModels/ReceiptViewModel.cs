@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
-using RetailTrack.ViewModels;
 using RetailTrack.Models;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,11 @@ namespace RetailTrack.ViewModels
         public IEnumerable<SelectListItem> PaymentMethods { get; set; } = new List<SelectListItem>();
         public List<ReceiptDetailViewModel> Items { get; set; } = new List<ReceiptDetailViewModel>();
         public List<ReceiptPaymentViewModel> Payments { get; set; } = new List<ReceiptPaymentViewModel>();
+
+        // Nuevas propiedades para preseleccionar valores desde la sesión
+        public Guid? SelectedMaterialType { get; set; }
+        public Guid? SelectedMaterial { get; set; }
+        public int? SelectedSize { get; set; }
     }
 
     public class ReceiptDetailViewModel
@@ -72,7 +76,12 @@ namespace RetailTrack.ViewModels
         // Campos del formulario de Receipt
         public int PaymentMethodId { get; set; }
         public int Percentage { get; set; }
-    }    
+
+        // Nuevas propiedades para preseleccionar valores desde la sesión
+        public Guid? SelectedMaterialType { get; set; }
+        public Guid? SelectedMaterial { get; set; }
+        public int? SelectedSize { get; set; }
+    }
 
     public class PaymentViewModel
     {
@@ -87,5 +96,5 @@ namespace RetailTrack.ViewModels
         public string SizeName { get; set; }
         public int Quantity { get; set; }
         public decimal UnitCost { get; set; }
-    }        
+    }
 }

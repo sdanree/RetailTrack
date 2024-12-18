@@ -88,50 +88,51 @@ namespace RetailTrack.Controllers
                     Name = "Remera",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 10, Stock = 100},
-                        new Material { Name = "Carbon", Cost = 12, Stock = 90 },
-                        new Material { Name = "Gris Jaspe", Cost = 8, Stock = 120 },
-                        new Material { Name = "Plata", Cost = 15, Stock = 70 },
-                        new Material { Name = "Blanco", Cost = 10, Stock = 110 },
-                        new Material { Name = "Arena", Cost = 9, Stock = 100 },
-                        new Material { Name = "Beige", Cost = 10, Stock = 85 },
-                        new Material { Name = "Chocolate", Cost = 14, Stock = 95 },
-                        new Material { Name = "Marron", Cost = 12, Stock = 80 },
-                        new Material { Name = "Ladrillo", Cost = 11, Stock = 75 },
-                        new Material { Name = "Rojo", Cost = 13, Stock = 90 },
-                        new Material { Name = "Ocre", Cost = 9, Stock = 100 },
-                        new Material { Name = "Naranja", Cost = 10, Stock = 110 },
-                        new Material { Name = "Mango", Cost = 10, Stock = 90 },
-                        new Material { Name = "Canario", Cost = 11, Stock = 80 },
-                        new Material { Name = "Lima", Cost = 10, Stock = 95 },
-                        new Material { Name = "Jade", Cost = 14, Stock = 85 },
-                        new Material { Name = "Olivo", Cost = 13, Stock = 75 },
-                        new Material { Name = "Bosque", Cost = 15, Stock = 70 },
-                        new Material { Name = "Marino", Cost = 12, Stock = 90 },
-                        new Material { Name = "Delfin", Cost = 11, Stock = 85 },
-                        new Material { Name = "Royal", Cost = 13, Stock = 95 },
-                        new Material { Name = "Turquesa", Cost = 10, Stock = 100 },
-                        new Material { Name = "Celeste", Cost = 8, Stock = 120 },
-                        new Material { Name = "Azul Claro", Cost = 12, Stock = 85 },
-                        new Material { Name = "Aqua", Cost = 9, Stock = 95 },
-                        new Material { Name = "Rosa", Cost = 14, Stock = 70 },
-                        new Material { Name = "Coral", Cost = 13, Stock = 90 },
-                        new Material { Name = "Fucsia", Cost = 12, Stock = 100 },
-                        new Material { Name = "Morado", Cost = 11, Stock = 80 },
-                        new Material { Name = "Amarillo N", Cost = 10, Stock = 85 },
-                        new Material { Name = "Verde N", Cost = 15, Stock = 75 },
-                        new Material { Name = "Naranja N", Cost = 14, Stock = 95 },
-                        new Material { Name = "Rosa N", Cost = 12, Stock = 80 },
-                        new Material { Name = "Negro J", Cost = 11, Stock = 90 },
-                        new Material { Name = "Marrón J", Cost = 10, Stock = 100 },
-                        new Material { Name = "Rojo J", Cost = 9, Stock = 85 },
-                        new Material { Name = "Jade J", Cost = 13, Stock = 95 },
-                        new Material { Name = "Bosque J", Cost = 14, Stock = 75 },
-                        new Material { Name = "Royal J", Cost = 12, Stock = 80 },
-                        new Material { Name = "Turquesa J", Cost = 11, Stock = 70 },
-                        new Material { Name = "Fucsia J", Cost = 13, Stock = 85 },
-                        new Material { Name = "Morado J", Cost = 10, Stock = 100 },
-                        new Material { Name = "Batik", Cost = 15, Stock = 90 },
+                        new Material { Name = "Negro" },
+                        new Material { Name = "Carbon" },
+                        new Material { Name = "Gris Jaspe" },
+                        new Material { Name = "Plata" },
+                        new Material { Name = "Blanco" },
+                        new Material { Name = "Arena" },
+                        new Material { Name = "Beige" },
+                        new Material { Name = "Chocolate" },
+                        new Material { Name = "Marron" },
+                        new Material { Name = "Ladrillo" },
+                        new Material { Name = "Rojo" },
+                        new Material { Name = "Ocre" },
+                        new Material { Name = "Naranja" },
+                        new Material { Name = "Mango" },
+                        new Material { Name = "Canario" },
+                        new Material { Name = "Lima" },
+                        new Material { Name = "Jade" },
+                        new Material { Name = "Olivo" },
+                        new Material { Name = "Bosque" },
+                        new Material { Name = "Marino" },
+                        new Material { Name = "Delfin" },
+                        new Material { Name = "Royal" },
+                        new Material { Name = "Turquesa" },
+                        new Material { Name = "Celeste" },
+                        new Material { Name = "Azul Claro" },
+                        new Material { Name = "Aqua" },
+                        new Material { Name = "Rosa" },
+                        new Material { Name = "Coral" },
+                        new Material { Name = "Fucsia" },
+                        new Material { Name = "Morado" },
+                        new Material { Name = "Amarillo N" },
+                        new Material { Name = "Verde N" },
+                        new Material { Name = "Naranja N" },
+                        new Material { Name = "Rosa N" },
+                        new Material { Name = "Negro J" },
+                        new Material { Name = "Marrón J" },
+                        new Material { Name = "Rojo J" },
+                        new Material { Name = "Jade J" },
+                        new Material { Name = "Bosque J" },
+                        new Material { Name = "Royal J" },
+                        new Material { Name = "Turquesa J" },
+                        new Material { Name = "Fucsia J" },
+                        new Material { Name = "Morado J" },
+                        new Material { Name = "Batik" },
+
                     }
                 },
                 new MaterialType
@@ -139,23 +140,24 @@ namespace RetailTrack.Controllers
                     Name = "Niño",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 10, Stock = 100 },
-                        new Material { Name = "Carbon", Cost = 12, Stock = 90 },
-                        new Material { Name = "Gris Jaspe", Cost = 8, Stock = 120 },
-                        new Material { Name = "Blanco", Cost = 10, Stock = 110 },
-                        new Material { Name = "Rojo", Cost = 13, Stock = 95 },
-                        new Material { Name = "Naranja", Cost = 10, Stock = 90 },
-                        new Material { Name = "Mango", Cost = 11, Stock = 85 },
-                        new Material { Name = "Canario", Cost = 12, Stock = 80 },
-                        new Material { Name = "Lima", Cost = 10, Stock = 100 },
-                        new Material { Name = "Jade", Cost = 14, Stock = 75 },
-                        new Material { Name = "Marino", Cost = 12, Stock = 85 },
-                        new Material { Name = "Royal", Cost = 13, Stock = 95 },
-                        new Material { Name = "Turquesa", Cost = 10, Stock = 100 },
-                        new Material { Name = "Celeste", Cost = 8, Stock = 110 },
-                        new Material { Name = "Rosa", Cost = 9, Stock = 105 },
-                        new Material { Name = "Fucsia", Cost = 11, Stock = 80 },
-                        new Material { Name = "Morado", Cost = 12, Stock = 85 },
+                        new Material { Name = "Negro" },
+                        new Material { Name = "Carbon" },
+                        new Material { Name = "Gris Jaspe" },
+                        new Material { Name = "Blanco" },
+                        new Material { Name = "Rojo" },
+                        new Material { Name = "Naranja" },
+                        new Material { Name = "Mango" },
+                        new Material { Name = "Canario" },
+                        new Material { Name = "Lima" },
+                        new Material { Name = "Jade" },
+                        new Material { Name = "Marino" },
+                        new Material { Name = "Royal" },
+                        new Material { Name = "Turquesa" },
+                        new Material { Name = "Celeste" },
+                        new Material { Name = "Rosa" },
+                        new Material { Name = "Fucsia" },
+                        new Material { Name = "Morado" },
+
                     }
                 },
                 new MaterialType
@@ -163,18 +165,18 @@ namespace RetailTrack.Controllers
                     Name = "Bebe",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 10, Stock = 100 },
-                        new Material { Name = "Blanco", Cost = 9, Stock = 120 },
-                        new Material { Name = "Rojo", Cost = 11, Stock = 90 },
-                        new Material { Name = "Naranja", Cost = 10, Stock = 80 },
-                        new Material { Name = "Canario", Cost = 12, Stock = 85 },
-                        new Material { Name = "Lima", Cost = 8, Stock = 110 },
-                        new Material { Name = "Marino", Cost = 13, Stock = 95 },
-                        new Material { Name = "Royal", Cost = 14, Stock = 70 },
-                        new Material { Name = "Turquesa", Cost = 10, Stock = 100 },
-                        new Material { Name = "Celeste", Cost = 9, Stock = 105 },
-                        new Material { Name = "Rosa", Cost = 10, Stock = 90 },
-                        new Material { Name = "Fucsia", Cost = 11, Stock = 85 },
+                        new Material { Name = "Negro" },
+                        new Material { Name = "Blanco" },
+                        new Material { Name = "Rojo" },
+                        new Material { Name = "Naranja" },
+                        new Material { Name = "Canario" },
+                        new Material { Name = "Lima" },
+                        new Material { Name = "Marino" },
+                        new Material { Name = "Royal" },
+                        new Material { Name = "Turquesa" },
+                        new Material { Name = "Celeste" },
+                        new Material { Name = "Rosa" },
+                        new Material { Name = "Fucsia" },
                     }
                 },
                 new MaterialType
@@ -182,12 +184,12 @@ namespace RetailTrack.Controllers
                     Name = "Buzo",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 12, Stock = 100 },
-                        new Material { Name = "Gris Jaspe", Cost = 10, Stock = 90 },
-                        new Material { Name = "Blanco", Cost = 11, Stock = 120 },
-                        new Material { Name = "Rojo", Cost = 13, Stock = 85 },
-                        new Material { Name = "Marino", Cost = 14, Stock = 95 },
-                        new Material { Name = "Royal", Cost = 15, Stock = 80 },
+                        new Material { Name = "Negro"},
+                        new Material { Name = "Gris Jaspe"},
+                        new Material { Name = "Blanco"},
+                        new Material { Name = "Rojo"},
+                        new Material { Name = "Marino"},
+                        new Material { Name = "Royal"},
 
                     }
                 },
@@ -196,28 +198,26 @@ namespace RetailTrack.Controllers
                     Name = "Canguro Abierto",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 12, Stock = 100 },
-                        new Material { Name = "Gris Jaspe", Cost = 10, Stock = 90 },
-                        new Material { Name = "Blanco", Cost = 11, Stock = 120 },
-                        new Material { Name = "Rojo", Cost = 13, Stock = 85 },
-                        new Material { Name = "Marino", Cost = 14, Stock = 95 },
-                        new Material { Name = "Royal", Cost = 15, Stock = 80 },
-
-                    }
+                        new Material { Name = "Negro"},
+                        new Material { Name = "Gris Jaspe"},
+                        new Material { Name = "Blanco"},
+                        new Material { Name = "Rojo"},
+                        new Material { Name = "Marino"},
+                        new Material { Name = "Royal"},                    }
                 },
                 new MaterialType
                 {
                     Name = "Canguro Cerrado",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 12, Stock = 100 },
-                        new Material { Name = "Gris Jaspe", Cost = 10, Stock = 90 },
-                        new Material { Name = "Blanco", Cost = 11, Stock = 120 },
-                        new Material { Name = "Marrón", Cost = 13, Stock = 85 },
-                        new Material { Name = "Rojo", Cost = 13, Stock = 95 },
-                        new Material { Name = "Bosque", Cost = 14, Stock = 80 },
-                        new Material { Name = "Marino", Cost = 15, Stock = 90 },
-                        new Material { Name = "Royal", Cost = 16, Stock = 70 },
+                        new Material { Name = "Negro"},
+                        new Material { Name = "Gris Jaspe"},
+                        new Material { Name = "Blanco"},
+                        new Material { Name = "Marrón"},
+                        new Material { Name = "Rojo"},
+                        new Material { Name = "Bosque"},
+                        new Material { Name = "Marino"},
+                        new Material { Name = "Royal"},
 
                     }
                 },
@@ -226,11 +226,11 @@ namespace RetailTrack.Controllers
                     Name = "Gorro",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Negro", Cost = 12, Stock = 100 },
-                        new Material { Name = "Beige", Cost = 10, Stock = 80 },
-                        new Material { Name = "Canario", Cost = 11, Stock = 90 },
-                        new Material { Name = "Jade", Cost = 14, Stock = 85 },
-                        new Material { Name = "Azul Claro", Cost = 13, Stock = 95 },
+                        new Material { Name = "Negro"},
+                        new Material { Name = "Beige"},
+                        new Material { Name = "Canario"},
+                        new Material { Name = "Jade"},
+                        new Material { Name = "Azul Claro"},
                     }
                 },
                 new MaterialType
@@ -238,13 +238,13 @@ namespace RetailTrack.Controllers
                     Name = "Manga Larga",
                     Materials = new List<Material>
                     {
-                        new Material { Name = "Gris Jaspe", Cost = 10, Stock = 120 },
-                        new Material { Name = "Blanco", Cost = 12, Stock = 140 },
-                        new Material { Name = "Rojo", Cost = 15, Stock = 100 },
-                        new Material { Name = "Mango", Cost = 13, Stock = 110 },
-                        new Material { Name = "Jade", Cost = 14, Stock = 90 },
-                        new Material { Name = "Marino", Cost = 11, Stock = 130 },
-                        new Material { Name = "Royal", Cost = 16, Stock = 80 },
+                        new Material { Name = "Gris Jaspe"},
+                        new Material { Name = "Blanco"},
+                        new Material { Name = "Rojo"},
+                        new Material { Name = "Mango"},
+                        new Material { Name = "Jade"},
+                        new Material { Name = "Marino"},
+                        new Material { Name = "Royal"},
 
                     }
                 },
@@ -259,6 +259,29 @@ namespace RetailTrack.Controllers
                     Materials = new List<Material>{}
                 }                  
             };
+            
+            var random = new Random();
+
+            foreach (var materialType in materialTypes)
+            {
+                foreach (var material in materialType.Materials)
+                {
+                    // Asocia entre 1 y 5 talles a cada material
+                    int numberOfSizes = random.Next(1, 6);
+                    material.MaterialSizes = new List<MaterialSize>();
+
+                    for (int i = 0; i < numberOfSizes; i++)
+                    {
+                        var size = Sizes[random.Next(Sizes.Count)];
+                        material.MaterialSizes.Add(new MaterialSize
+                        {
+                            SizeId = size.Size_Id,
+                            Stock = random.Next(10, 101),
+                            Cost = random.Next(5, 21)
+                        });
+                    }
+                }
+            }            
 
             // Init. Design
             var DesingsList = new List<Design>

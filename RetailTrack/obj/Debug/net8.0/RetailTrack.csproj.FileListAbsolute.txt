@@ -9,6 +9,8 @@ C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.RazorAssemblyI
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.RazorAssemblyInfo.cs
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.sourcelink.json
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\appsettings.json
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\package-lock.json
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\package.json
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\RetailTrack.staticwebassets.runtime.json
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\RetailTrack.exe
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\RetailTrack.deps.json
@@ -410,5 +412,3 @@ C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\refint\RetailTrack.dll
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.pdb
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\RetailTrack.genruntimeconfig.cache
 C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\ref\RetailTrack.dll
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\package-lock.json
-C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\package.json

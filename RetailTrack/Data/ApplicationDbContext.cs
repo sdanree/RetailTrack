@@ -13,12 +13,13 @@ namespace RetailTrack.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<MaterialType> MaterialTypes { get; set; }    
         public DbSet<Material> Materials { get; set; }
+        public DbSet<MaterialSize> MaterialSizes { get; set; } 
         public DbSet<Movement> Movements { get; set; }
         public DbSet<Size> Sizes { get; set; }
         public DbSet<ProductStatus> ProductStatuses { get; set; }
         public DbSet<MovementType> MovementTypes { get; set; }       
         public DbSet<Receipt> Receipts { get; set; } 
-        public DbSet<ReceiptDetail> ReceiptDetails { get; set; } // Nueva tabla para los detalles
+        public DbSet<ReceiptDetail> ReceiptDetails { get; set; } 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ReceiptPayment> ReceiptPayments { get; set; }
 
@@ -30,6 +31,23 @@ namespace RetailTrack.Data
                 .WithMany(mt => mt.Materials)
                 .HasForeignKey(m => m.MaterialTypeId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Configurar la relación entre MaterialSize y Material
+            modelBuilder.Entity<MaterialSize>()
+                .HasKey(ms => new { ms.MaterialId, ms.SizeId }); // Clave compuesta
+
+            modelBuilder.Entity<MaterialSize>()
+                .HasOne(ms => ms.Material)
+                .WithMany(m => m.MaterialSizes)
+                .HasForeignKey(ms => ms.MaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configurar la relación entre MaterialSize y Size
+            modelBuilder.Entity<MaterialSize>()
+                .HasOne(ms => ms.Size)
+                .WithMany()
+                .HasForeignKey(ms => ms.SizeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configuración de la clave primaria en Receipt
             modelBuilder.Entity<Receipt>()
@@ -52,26 +70,25 @@ namespace RetailTrack.Data
                 .HasForeignKey(grd => grd.MaterialId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configurar la relación entre ReceiptDetail y ProductSize
+            // Configurar la relación entre ReceiptDetail y Size
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(grd => grd.Size)
                 .WithMany()
                 .HasForeignKey(grd => grd.SizeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<ReceiptPayment>()
-            .HasKey(rp => new { rp.ReceiptId, rp.PaymentMethodId });
+            modelBuilder.Entity<ReceiptPayment>()
+                .HasKey(rp => new { rp.ReceiptId, rp.PaymentMethodId });
 
-        modelBuilder.Entity<ReceiptPayment>()
-            .HasOne(rp => rp.Receipt)
-            .WithMany(r => r.Payments)
-            .HasForeignKey(rp => rp.ReceiptId);
+            modelBuilder.Entity<ReceiptPayment>()
+                .HasOne(rp => rp.Receipt)
+                .WithMany(r => r.Payments)
+                .HasForeignKey(rp => rp.ReceiptId);
 
-        modelBuilder.Entity<ReceiptPayment>()
-            .HasOne(rp => rp.PaymentMethod)
-            .WithMany(pm => pm.Receipts)
-            .HasForeignKey(rp => rp.PaymentMethodId);
-                            
+            modelBuilder.Entity<ReceiptPayment>()
+                .HasOne(rp => rp.PaymentMethod)
+                .WithMany(pm => pm.Receipts)
+                .HasForeignKey(rp => rp.PaymentMethodId);
         }
     }
 }

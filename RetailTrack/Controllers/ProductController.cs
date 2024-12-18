@@ -15,12 +15,14 @@ namespace RetailTrack.Controllers
         private readonly ProductService _productService;
         private readonly DesignService _designService;
         private readonly SizeService _sizeService;
+        private readonly MaterialService _materialService;
 
-        public ProductController(ProductService productService, DesignService designService, SizeService sizeService)
+        public ProductController(ProductService productService, DesignService designService, SizeService sizeService, MaterialService materialService)
         {
-            _productService = productService;
-            _designService  = designService;
-            _sizeService    = sizeService;        
+            _productService     = productService;
+            _designService      = designService;
+            _sizeService        = sizeService;        
+            _materialService    = materialService;
         }
 
         [HttpGet]
@@ -28,7 +30,7 @@ namespace RetailTrack.Controllers
         {
             // Obtener los datos necesarios para el formulario
             var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            var materialTypes   = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
+            var materialTypes   = await _materialService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
 
             // Crear el ViewModel con los datos cargados
             var viewModel = new ProductCreateViewModel
@@ -111,7 +113,7 @@ namespace RetailTrack.Controllers
         private async Task RecargarListas(ProductCreateViewModel viewModel)
         {
             var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            var materialTypes   = await _productService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
+            var materialTypes   = await _materialService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
 
             viewModel.Designs       = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name });
             viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name });

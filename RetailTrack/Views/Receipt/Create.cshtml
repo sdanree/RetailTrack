@@ -2,7 +2,7 @@
 
 <div class="container">
     <h2>Registrar Orden de Compra</h2>
-    <form method="post" asp-action="AddItem" asp-controller="Receipt">
+    <form method="post" action="@Url.Action("AddItem", "Receipt")" asp-controller="Receipt">
         <div class="row">
             <div class="col-md-6">
                 <label for="MaterialTypeId">Tipo de Material:</label>
@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-6">
                 <label for="Materials">Material:</label>
-                <select id="Materials" name="MaterialId" class="form-control">
+                <select id="Materials" name="NewItem.MaterialId" class="form-control">
                     <option value="">Seleccione un material</option>
                     @foreach (var material in Model.Materials)
                     {
@@ -28,7 +28,7 @@
         <div class="row mt-3">
             <div class="col-md-6">
                 <label for="SizeId">Talle:</label>
-                <select id="SizeId" name="SizeId" class="form-control">
+                <select id="SizeId" name="NewItem.SizeId" class="form-control">
                     <option value="">Seleccione un tamaño</option>
                     @foreach (var size in Model.Sizes)
                     {
@@ -38,17 +38,18 @@
             </div>
             <div class="col-md-3">
                 <label for="Quantity">Cantidad:</label>
-                <input type="number" id="Quantity" name="Quantity" class="form-control" min="1" />
+                <input type="number" id="Quantity" name="NewItem.Quantity" class="form-control" min="1" />
             </div>
             <div class="col-md-3">
                 <label for="UnitCost">Costo Unitario:</label>
-                <input type="number" id="UnitCost" name="UnitCost" class="form-control" step="0.01" />
+                <input type="number" id="UnitCost" name="NewItem.UnitCost" class="form-control" step="0.01" />
             </div>
         </div>
         <div class="row mt-3">
             <div class="col-md-12 text-right">
                 <button type="submit" class="btn btn-primary">Agregar material a orden</button>
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addMaterialModal">Nuevo Material</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Nuevo Material</button>
+
             </div>
         </div>
     </form>
@@ -72,7 +73,7 @@
 
     <div id="payments" class="mt-4">
         <h3>Métodos de Pago</h3>
-        <form asp-action="AddPayment" asp-controller="Receipt" method="post">
+        <form action="@Url.Action("AddItem", "AddPayment")" asp-controller="Receipt" method="post">
             <div class="form-group">
                 <label for="PaymentMethodId">Método de Pago:</label>
                 <select name="PaymentMethodId" asp-items="Model.Payments.Select(p => new SelectListItem { Value = p.PaymentMethodName, Text = p.PaymentMethodName })" class="form-control"></select>
@@ -108,8 +109,8 @@
                             <td>@item.MaterialName</td>
                             <td>@item.SizeName</td>
                             <td>@item.Quantity</td>
-                            <td>@item.UnitCost.ToString("F2")</td>
-                            <td>@(item.Quantity * item.UnitCost).ToString("F2")</td>
+                            <td>$@item.UnitCost.ToString("F2")</td>
+                            <td>$@(item.Quantity * item.UnitCost)</td>
                         </tr>
                     }
                 </tbody>

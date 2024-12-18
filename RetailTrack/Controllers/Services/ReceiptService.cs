@@ -29,8 +29,8 @@ namespace RetailTrack.Services
                 var material = await _context.Materials.FindAsync(detail.MaterialId);
                 if (material != null)
                 {
-                    material.Stock += detail.Quantity;
-                    material.Cost = detail.UnitCost;
+//                    material.Stock += detail.Quantity;
+//                    material.Cost = detail.UnitCost;
                     _context.Materials.Update(material);
                 }
             }

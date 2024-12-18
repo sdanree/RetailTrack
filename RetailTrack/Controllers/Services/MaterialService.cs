@@ -26,6 +26,11 @@ public class MaterialService
             .FirstOrDefaultAsync(m => m.Id == id);
     }
 
+    public async Task<List<MaterialType>> GetAllMaterialTypesAsync()
+    {
+        return await _context.MaterialTypes.ToListAsync();
+    }    
+
     // Leer todos los Materiales
     public async Task<List<Material>> GetAllMaterialsAsync()
     {
@@ -51,11 +56,5 @@ public class MaterialService
             await _context.SaveChangesAsync();
         }
     }
-
-    public async Task<List<MaterialType>> GetAllMaterialTypesAsync()
-    {
-        return await _context.MaterialTypes.ToListAsync();
-    }
-
 
 }

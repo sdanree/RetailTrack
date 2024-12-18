@@ -1,15 +1,25 @@
-// Función para cargar la vista parcial de alta de materiales en el modal
 $(document).ready(function () {
     $('#addMaterialModal').on('show.bs.modal', function () {
+        $.get('@Url.Action("CreatePartial", "Receipt")', function (data) {
+            $('#materialFormContainer').html(data);
+        });
+    });
+
+    // Enviar formulario del modal
+    $(document).on('submit', '#addMaterialForm', function (e) {
+        e.preventDefault();
+
         $.ajax({
-            url: '/Material/CreatePartial', // URL relativa
-            type: 'GET',
-            success: function (data) {
-                $('#materialFormContainer').html(data);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al cargar la vista parcial:", error);
-                $('#materialFormContainer').html('<p class="text-danger">Error al cargar la vista de Nuevo Material.</p>');
+            url: '@Url.Action("AddMaterial", "Receipt")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    location.reload(); // Recargar la vista principal
+                } else {
+                    // Volver a cargar la vista parcial con errores
+                    $('#materialFormContainer').html(response);
+                }
             }
         });
     });
