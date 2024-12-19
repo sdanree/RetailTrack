@@ -1,9 +1,9 @@
 @model RetailTrack.ViewModels.MaterialViewModel
 
-<form action="@Url.Action("AddMaterial", "Receipt")" method="post">
+<form action="@Url.Action("AddMaterial", "Receipt")"id="addMaterialForm">
     <div class="form-group">
         <label asp-for="MaterialTypeId">Tipo de Material</label>
-        <select id="MaterialTypeId" name="MaterialTypeId" class="form-control" onchange="getMaterialsByType(this.value)">
+        <select id="MaterialTypeId" name="MaterialTypeId" class="form-control">
             <option value="">Seleccione un tipo de material</option>
             @foreach (var materialType in Model.MaterialTypes)
             {
@@ -11,22 +11,11 @@
             }
         </select>
         <span asp-validation-for="MaterialTypeId" class="text-danger"></span>
-    </div>    
+    </div>
     <div class="form-group">
         <label asp-for="Name">Nombre del Material</label>
         <input asp-for="Name" name="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="SizeId">Tamaño</label>
-        <select asp-for="SizeId" name="SizeId" class="form-control">
-            <option value="">Seleccione un Talle</option>
-            @foreach (var size in Model.Sizes)
-            {
-                <option value="@size.Value">@size.Text</option>
-            }
-        </select>
-        <span asp-validation-for="SizeId" class="text-danger"></span>    
     </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
 </form>

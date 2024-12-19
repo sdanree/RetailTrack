@@ -34,7 +34,7 @@ namespace RetailTrack.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("InitializeData _ CALLING");
+               // _logger.LogInformation("InitializeData _ CALLING");
                 return BadRequest("Error al inicializar datos");
             }
             _logger.LogInformation("InitializeData _ Saliendo");
@@ -43,17 +43,21 @@ namespace RetailTrack.Controllers
 
         private async Task SeedDataAsync()
         {
+            Console.WriteLine("SeedDataAsync _ before");                   
             _logger.LogInformation("SeedDataAsync _ before");            
             // Limpia las tablas
             _context.Products.RemoveRange(_context.Products);
-            _context.Sizes.RemoveRange(_context.Sizes);
             _context.ProductStatuses.RemoveRange(_context.ProductStatuses);
+            _context.MaterialSizes.RemoveRange(_context.MaterialSizes);
             _context.Materials.RemoveRange(_context.Materials);
             _context.MaterialTypes.RemoveRange(_context.MaterialTypes);
+            _context.Sizes.RemoveRange(_context.Sizes);
             _context.Designs.RemoveRange(_context.Designs);
             _context.PaymentMethods.RemoveRange(_context.PaymentMethods);
             await _context.SaveChangesAsync();
-
+            
+            var random = new Random();
+            
             // Init. ProductSize 
             var Sizes = new List<Size>
             {
@@ -259,8 +263,6 @@ namespace RetailTrack.Controllers
                     Materials = new List<Material>{}
                 }                  
             };
-            
-            var random = new Random();
 
             foreach (var materialType in materialTypes)
             {
@@ -269,17 +271,26 @@ namespace RetailTrack.Controllers
                     // Asocia entre 1 y 5 talles a cada material
                     int numberOfSizes = random.Next(1, 6);
                     material.MaterialSizes = new List<MaterialSize>();
+                    var assignedSizes = new HashSet<int>();
 
                     for (int i = 0; i < numberOfSizes; i++)
                     {
-                        var size = Sizes[random.Next(Sizes.Count)];
+                        int sizeId;
+                        do
+                        {
+                            sizeId = Sizes[random.Next(Sizes.Count)].Size_Id;
+                        } while (!assignedSizes.Add(sizeId));
+
                         material.MaterialSizes.Add(new MaterialSize
                         {
-                            SizeId = size.Size_Id,
+                            Id = Guid.NewGuid(),
+                            MaterialId = material.Id,
+                            SizeId = sizeId,
                             Stock = random.Next(10, 101),
                             Cost = random.Next(5, 21)
                         });
                     }
+
                 }
             }            
 

@@ -62,7 +62,8 @@ namespace RetailTrack.ViewModels
     {
         public int PaymentMethodId { get; set; }
         public string PaymentMethodName { get; set; } = string.Empty;
-        public decimal Percentage { get; set; }
+        public decimal? Percentage { get; set; }
+        public decimal Amount { get; set; }
     }
 
     public class ReceiptCreateViewModel
@@ -70,7 +71,8 @@ namespace RetailTrack.ViewModels
         public IEnumerable<SelectListItem> MaterialTypes { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Materials { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Sizes { get; set; } = new List<SelectListItem>();
-        public IEnumerable<PaymentViewModel> Payments { get; set; } = new List<PaymentViewModel>();
+        public IEnumerable<SelectListItem> PaymentMethods { get; set; } = new List<SelectListItem>();
+        public List<ReceiptPaymentViewModel> Payments { get; set; } = new List<ReceiptPaymentViewModel>();
         public List<ReceiptItemViewModel> Items { get; set; } = new List<ReceiptItemViewModel>();
 
         // Campos del formulario de Receipt
@@ -85,15 +87,16 @@ namespace RetailTrack.ViewModels
 
     public class PaymentViewModel
     {
-        public string PaymentMethodName { get; set; }
-        public int Percentage { get; set; }
+        public string PaymentMethodName { get; set; } = string.Empty;
+        public int? Percentage { get; set; }
+        public int Amount { get; set; }
     }
 
     public class ReceiptItemViewModel
     {
-        public string MaterialTypeName { get; set; }
-        public string MaterialName { get; set; }
-        public string SizeName { get; set; }
+        public string MaterialTypeName { get; set; } = string.Empty;
+        public string MaterialName { get; set; } = string.Empty;
+        public string SizeName { get; set; } = string.Empty;
         public int Quantity { get; set; }
         public decimal UnitCost { get; set; }
     }

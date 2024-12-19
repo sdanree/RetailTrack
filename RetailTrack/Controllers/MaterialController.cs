@@ -94,12 +94,6 @@ public class MaterialController : Controller
                 Value = mt.Id.ToString(),
                 Text = mt.Name
             }),
- /*           Sizes = sizes.Select(sz => new SelectListItem
-            {
-                Value = sz.Size_Id.ToString(),
-                Text = sz.Size_Name
-            })
-*/
         };
 
         return PartialView("_CreateMaterialPartial", viewModel);
