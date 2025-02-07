@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\css\\tailwind.css"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\0f46c1c0-428b-4016-a3fc-5c8ae2e3c49d.jpg",
+      "PackagePath": "staticwebassets\\img\\0f46c1c0-428b-4016-a3fc-5c8ae2e3c49d.jpg"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\img\\2db9c4ec-bdce-4ec9-ac32-dd0379a3f129.jpg",
       "PackagePath": "staticwebassets\\img\\2db9c4ec-bdce-4ec9-ac32-dd0379a3f129.jpg"
     },
@@ -53,12 +57,28 @@
       "PackagePath": "staticwebassets\\js\\GetMaterials.js"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetProvider.js",
+      "PackagePath": "staticwebassets\\js\\GetProvider.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\ProviderNew.js",
+      "PackagePath": "staticwebassets\\js\\ProviderNew.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\clearReceiptSession.js",
+      "PackagePath": "staticwebassets\\js\\clearReceiptSession.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\receipt.js",
       "PackagePath": "staticwebassets\\js\\receipt.js"
     },
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\validateOrder.js",
+      "PackagePath": "staticwebassets\\js\\validateOrder.js"
     },
     {
       "Id": "C:\\Users\\camil\\.nuget\\packages\\bootstrap\\5.3.3\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.css",

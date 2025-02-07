@@ -20,6 +20,7 @@ builder.Services.AddScoped<MaterialTypeService>();
 builder.Services.AddScoped<MaterialService>();
 builder.Services.AddScoped<ReceiptService>();
 builder.Services.AddScoped<SizeService>();
+builder.Services.AddScoped<ProviderService>();
 
 // Configura Razor Runtime Compilation
 builder.Services.AddControllersWithViews()

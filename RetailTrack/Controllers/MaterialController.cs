@@ -48,7 +48,6 @@ public class MaterialController : Controller
         if (!ModelState.IsValid)
         {
             var materialTypes = await _materialService.GetAllMaterialTypesAsync();
-//            var sizes = await _sizeService.GetAllSizesAsync();
 
             viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem
             {
@@ -56,12 +55,6 @@ public class MaterialController : Controller
                 Text = mt.Name
             });
 
-/*            viewModel.Sizes = sizes.Select(s => new SelectListItem
-            {
-                Value = s.Size_Id.ToString(),
-                Text = s.Size_Name
-            });
-*/
             return View(viewModel);
         }
 
@@ -70,9 +63,6 @@ public class MaterialController : Controller
             Id = Guid.NewGuid(),
             Name = viewModel.Name,
             MaterialTypeId = viewModel.MaterialTypeId,
-//            SizeId = viewModel.SizeId,
-//            Stock = 0,
-//            Cost = 0
         };
 
         await _materialService.AddMaterialAsync(material);
@@ -113,12 +103,7 @@ public class MaterialController : Controller
                 Value = mt.Id.ToString(),
                 Text = mt.Name
             });
- /*           viewModel.Sizes = sizes.Select(sz => new SelectListItem
-            {
-                Value = sz.Size_Id.ToString(),
-                Text = sz.Size_Name
-            });
-*/
+
             return PartialView("_CreateMaterialPartial", viewModel);
         }
 
@@ -127,9 +112,7 @@ public class MaterialController : Controller
             Id = Guid.NewGuid(),
             Name = viewModel.Name,
             MaterialTypeId = viewModel.MaterialTypeId,
-//            SizeId = viewModel.SizeId,
-//            Stock = 0,
-//            Cost = 0
+
         };
 
         await _materialService.AddMaterialAsync(newMaterial);

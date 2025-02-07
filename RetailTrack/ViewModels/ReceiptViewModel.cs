@@ -21,6 +21,7 @@ namespace RetailTrack.ViewModels
         public Guid? SelectedMaterialType { get; set; }
         public Guid? SelectedMaterial { get; set; }
         public int? SelectedSize { get; set; }
+        public Provider? SelectedProviderDetails {get; set;}
     }
 
     public class ReceiptDetailViewModel
@@ -72,17 +73,20 @@ namespace RetailTrack.ViewModels
         public IEnumerable<SelectListItem> Materials { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Sizes { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> PaymentMethods { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Providers { get; set; } = new List<SelectListItem>();
         public List<ReceiptPaymentViewModel> Payments { get; set; } = new List<ReceiptPaymentViewModel>();
         public List<ReceiptItemViewModel> Items { get; set; } = new List<ReceiptItemViewModel>();
 
         // Campos del formulario de Receipt
         public int PaymentMethodId { get; set; }
         public int Percentage { get; set; }
+        public Guid ProviderId {get; set;}
 
         // Nuevas propiedades para preseleccionar valores desde la sesión
         public Guid? SelectedMaterialType { get; set; }
         public Guid? SelectedMaterial { get; set; }
         public int? SelectedSize { get; set; }
+        public Provider? SelectedProviderDetails {get; set;}
     }
 
     public class PaymentViewModel
@@ -94,6 +98,8 @@ namespace RetailTrack.ViewModels
 
     public class ReceiptItemViewModel
     {
+        public Guid MaterialId {get; set;}
+        public int SizeId {get; set;}
         public string MaterialTypeName { get; set; } = string.Empty;
         public string MaterialName { get; set; } = string.Empty;
         public string SizeName { get; set; } = string.Empty;

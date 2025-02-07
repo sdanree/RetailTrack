@@ -18,7 +18,7 @@ $(document).ready(function () {
         e.preventDefault();
     
         $.ajax({
-            url: $(this).attr('action'), // URL del formulario
+            url: $(this).attr('action'), 
             type: 'POST',
             data: $(this).serialize(),
             success: function (response) {

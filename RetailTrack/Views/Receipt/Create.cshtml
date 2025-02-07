@@ -10,10 +10,14 @@
     }
 
  <div class="container">
+
     <!-- Navegación de pestañas -->
     <ul class="nav nav-tabs" id="receiptTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab" aria-controls="materials" aria-selected="true">Materiales</button>
+            <button class="nav-link active" id="provider-tab" data-bs-toggle="tab" data-bs-target="#provider" type="button" role="tab" aria-controls="provider" aria-selected="true">Proveedor</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab" aria-controls="materials" aria-selected="false">Materiales</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">Métodos de Pago</button>
@@ -22,8 +26,69 @@
 
     <!-- Contenido de las pestañas -->
     <div class="tab-content mt-3" id="receiptTabsContent">
+        <!-- Pestaña Proveedor -->
+        <div class="tab-pane fade show active" id="provider" role="tabpanel" aria-labelledby="provider-tab">
+             <!-- Mostrar los datos del proveedor seleccionado -->
+            @if (Model.SelectedProviderDetails != null)
+            {
+                <div class="mt-4">
+                    <h3>Proveedor Asociado</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <p><strong>Nombre del Negocio:</strong> @Model.SelectedProviderDetails.BusinessName</p>
+                            <p><strong>Teléfono:</strong> @Model.SelectedProviderDetails.Phone</p>
+                            <p><strong>RUT:</strong> @Model.SelectedProviderDetails.RUT</p>
+                            <p><strong>Dirección:</strong> @Model.SelectedProviderDetails.Address</p>
+                        </div>
+                    </div>
+                </div>
+            }else{        
+                <form method="post" action="@Url.Action("AddProvider", "Receipt")" asp-controller="Receipt">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label for="providerSelect" class="form-label">Proveedor:</label>
+                            <select id="providerSelect" name="providerId" class="form-control" onchange=>
+                                <option value="">Seleccione un proveedor</option>
+                                @foreach (var provider in Model.Providers)
+                                {
+                                    <option value="@provider.Value">@provider.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="BusinessName" class="form-label">Nombre del Negocio:</label>
+                            <input type="text" id="BusinessName" name="pBusinessName" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-3">
+                        <div class="col-md-6">
+                            <label for="Phone" class="form-label">Teléfono:</label>
+                            <input type="text" id="Phone" name="pPhone" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="RUT" class="form-label">RUT:</label>
+                            <input type="text" id="RUT" name="pRUT" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-3">
+                        <div class="col-md-6">
+                            <label for="Address" class="form-label">Dirección:</label>
+                            <input type="text" id="Address" name="pAddress" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12 text-end">
+                            <button type="submit" class="btn btn-primary">Agregar proveedor a orden</button>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addProviderModal">Nuevo Proveedor</button>
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+
+
         <!-- Pestaña Materiales -->
-        <div class="tab-pane fade show active" id="materials" role="tabpanel" aria-labelledby="materials-tab">
+        <div class="tab-pane fade" id="materials" role="tabpanel" aria-labelledby="materials-tab">
             <form method="post" action="@Url.Action("AddItem", "Receipt")" asp-controller="Receipt">
                 <div class="row g-2">
 
@@ -124,6 +189,52 @@
         </div>
     </div>
 
+    <!-- Modal para Nuevo Provider -->
+    <div class="modal fade" id="addProviderModal" tabindex="-1" role="dialog" aria-labelledby="addProviderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProviderModalLabel">Agregar Nuevo Proveedor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProviderForm">
+                        <div class="form-group">
+                            <label for="providerName">Razon social</label>
+                            <input type="text" class="form-control" id="providerName" name="Name" maxlength="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="providerBusinessName">Nombre Comercial</label>
+                            <input type="text" class="form-control" id="providerBusinessName" name="BusinessName" maxlength="150" required>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="providerPhone">Teléfono</label>
+                            <input type="text" class="form-control" id="providerPhone" name="Phone" maxlength="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="providerRUT">RUT</label>
+                            <input type="text" class="form-control" id="providerRUT" name="RUT" maxlength="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="providerAddress">Dirección</label>
+                            <textarea class="form-control" id="providerAddress" name="Address" maxlength="300"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="providerDescription">Descripción</label>
+                            <textarea class="form-control" id="providerDescription" name="Description" maxlength="500"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="saveProviderButton">Guardar Proveedor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mt-5">
         <h3>Lista de Métodos de Pago</h3>
         @if (Model.Payments != null && Model.Payments.Count > 0)
@@ -187,8 +298,48 @@
             <p>No hay materiales agregados.</p>
         }
     </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12 text-end">
+            <form method="post" action="@Url.Action("CreateReceipt", "Receipt")" asp-controller="Receipt" id="orderForm">
+                <!-- Proveedor seleccionado -->
+                @if (Model.SelectedProviderDetails != null)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Proveedor Asociado</h4>
+                            <p><strong>Nombre:</strong> @Model.SelectedProviderDetails.Name</p>
+                            <p><strong>Teléfono:</strong> @Model.SelectedProviderDetails.Phone</p>
+                            <p><strong>RUT:</strong> @Model.SelectedProviderDetails.RUT</p>
+                            <p><strong>Dirección:</strong> @Model.SelectedProviderDetails.Address</p>
+                        </div>
+                    </div>
+                }
 
-    <form asp-action="Create" asp-controller="Receipt" method="post">
-        <button type="submit" class="btn btn-success">Registrar Orden</button>
-    </form>
+                <!-- Materiales -->
+                @for (var i = 0; i < Model.Items.Count; i++)
+                {
+                    <input type="hidden" name="Items[@i].MaterialId" value="@Model.Items[i].MaterialId" />
+                    <input type="hidden" name="Items[@i].SizeId" value="@Model.Items[i].SizeId" />
+                    <input type="hidden" name="Items[@i].Quantity" value="@Model.Items[i].Quantity"  class="material-quantity" />
+                    <input type="hidden" name="Items[@i].UnitCost" value="@Model.Items[i].UnitCost" class="material-cost" />
+                }
+
+                <!-- Métodos de pago -->
+                @for (var i = 0; i < Model.Payments.Count; i++)
+                {
+                    <input type="hidden" name="Payments[@i].PaymentMethodId" value="@Model.Payments[i].PaymentMethodId" />
+                    <input type="hidden" name="Payments[@i].Amount" value="@Model.Payments[i].Amount" class="payment-amount" />
+                    <input type="hidden" name="Payments[@i].Percentage" value="@Model.Payments[i].Percentage" />
+                }
+
+                <button type="submit" id="registerOrderButton" class="btn btn-success mt-4">Registrar Orden</button>
+            </form>
+
+            <form action="@Url.Action("Index", "Receipt")" asp-controller="Receipt" method="get" class="d-inline">
+                <button type="submit" class="btn btn-danger">Cancelar</button>          
+            </form>
+        </div>    
+    </div>
+    
 </div>

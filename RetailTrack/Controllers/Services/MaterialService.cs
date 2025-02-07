@@ -57,4 +57,22 @@ public class MaterialService
         }
     }
 
+        public async Task<MaterialSize?> GetMaterialSizeAsync(Guid materialId, int sizeId)
+        {
+            return await _context.MaterialSizes
+                .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
+        }
+
+        public async Task UpdateMaterialSizeAsync(MaterialSize materialSize)
+        {
+            _context.MaterialSizes.Update(materialSize);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddMaterialSizeAsync(MaterialSize materialSize)
+        {
+            _context.MaterialSizes.Add(materialSize);
+            await _context.SaveChangesAsync();
+        }
+
 }

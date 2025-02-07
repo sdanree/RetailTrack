@@ -22,7 +22,8 @@ namespace RetailTrack.Data
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; } 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ReceiptPayment> ReceiptPayments { get; set; }
-
+        public DbSet<Provider> Providers {get;set;}
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configurar la relación entre MaterialType y Material
