@@ -26,10 +26,20 @@
                     <option value="">Todos</option>
                     @foreach (var payment in Model.PaymentMethods)
                     {
-                        <option value="@payment.Value">@payment.Text</option>
+                        <option value="@payment.Value" @(payment.Value == Model.SelectedPaymentMethod?.ToString() ? "selected" : "")>@payment.Text</option>
                     }
                 </select>
             </div>
+        </div>
+        <div class="form-group me-3">
+            <label for="providerId" class="form-label me-1">Proveedor:</label>
+            <select name="InproviderId" id="providerId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var provider in Model.Providers)
+                {
+                    <option value="@provider.Value" @(provider.Value == Model.SelectedProvider?.ToString() ? "selected" : "")>@provider.Text</option>
+                }
+            </select>
         </div>
         <div class="row mt-3">
             <div class="col-md-6">
@@ -43,8 +53,9 @@
     <thead>
         <tr>
             <th>Fecha</th>
-            <th>Detalles</th>
+            <th>Proveedor</th>
             <th>Método de Pago</th>
+            <th>Importe</th>
         </tr>
     </thead>
     <tbody>
@@ -52,24 +63,26 @@
         {
             <tr>
                 <td>@receipt.ReceiptDate.ToShortDateString()</td>
+                <td>@receipt.ProviderName</td>
+                <td>@receipt.PaymentMethods</td>
                 <td>
                     <ul>
                         @foreach (var detail in receipt.Details)
                         {
                             <li>
-                                Material: @detail.MaterialName,
-                                Talle: @detail.SizeName,
-                                Cantidad: @detail.Quantity,
-                                Costo: $@detail.UnitCost.ToString("F2"),
                                 @{
                                     var totalAmount = (detail.Quantity * detail.UnitCost);
                                 }
-                                Total: $@totalAmount.ToString("F2")
+                                $@totalAmount.ToString("F2")
                             </li>
                         }
                     </ul>
                 </td>
-                <td>@receipt.PaymentMethods</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="@Url.Action("Details", "Receipt", new { receiptId = receipt.ReceiptId })">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </td>
             </tr>
         }
     </tbody>

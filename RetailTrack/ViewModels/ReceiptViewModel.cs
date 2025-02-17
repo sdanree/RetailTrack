@@ -24,6 +24,49 @@ namespace RetailTrack.ViewModels
         public Provider? SelectedProviderDetails {get; set;}
     }
 
+    public class ReceiptIndexViewModel
+    {
+        public List<ReceiptIndexDetailViewModel> Receipts { get; set; } = new List<ReceiptIndexDetailViewModel>();
+        public IEnumerable<SelectListItem> PaymentMethods { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Providers { get; set; } = new List<SelectListItem>();
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int? SelectedPaymentMethod { get; set; }
+        public Guid? SelectedProvider { get; set; }
+    }
+
+    public class ReceiptIndexDetailViewModel
+    {
+        public Guid ReceiptId { get; set; }
+        public DateTime ReceiptDate { get; set; }
+        public string ProviderName { get; set; } = string.Empty; 
+        public string PaymentMethods { get; set; }
+        public List<ReceiptDetailViewModel> Details { get; set; } = new List<ReceiptDetailViewModel>();
+    }
+
+    public class ReceiptDetailItemViewModel
+    {
+       public Guid DetailId { get; set; }
+        public Guid MaterialId { get; set; }
+        public string MaterialName { get; set; } = string.Empty;
+        public string MaterialTypeName { get; set; } = string.Empty;
+        public int SizeId { get; set; }
+        public string SizeName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public decimal UnitCost { get; set; }
+        public decimal TotalCost => Quantity * UnitCost;
+    }
+
+    public class ReceiptGeneralDetailViewModel
+    {
+        public Guid ReceiptId { get; set; }
+        public DateTime ReceiptDate { get; set; }
+        public ProviderViewModel Provider { get; set; }
+        public List<ReceiptDetailItemViewModel> Details { get; set; } = new List<ReceiptDetailItemViewModel>();
+        public List<ReceiptPaymentViewModel> Payments { get; set; } = new List<ReceiptPaymentViewModel>();
+        public decimal TotalCost => Details.Sum(d => d.TotalCost);
+    }
+
     public class ReceiptDetailViewModel
     {
         public Guid DetailId { get; set; }
@@ -40,24 +83,9 @@ namespace RetailTrack.ViewModels
         public Guid ReceiptId { get; set; }
         public DateTime ReceiptDate { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
+        public ProviderViewModel Provider { get; set; }
     }
 
-    public class ReceiptIndexViewModel
-    {
-        public List<ReceiptIndexDetailViewModel> Receipts { get; set; } = new List<ReceiptIndexDetailViewModel>();
-        public IEnumerable<SelectListItem> PaymentMethods { get; set; } = new List<SelectListItem>();
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public int? SelectedPaymentMethod { get; set; }
-    }
-
-    public class ReceiptIndexDetailViewModel
-    {
-        public Guid ReceiptId { get; set; }
-        public DateTime ReceiptDate { get; set; }
-        public string PaymentMethods { get; set; }
-        public List<ReceiptDetailViewModel> Details { get; set; } = new List<ReceiptDetailViewModel>();
-    }
 
     public class ReceiptPaymentViewModel
     {
@@ -106,4 +134,14 @@ namespace RetailTrack.ViewModels
         public int Quantity { get; set; }
         public decimal UnitCost { get; set; }
     }
+
+    public class DeleteMaterialRequest
+    {
+        public Guid MaterialId { get; set; }
+    }
+
+    public class DeletePaymentRequest
+    {
+        public int PaymentMethodId { get; set; }
+    }    
 }

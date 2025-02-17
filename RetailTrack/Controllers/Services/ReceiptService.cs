@@ -54,6 +54,7 @@ namespace RetailTrack.Services
         public async Task<List<Receipt>> GetAllReceiptsAsync()
         {
             return await _context.Receipts
+                .Include(r => r.Provider)
                 .Include(r => r.Details)
                     .ThenInclude(d => d.Material)
                         .ThenInclude(m => m.MaterialType)
@@ -152,6 +153,20 @@ namespace RetailTrack.Services
         {
             _context.MaterialSizes.Update(materialSize);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Receipt> GetReceiptByIdAsync(Guid receiptId)
+        {
+            return await _context.Receipts
+                .Include(r => r.Provider)
+                .Include(r => r.Details)
+                    .ThenInclude(d => d.Material)
+                        .ThenInclude(m => m.MaterialType)
+                .Include(r => r.Details)
+                    .ThenInclude(d => d.Size)
+                .Include(r => r.Payments)
+                    .ThenInclude(p => p.PaymentMethod)
+                .FirstOrDefaultAsync(r => r.ReceiptId == receiptId);
         }
 
     }

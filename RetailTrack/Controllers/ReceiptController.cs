@@ -31,8 +31,9 @@ namespace RetailTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int? paymentMethodId)
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int? paymentMethodId, Guid? InproviderId)
         {
+            Console.WriteLine($"InproviderId _ {InproviderId}");
             var Receipts = await _receiptService.GetAllReceiptsAsync();
 
             if (startDate.HasValue)
@@ -44,34 +45,47 @@ namespace RetailTrack.Controllers
             if (paymentMethodId.HasValue)
                 Receipts = Receipts.Where(gr => gr.Payments.Any(p => p.PaymentMethodId == paymentMethodId.Value)).ToList();
 
+            if (InproviderId.HasValue)
+                Receipts = Receipts.Where(gr => gr.Provider != null && gr.Provider.Id == InproviderId.Value).ToList();
+            
+
             var paymentMethods = await _receiptService.GetAllPaymentMethodsAsync();
+            
+            var providersList = await _providerService.GetAllProvidersAsync();
 
             var viewModel = new ReceiptIndexViewModel
             {
                 Receipts = Receipts.Select(gr => new ReceiptIndexDetailViewModel
                 {
-                    ReceiptId = gr.ReceiptId,
-                    ReceiptDate = gr.ReceiptDate,
-                    PaymentMethods = string.Join(", ", gr.Payments.Select(p => p.PaymentMethod.Name)),
-                    Details = gr.Details.Select(detail => new ReceiptDetailViewModel
+                    ReceiptId       = gr.ReceiptId,
+                    ReceiptDate     = gr.ReceiptDate,
+                    ProviderName    = gr.Provider?.BusinessName ?? "Sin Proveedor",
+                    PaymentMethods  = string.Join(", ", gr.Payments.Select(p => p.PaymentMethod.Name)),
+                    Details         = gr.Details.Select(detail => new ReceiptDetailViewModel
                     {
-                        MaterialId = detail.MaterialId,
-                        MaterialName = detail.Material.Name,
-                        MaterialTypeName = detail.Material.MaterialType.Name,
-                        SizeId = detail.SizeId,
-                        SizeName = detail.Size.Size_Name,
-                        Quantity = detail.Quantity,
-                        UnitCost = detail.UnitCost
+                        MaterialId          = detail.MaterialId,
+                        MaterialName        = detail.Material.Name,
+                        MaterialTypeName    = detail.Material.MaterialType.Name,
+                        SizeId              = detail.SizeId,
+                        SizeName            = detail.Size.Size_Name,
+                        Quantity            = detail.Quantity,
+                        UnitCost            = detail.UnitCost
                     }).ToList()
                 }).ToList(),
                 PaymentMethods = paymentMethods.Select(pm => new SelectListItem
                 {
                     Value = pm.PaymentMethodId.ToString(),
-                    Text = pm.Name
+                    Text  = pm.Name
                 }),
-                StartDate = startDate,
-                EndDate = endDate,
-                SelectedPaymentMethod = paymentMethodId
+                Providers = providersList.Select(pv => new SelectListItem
+                {
+                    Value = pv.Id.ToString(),
+                    Text  = pv.BusinessName
+                }),
+                StartDate               = startDate,
+                EndDate                 = endDate,
+                SelectedPaymentMethod   = paymentMethodId,
+                SelectedProvider        = InproviderId
             };
 
             return View(viewModel);
@@ -83,7 +97,6 @@ namespace RetailTrack.Controllers
             var viewModel = new ReceiptCreateViewModel
             {
                 SelectedProviderDetails = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails"),
-                //Items = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>(),
                 Items = (HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>())
                         .Select(item => new ReceiptItemViewModel
                         {
@@ -121,77 +134,53 @@ namespace RetailTrack.Controllers
             return View(viewModel);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> AddItem(ReceiptViewModel viewModel)
+        [Produces("application/json")]
+        public async Task<IActionResult> AddItem([FromBody] ReceiptDetailViewModel newItem)
         {
-            var sessionData = HttpContext.Session.GetString("ReceiptItems");
-        
+            // Log para verificar los datos recibidos
+            Console.WriteLine($"JSON recibido: {System.Text.Json.JsonSerializer.Serialize(newItem)}");
+
+            if (newItem == null || newItem.MaterialId == Guid.Empty || newItem.SizeId == 0 || newItem.Quantity <= 0 || newItem.UnitCost <= 0)
+            {
+                return Json(new { success = false, message = "Datos inválidos para el material." });
+            }
+
             var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
 
-            var material = await _materialService.GetMaterialByIdAsync(viewModel.NewItem.MaterialId);
+            // Validar y obtener el material
+            var material = await _materialService.GetMaterialByIdAsync(newItem.MaterialId);
             if (material == null)
             {
-                ModelState.AddModelError("NewItem.MaterialId", "Material no válido.");
-            }
-            else
-            {
-                var selectedMaterialType    = await _productService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
-                var selectedSize            = await _sizeService.GetSizeByIdAsync(viewModel.NewItem.SizeId);
-
-                var newItem = new ReceiptDetailViewModel
-                {
-                    MaterialId          = material.Id,
-                    MaterialName        = material.Name,
-                    MaterialTypeName    = selectedMaterialType?.Name ?? "N/A",
-                    SizeId              = selectedSize?.Size_Id ?? 0,
-                    SizeName            = selectedSize?.Size_Name ?? "N/A",
-                    Quantity            = viewModel.NewItem.Quantity,
-                    UnitCost            = viewModel.NewItem.UnitCost
-                };
-
-                sessionItems.Add(newItem);
-
-                // Guardar en la sesión actualizada
-                HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
-
-                // Mostrar nuevamente el JSON actualizado en la consola
-                var updatedJson = JsonSerializer.Serialize(sessionItems);
-                Console.WriteLine("Contenido actualizado de ReceiptItems en lita: " + updatedJson);
+                return Json(new { success = false, message = "Material no válido." });
             }
 
-            await RecargarListas(viewModel);
+            var selectedMaterialType = await _productService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
+            var selectedSize = await _sizeService.GetSizeByIdAsync(newItem.SizeId);
 
-            var sessionPayments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>();
-            var selectedProvider = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails");
-
-            // Convertir ReceiptViewModel a ReceiptCreateViewModel
-            var createViewModel = new ReceiptCreateViewModel
+            // Crear el nuevo ítem a partir del material y los datos recibidos
+            var itemToAdd = new ReceiptDetailViewModel
             {
-                MaterialTypes   = viewModel.MaterialTypes,
-                Materials       = viewModel.Materials,
-                Sizes           = viewModel.Sizes,
-                PaymentMethods  = viewModel.PaymentMethods,                
-                Payments        = sessionPayments,                
-                Items = viewModel.Items.Select(i => new ReceiptItemViewModel
-                {
-                    MaterialTypeName = i.MaterialTypeName,
-                    MaterialName = i.MaterialName,
-                    SizeName = i.SizeName,
-                    Quantity = i.Quantity,
-                    UnitCost = i.UnitCost
-                }).ToList(),
-                SelectedMaterialType    = viewModel.SelectedMaterialType,
-                SelectedMaterial        = viewModel.SelectedMaterial,
-                SelectedSize            = viewModel.SelectedSize           
+                MaterialId = material.Id,
+                MaterialName = material.Name,
+                MaterialTypeName = selectedMaterialType?.Name ?? "N/A",
+                SizeId = selectedSize?.Size_Id ?? 0,
+                SizeName = selectedSize?.Size_Name ?? "N/A",
+                Quantity = newItem.Quantity,
+                UnitCost = newItem.UnitCost
             };
 
-            if (selectedProvider != null)
-            {
-                createViewModel.ProviderId = selectedProvider.Id;
-                createViewModel.SelectedProviderDetails = selectedProvider;
-            }
-            return View("Create", createViewModel);
+            // Agregar el nuevo ítem a la lista
+            sessionItems.Add(itemToAdd);
+
+            // Guardar en la sesión actualizada
+            HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
+
+            // Log de la lista actualizada
+            Console.WriteLine("Lista actualizada de ReceiptItems:");
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(sessionItems));
+
+            return Json(new { success = true, items = sessionItems });
         }
 
         [HttpPost]
@@ -233,44 +222,56 @@ namespace RetailTrack.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPayment(ReceiptViewModel viewModel)
+        [Produces("application/json")]
+        public async Task<IActionResult> AddPayment([FromBody] ReceiptPaymentViewModel newPayment)
         {
+            Console.WriteLine($"JSON recibido: {System.Text.Json.JsonSerializer.Serialize(newPayment)}");
+
+            // Validación inicial de datos
+            if (newPayment == null || newPayment.PaymentMethodId <= 0 || newPayment.Amount <= 0)
+            {
+                return Json(new { success = false, message = "Datos inválidos en el método de pago." });
+            }
+
             // Obtener la lista de pagos desde la sesión
             var sessionPayments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>();
 
+            Console.WriteLine($"sessionPayments from session: {System.Text.Json.JsonSerializer.Serialize(sessionPayments)}");
+
             // Validar el nuevo método de pago
-            var paymentMethod = await _receiptService.GetPaymentMethodByIdAsync(viewModel.NewPayment.PaymentMethodId);
+            var paymentMethod = await _receiptService.GetPaymentMethodByIdAsync(newPayment.PaymentMethodId);
             if (paymentMethod == null)
             {
-                ModelState.AddModelError("NewPayment.PaymentMethodId", "Método de pago no válido.");
+                return Json(new { success = false, message = "Método de pago no válido." });
             }
-            else
+
+            // Crear el nuevo pago y agregarlo a la lista
+            var paymentToAdd = new ReceiptPaymentViewModel
             {
-                var newPayment = new ReceiptPaymentViewModel
-                {
-                    PaymentMethodId     = paymentMethod.PaymentMethodId,
-                    PaymentMethodName   = paymentMethod.Name,
-                    Percentage          = viewModel.NewPayment.Percentage,
-                    Amount              = viewModel.NewPayment.Amount
-                };
+                PaymentMethodId = paymentMethod.PaymentMethodId,
+                PaymentMethodName = paymentMethod.Name,
+                Percentage = newPayment.Percentage,
+                Amount = newPayment.Amount
+            };
+            sessionPayments.Add(paymentToAdd);
 
-                sessionPayments.Add(newPayment);
-                HttpContext.Session.SetObjectAsJson("ReceiptPayments", sessionPayments);
-            }
+            Console.WriteLine($"sessionPayments before save session: {System.Text.Json.JsonSerializer.Serialize(sessionPayments)}");
+            // Guardar los pagos actualizados en la sesión
+            HttpContext.Session.SetObjectAsJson("ReceiptPayments", sessionPayments);
 
-            await RecargarListas(viewModel);
-
+            // Reconstruir el modelo necesario para devolver datos a la vista
             var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
             var selectedProvider = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails");
 
+            // Aquí mantengo tu lógica para reconstruir el modelo completo
             var createViewModel = new ReceiptCreateViewModel
             {
-                MaterialTypes   = viewModel.MaterialTypes,
-                Materials       = viewModel.Materials,
-                Sizes           = viewModel.Sizes,
-                PaymentMethods  = viewModel.PaymentMethods,
-                Payments        = sessionPayments,
-                Items           = viewModel.Items.Select(i => new ReceiptItemViewModel
+                MaterialTypes = new List<SelectListItem>(), 
+                Materials = new List<SelectListItem>(), 
+                Sizes = new List<SelectListItem>(), 
+                PaymentMethods = new List<SelectListItem>(), 
+                Payments = sessionPayments,
+                Items = sessionItems.Select(i => new ReceiptItemViewModel
                 {
                     MaterialTypeName = i.MaterialTypeName,
                     MaterialName = i.MaterialName,
@@ -278,14 +279,15 @@ namespace RetailTrack.Controllers
                     Quantity = i.Quantity,
                     UnitCost = i.UnitCost
                 }).ToList(),
-                SelectedMaterialType    = viewModel.SelectedMaterialType,
-                SelectedMaterial        = viewModel.SelectedMaterial,
-                SelectedSize            = viewModel.SelectedSize,
-                ProviderId              = selectedProvider.Id,
+                SelectedMaterialType = null,
+                SelectedMaterial = null,
+                SelectedSize = null,
+                ProviderId = selectedProvider?.Id ?? Guid.Empty,
                 SelectedProviderDetails = selectedProvider
             };
 
-            return View("Create", createViewModel);
+            // Retorna un JSON con los pagos actualizados
+            return Json(new { success = true, payments = sessionPayments });
         }
 
         [HttpPost]
@@ -319,7 +321,6 @@ namespace RetailTrack.Controllers
 
             return RedirectToAction("Create");
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetProviderDetails(Guid providerId)
@@ -387,55 +388,49 @@ namespace RetailTrack.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateReceipt(ReceiptCreateViewModel viewModel)
+        public async Task<IActionResult> CreateReceipt([FromBody] ReceiptCreateViewModel viewModel)
         {
-            // Validar que el modelo sea válido
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Hubo un error en los datos proporcionados. Por favor, revise e intente nuevamente.";
-                await RecargarListas(viewModel); // Asegurar que las listas necesarias se recarguen
-                return View("Create", viewModel);
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .Select(ms => new
+                    {
+                        Field = ms.Key,
+                        Errors = ms.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    })
+                    .ToList();
+
+                Console.WriteLine("Errores del modelo:", System.Text.Json.JsonSerializer.Serialize(errors));
+
+                return Json(new { success = false, message = "Hubo un error en los datos proporcionados. Por favor, revise e intente nuevamente.", errors });
             }
 
-            // Recuperar datos necesarios desde la sesión
-            var provider = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails");
-            var details = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
-            var payments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>();
-
-            // Validaciones adicionales
-            if (provider == null)
+            // Validación extra para SizeId
+            if (viewModel.Items.Any(item => item.SizeId == 0))
             {
-                TempData["ErrorMessage"] = "Debe seleccionar un proveedor antes de registrar la orden.";
-                await RecargarListas(viewModel);
-                return View("Create", viewModel);
-            }
-
-            if (!details.Any())
-            {
-                TempData["ErrorMessage"] = "Debe agregar al menos un material antes de registrar la orden.";
-                await RecargarListas(viewModel);
-                return View("Create", viewModel);
-            }
-
-            if (!payments.Any())
-            {
-                TempData["ErrorMessage"] = "Debe agregar al menos un método de pago antes de registrar la orden.";
-                await RecargarListas(viewModel);
-                return View("Create", viewModel);
+                return Json(new
+                {
+                    success = false,
+                    message = "El campo SizeId no puede ser nulo o inválido.",
+                    errors = viewModel.Items.Select((item, index) => new
+                    {
+                        Field = $"Items[{index}].SizeId",
+                        Errors = new[] { "El valor de SizeId no es válido." }
+                    })
+                });
             }
 
             try
             {
-                // Crear el objeto Receipt
                 var receipt = new Receipt
                 {
                     ReceiptId = Guid.NewGuid(),
                     ReceiptDate = DateTime.Now,
-                    ProviderId = provider.Id
+                    ProviderId = viewModel.ProviderId
                 };
 
-                // Mapear detalles
-                var mappedDetails = details.Select(item => new ReceiptDetail
+                var mappedDetails = viewModel.Items.Select(item => new ReceiptDetail
                 {
                     ReceiptId = receipt.ReceiptId,
                     MaterialId = item.MaterialId,
@@ -444,8 +439,7 @@ namespace RetailTrack.Controllers
                     UnitCost = item.UnitCost
                 }).ToList();
 
-                // Mapear pagos
-                var mappedPayments = payments.Select(payment => new ReceiptPayment
+                var mappedPayments = viewModel.Payments.Select(payment => new ReceiptPayment
                 {
                     ReceiptId = receipt.ReceiptId,
                     PaymentMethodId = payment.PaymentMethodId,
@@ -453,22 +447,13 @@ namespace RetailTrack.Controllers
                     Percentage = payment.Percentage
                 }).ToList();
 
-                // Procesar la transacción
                 await _receiptService.ProcessReceiptTransactionAsync(receipt, mappedDetails, mappedPayments);
 
-                // Limpiar datos de sesión
-                HttpContext.Session.Remove("SelectedProviderDetails");
-                HttpContext.Session.Remove("ReceiptItems");
-                HttpContext.Session.Remove("ReceiptPayments");
-
-                TempData["SuccessMessage"] = "Orden de compra registrada correctamente.";
-                return RedirectToAction("Index");
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Ocurrió un error al registrar la orden de compra: {ex.Message}";
-                await RecargarListas(viewModel);
-                return View("Create", viewModel);
+                return Json(new { success = false, message = $"Error interno: {ex.Message}" });
             }
         }
 
@@ -483,7 +468,132 @@ namespace RetailTrack.Controllers
             return Json(new { success = true });
         }
 
+        [HttpPost]
+        public IActionResult UpdatePayment([FromBody] ReceiptPaymentViewModel updatedPayment)
+        {
+            var sessionPayments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>();
 
+            // Buscar el método de pago por su PaymentMethodId
+            var payment = sessionPayments.FirstOrDefault(p => p.PaymentMethodId == updatedPayment.PaymentMethodId);
+            if (payment != null)
+            {
+                payment.Amount = updatedPayment.Amount;
+
+                HttpContext.Session.SetObjectAsJson("ReceiptPayments", sessionPayments);
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public IActionResult UpdateMaterial([FromBody] ReceiptItemViewModel updatedMaterial)
+        {
+            var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptItemViewModel>>("ReceiptItems") ?? new List<ReceiptItemViewModel>();
+
+            // Buscar el material por su MaterialId
+            var material = sessionItems.FirstOrDefault(m => m.MaterialId == updatedMaterial.MaterialId);
+            if (material != null)
+            {
+                material.Quantity = updatedMaterial.Quantity;
+                material.UnitCost = updatedMaterial.UnitCost;
+
+                HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteMaterial([FromBody] DeleteMaterialRequest request)
+        {
+            if (request == null || request.MaterialId == Guid.Empty)
+            {
+                return Json(new { success = false, message = "MaterialId inválido." });
+            }
+
+            try
+            {
+                // Obtener y actualizar la lista de materiales en sesión
+                var items = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
+                var updatedItems = items.Where(item => item.MaterialId != request.MaterialId).ToList();
+                HttpContext.Session.SetObjectAsJson("ReceiptItems", updatedItems);
+
+                return Json(new { success = true, message = "Material eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al eliminar el material: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeletePayment([FromBody] DeletePaymentRequest request)
+        {
+            if (request == null || request.PaymentMethodId <= 0)
+            {
+                return Json(new { success = false, message = "PaymentMethodId inválido." });
+            }
+
+            try
+            {
+                // Obtener y actualizar la lista de métodos de pago en sesión
+                var payments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>();
+                var updatedPayments = payments.Where(payment => payment.PaymentMethodId != request.PaymentMethodId).ToList();
+                HttpContext.Session.SetObjectAsJson("ReceiptPayments", updatedPayments);
+
+                return Json(new { success = true, message = "Método de pago eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al eliminar el método de pago: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid receiptId)
+        {
+            var receipt = await _receiptService.GetReceiptByIdAsync(receiptId);
+            if (receipt == null)
+            {
+                TempData["ErrorMessage"] = "El recibo no fue encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var viewModel = new ReceiptGeneralDetailViewModel
+            {
+                ReceiptId = receipt.ReceiptId,
+                ReceiptDate = receipt.ReceiptDate,
+                Provider = new ProviderViewModel
+                {
+                    Name = receipt.Provider.Name,
+                    BusinessName = receipt.Provider.BusinessName,
+                    RUT = receipt.Provider.RUT,
+                    Address = receipt.Provider.Address,
+                    Phone = receipt.Provider.Phone
+                },
+                Details = receipt.Details.Select(detail => new ReceiptDetailItemViewModel
+                {
+                    MaterialId = detail.MaterialId,
+                    MaterialName = detail.Material.Name,
+                    MaterialTypeName = detail.Material.MaterialType.Name,
+                    SizeId = detail.SizeId,
+                    SizeName = detail.Size.Size_Name,
+                    Quantity = detail.Quantity,
+                    UnitCost = detail.UnitCost
+                }).ToList(),
+                Payments = receipt.Payments.Select(payment => new ReceiptPaymentViewModel
+                {
+                    PaymentMethodId = payment.PaymentMethodId,
+                    PaymentMethodName = payment.PaymentMethod.Name,
+                    Amount = payment.Amount ?? 0m,
+                    Percentage = payment.Percentage ?? 0m
+                }).ToList()
+            };
+
+            return View("Details", viewModel);
+        }
 
 
 

@@ -1,0 +1,74 @@
+@model RetailTrack.ViewModels.ReceiptGeneralDetailViewModel
+
+<div class="container mt-4">
+    <h2>Detalles del Recibo</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Información del Proveedor</h4>
+            <p><strong>Razón Social:</strong> @Model.Provider.BusinessName</p>
+            <p><strong>RUT:</strong> @Model.Provider.RUT</p>
+            <p><strong>Teléfono:</strong> @Model.Provider.Phone</p>
+            <p><strong>Dirección:</strong> @Model.Provider.Address</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Materiales</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Material</th>
+                        <th>Material</th>
+                        <th>Tamaño</th>
+                        <th>Cantidad</th>
+                        <th>Costo Unitario</th>
+                        <th>Costo Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in Model.Details)
+                    {
+                        <tr>
+                            <td>@detail.MaterialTypeName</td>
+                            <td>@detail.MaterialName</td>
+                            <td>@detail.SizeName</td>
+                            <td>@detail.Quantity</td>
+                            <td>$@detail.UnitCost.ToString("F2")</td>
+                            <td>$@detail.TotalCost.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Métodos de Pago</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Método de Pago</th>
+                        <th>Importe</th>
+                        <th>Porcentaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var payment in Model.Payments)
+                    {
+                        <tr>
+                            <td>@payment.PaymentMethodName</td>
+                            <td>$@payment.Amount.ToString("F2")</td>
+                            <td>%@payment.Percentage?.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><strong>Importe Total: </strong>$@Model.TotalCost.ToString("F2")</p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="@Url.Action("Index", "Receipt")">Volver</a>
+</div>
