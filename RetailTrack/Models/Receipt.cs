@@ -15,6 +15,8 @@ namespace RetailTrack.Models
         [Required]
         public DateTime ReceiptDate { get; set; }
 
+        public string? ReceiptExternalCode {get;set;}
+
         public ICollection<ReceiptPayment> Payments { get; set; } = new List<ReceiptPayment>();
 
         public ICollection<ReceiptDetail> Details { get; set; } = new List<ReceiptDetail>();

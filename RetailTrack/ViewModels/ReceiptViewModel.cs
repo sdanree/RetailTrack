@@ -33,12 +33,14 @@ namespace RetailTrack.ViewModels
         public DateTime? EndDate { get; set; }
         public int? SelectedPaymentMethod { get; set; }
         public Guid? SelectedProvider { get; set; }
+        public string? SelectedExternalCode { get; set;}
     }
 
     public class ReceiptIndexDetailViewModel
     {
         public Guid ReceiptId { get; set; }
         public DateTime ReceiptDate { get; set; }
+        public string? ExternalCode { get; set;}
         public string ProviderName { get; set; } = string.Empty; 
         public string PaymentMethods { get; set; }
         public List<ReceiptDetailViewModel> Details { get; set; } = new List<ReceiptDetailViewModel>();
@@ -109,12 +111,15 @@ namespace RetailTrack.ViewModels
         public int PaymentMethodId { get; set; }
         public int Percentage { get; set; }
         public Guid ProviderId {get; set;}
+        public string ReceiptExternalCode {get; set;}
+        public decimal ReceiptTotalAmount {get; set;}
 
         // Nuevas propiedades para preseleccionar valores desde la sesión
         public Guid? SelectedMaterialType { get; set; }
         public Guid? SelectedMaterial { get; set; }
         public int? SelectedSize { get; set; }
         public Provider? SelectedProviderDetails {get; set;}
+        public string? SelectedReceiptExternalCode {get; set;} 
     }
 
     public class PaymentViewModel
@@ -144,4 +149,9 @@ namespace RetailTrack.ViewModels
     {
         public int PaymentMethodId { get; set; }
     }    
+
+    public class ExternalCodeViewModel
+    {
+        public string ExternalCode { get; set; }
+    }
 }

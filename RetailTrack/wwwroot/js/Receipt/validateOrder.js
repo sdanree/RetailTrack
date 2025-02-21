@@ -23,7 +23,19 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        console.log("Proveedor seleccionado:", providerId);
+        let nroFactura = document.querySelector(".externalCode");
+
+        if (nroFactura && nroFactura.value.trim() === "") {
+            console.log("El número de factura está vacío.");
+            let confirmar = confirm("Si no ingresa Nro. de factura, se asignará uno automáticamente. ¿Desea continuar?");
+    
+            if (!confirmar) {
+                console.log("Usuario no quiere deja vacio Nro. Factura");
+                return; 
+            }
+        } 
+        
+        console.log("Proveedor seleccionado:", providerId, "Nro. Factura: ", nroFactura.value);
 
         // Validar materiales
         const items = Array.from(document.querySelectorAll(".material-row"));
@@ -76,7 +88,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const orderData = {
             ProviderId: providerId,
             Items: materialData,
-            Payments: paymentData
+            Payments: paymentData,
+            ReceiptExternalCode: nroFactura ? nroFactura.value.trim() : ""
         };
 
         console.log("Datos a enviar al servidor:", orderData);

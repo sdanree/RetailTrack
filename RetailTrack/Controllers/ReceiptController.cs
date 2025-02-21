@@ -31,7 +31,7 @@ namespace RetailTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int? paymentMethodId, Guid? InproviderId)
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int? paymentMethodId, Guid? InproviderId, string? InExternalCode)
         {
             Console.WriteLine($"InproviderId _ {InproviderId}");
             var Receipts = await _receiptService.GetAllReceiptsAsync();
@@ -47,7 +47,13 @@ namespace RetailTrack.Controllers
 
             if (InproviderId.HasValue)
                 Receipts = Receipts.Where(gr => gr.Provider != null && gr.Provider.Id == InproviderId.Value).ToList();
-            
+             
+            if (!string.IsNullOrEmpty(InExternalCode))
+            {
+                Receipts = Receipts
+                    .Where(gr => !string.IsNullOrWhiteSpace(gr.ReceiptExternalCode) && gr.ReceiptExternalCode.Contains(InExternalCode))
+                    .ToList();
+            }
 
             var paymentMethods = await _receiptService.GetAllPaymentMethodsAsync();
             
@@ -60,6 +66,7 @@ namespace RetailTrack.Controllers
                     ReceiptId       = gr.ReceiptId,
                     ReceiptDate     = gr.ReceiptDate,
                     ProviderName    = gr.Provider?.BusinessName ?? "Sin Proveedor",
+                    ExternalCode    = gr.ReceiptExternalCode ?? "",
                     PaymentMethods  = string.Join(", ", gr.Payments.Select(p => p.PaymentMethod.Name)),
                     Details         = gr.Details.Select(detail => new ReceiptDetailViewModel
                     {
@@ -85,7 +92,8 @@ namespace RetailTrack.Controllers
                 StartDate               = startDate,
                 EndDate                 = endDate,
                 SelectedPaymentMethod   = paymentMethodId,
-                SelectedProvider        = InproviderId
+                SelectedProvider        = InproviderId,
+                SelectedExternalCode    = InExternalCode
             };
 
             return View(viewModel);
@@ -94,11 +102,15 @@ namespace RetailTrack.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var items = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
+            var receiptExternalCode = HttpContext.Session.GetString("ReceiptExternalCode") ?? "";   
+            Console.WriteLine($" Nro. Factura_{receiptExternalCode}");     
+
             var viewModel = new ReceiptCreateViewModel
             {
-                SelectedProviderDetails = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails"),
-                Items = (HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>())
-                        .Select(item => new ReceiptItemViewModel
+                SelectedReceiptExternalCode = receiptExternalCode,
+                SelectedProviderDetails     = HttpContext.Session.GetObjectFromJson<Provider>("SelectedProviderDetails"),
+                Items = items.Select(item => new ReceiptItemViewModel
                         {
                             MaterialId = item.MaterialId,
                             SizeId = item.SizeId,
@@ -108,6 +120,7 @@ namespace RetailTrack.Controllers
                             Quantity = item.Quantity,
                             UnitCost = item.UnitCost
                         }).ToList(),
+                
                 Payments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>(),
                 Providers = _providerService.GetAllProvidersAsync().Result.Select(p => new SelectListItem
                 {
@@ -129,6 +142,8 @@ namespace RetailTrack.Controllers
                     Value = pm.PaymentMethodId.ToString(),
                     Text = pm.Name
                 }),
+                ReceiptTotalAmount = items.Sum(item => item.Quantity * item.UnitCost)
+
             };
 
             return View(viewModel);
@@ -175,6 +190,13 @@ namespace RetailTrack.Controllers
 
             // Guardar en la sesión actualizada
             HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
+
+            var receiptExternalCode = HttpContext.Session.GetString("ReceiptExternalCode") ?? "";
+            Console.WriteLine($"Nro. Factura después de agregar material: {receiptExternalCode}");
+            if (!string.IsNullOrEmpty(receiptExternalCode))
+            {
+            HttpContext.Session.SetString("ReceiptExternalCode", receiptExternalCode);
+            }
 
             // Log de la lista actualizada
             Console.WriteLine("Lista actualizada de ReceiptItems:");
@@ -285,6 +307,13 @@ namespace RetailTrack.Controllers
                 ProviderId = selectedProvider?.Id ?? Guid.Empty,
                 SelectedProviderDetails = selectedProvider
             };
+
+            var receiptExternalCode = HttpContext.Session.GetString("ReceiptExternalCode") ?? "";
+            Console.WriteLine($"Nro. Factura después de agregar pago: {receiptExternalCode}");
+            if (!string.IsNullOrEmpty(receiptExternalCode))
+            {
+            HttpContext.Session.SetString("ReceiptExternalCode", receiptExternalCode);
+            }            
 
             // Retorna un JSON con los pagos actualizados
             return Json(new { success = true, payments = sessionPayments });
@@ -423,11 +452,13 @@ namespace RetailTrack.Controllers
 
             try
             {
+
                 var receipt = new Receipt
                 {
                     ReceiptId = Guid.NewGuid(),
                     ReceiptDate = DateTime.Now,
-                    ProviderId = viewModel.ProviderId
+                    ProviderId = viewModel.ProviderId,
+                    ReceiptExternalCode = viewModel.ReceiptExternalCode
                 };
 
                 var mappedDetails = viewModel.Items.Select(item => new ReceiptDetail
@@ -595,7 +626,25 @@ namespace RetailTrack.Controllers
             return View("Details", viewModel);
         }
 
+        [HttpPost]
+        public IActionResult UpdateExternalCode([FromBody] ExternalCodeViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(model.ExternalCode))
+                {
+                    HttpContext.Session.SetString("ReceiptExternalCode", model.ExternalCode);
+                    Console.WriteLine($"Nro. Factura actualizado en sesión: {model.ExternalCode}");
+                }
 
+                return Json(new { success = true, externalCode = model.ExternalCode });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en UpdateExternalCode: {ex.Message}");
+                return Json(new { success = false, message = "Error al actualizar el código externo." });
+            }
+        }
 
     }
 }

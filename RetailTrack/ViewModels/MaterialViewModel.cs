@@ -11,9 +11,14 @@ namespace RetailTrack.ViewModels
     {
         public IEnumerable<Material> Materials { get; set; } = new List<Material>();
         public IEnumerable<SelectListItem> MaterialTypes { get; set; } = new List<SelectListItem>();
-        public string? SelectedMaterialTypeId { get; set; }
-        public string? NameFilter { get; set; }
+        public IEnumerable<SelectListItem> Sizes { get; set; } = new List<SelectListItem>();
+        public Guid? SelectedMaterialTypeId { get; set; }
+        public Guid? SelectedMaterial { get; set; }
+        public int? SelectedSize { get; set; }
+        public bool? SelectedOutOfStock { get; set; } 
+        public string MaterialNameFilter { get; set; } = string.Empty;
     }
+
 
     public class MaterialViewModel
     {

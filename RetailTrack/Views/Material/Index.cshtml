@@ -1,28 +1,51 @@
 @model RetailTrack.ViewModels.MaterialIndexViewModel
 
-
 <h2>Lista de Materiales</h2>
 
 <!-- Filtros -->
 <form method="get" class="mb-3">
-    <div class="form-row">
-        <div class="form-group col-md-4">
+    <div class="row">
+        <div class="col-md-6">
+            <label for="materialName">Nombre del Material</label>
+            <input type="text" id="materialName" name="InMaterialName" value="@Model.MaterialNameFilter" class="form-control" placeholder="Buscar por nombre" />
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check">
+                <input type="checkbox" id="outOfStock" name="InOutOfStock" value="true" class="form-check-input" @(Model.SelectedOutOfStock == true ? "checked" : "") />
+                <label class="form-check-label" for="outOfStock">Sin Stock</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
             <label for="materialTypeId">Tipo de Material</label>
-            <select id="materialTypeId" name="materialTypeId" class="form-control">
+            <select id="materialTypeId" name="InMaterialtypeId" class="form-control">
                 <option value="">Todos</option>
                 @foreach (var type in Model.MaterialTypes)
                 {
-                    <option value="@type.Value" @(type.Value == Model.SelectedMaterialTypeId ? "selected" : "")>
+                    <option value="@type.Value" @(type.Value == Model.SelectedMaterialTypeId.ToString() ? "selected" : null)>
                         @type.Text
                     </option>
                 }
             </select>
         </div>
-        <div class="form-group col-md-4">
-            <label for="nameFilter">Nombre</label>
-            <input type="text" id="nameFilter" name="name" value="@Model.NameFilter" class="form-control" placeholder="Buscar por nombre" />
+        <div class="col-md-6">
+            <label for="sizeId">Tamaño</label>
+            <select id="sizeId" name="InSizeId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var size in Model.Sizes)
+                {
+                    <option value="@size.Value" @(size.Value == Model.SelectedSize.ToString() ? "selected" : null)>
+                        @size.Text
+                    </option>
+                }
+            </select>
         </div>
-        <div class="form-group col-md-4 align-self-end">
+    </div>
+    <!-- Botones de acción -->
+    <div class="row mt-3">
+        <div class="col-md-12 text-right">
             <button type="submit" class="btn btn-primary">Filtrar</button>
             <a href="@Url.Action("Index", "Material")" class="btn btn-secondary">Limpiar</a>
         </div>
@@ -37,25 +60,32 @@
         <tr>
             <th>Tipo de Material</th>        
             <th>Nombre</th>
+            <th>Talle</th>
             <th>Costo</th>
             <th>Stock</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var material in Model.Materials)
+    @foreach (var material in Model.Materials)
+    {
+        @foreach (var materialSize in material.MaterialSizes)
         {
             <tr>
                 <td>@material.MaterialType?.Name</td>
                 <td>@material.Name</td>
-                <td>$@material.Cost.ToString("F1")</td>
-                <td>@material.Stock</td>
+                <td>@(materialSize.Size?.Size_Name ?? "Sin Talle")</td> 
+                <td class="@(materialSize.Cost <= 0 ? "text-danger" : "")">
+                    $@materialSize.Cost.ToString("F2")
+                </td>                
+                <td class="@(materialSize.Stock <= 0 ? "text-danger" : "")">
+                    @materialSize.Stock
+                </td>
                 <td>
-                    <a href="@Url.Action("Edit", "Material", new { id = material.Id })" class="btn btn-primary">Editar</a>
-                    <a href="@Url.Action("Delete", "Material", new { id = material.Id })" class="btn btn-danger">Eliminar</a>
+                    <a href="@Url.Action("PurchaseHistory", "Material", new { materialId = material.Id })" class="btn btn-info">📜 Historial</a>
                 </td>
             </tr>
         }
+    }
     </tbody>
 </table>
-

@@ -31,12 +31,31 @@ public class MaterialService
         return await _context.MaterialTypes.ToListAsync();
     }    
 
+    public async Task<Material?> GetMaterialWithSizesByIdAsync(Guid materialId)
+    {
+        return await _context.Materials
+            .Include(m => m.MaterialType)
+            .Include(m => m.MaterialSizes)
+                .ThenInclude(ms => ms.Size)
+            .FirstOrDefaultAsync(m => m.Id == materialId);
+    }
+ 
     // Leer todos los Materiales
     public async Task<List<Material>> GetAllMaterialsAsync()
     {
         return await _context.Materials
-            .Include(m => m.MaterialType) // Incluye el MaterialType asociado
+            .Include(m => m.MaterialSizes)
+                .ThenInclude(ms => ms.Size) 
+            .Include(m => m.MaterialType)
             .ToListAsync();
+    }
+
+    public IQueryable<Material> GetMaterialQuery()
+    {
+        return _context.Materials
+            .Include(m => m.MaterialType)
+            .Include(m => m.MaterialSizes)
+                .ThenInclude(ms => ms.Size);
     }
 
     // Actualizar Material

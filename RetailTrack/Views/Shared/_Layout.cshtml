@@ -15,6 +15,11 @@
     <!-- Navbar con Bootstrap -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Home</a>
+        <a href="@Url.Action("Index", "Product")" class="navbar-brand">Productos</a>
+        <a href="@Url.Action("Index", "Design")" class="navbar-brand">Diseños</a>
+        <a href="@Url.Action("Index", "Material")" class="navbar-brand">Materiales</a>
+        <a href="@Url.Action("Index", "Receipt")" class="navbar-brand">Facturas</a>
+        <a href="@Url.Action("Index","Settings")" class="navbar-brand">Configuracion</a>        
     </nav>
 
     <!-- Contenido Principal -->
@@ -37,6 +42,7 @@
     <script src="~/js/GetProvider.js"></script>
     <script src="~/js/ProviderNew.js"></script>
     <script src="~/js/GetMaterial.js"></script>
+    <script src="~/js/Receipt/showTabs.js"></script>   
     <script src="~/js/Receipt/receipt.js"></script>    
     <script src="~/js/Receipt/validateOrder.js"></script>
     <script src="~/js/Receipt/clearReceiptSession.js"></script>

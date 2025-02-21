@@ -1,0 +1,49 @@
+@model RetailTrack.ViewModels.PurchaseHistoryViewModel
+
+<h2>Historial de Compras - @Model.MaterialName (@Model.MaterialType)</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Proveedor</th>
+            <th>Métodos de Pago</th>
+            <th>Total Orden de compra</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var receipt in Model.Receipts)
+        {
+            <tr>
+                <td>@receipt.ReceiptDate.ToShortDateString()</td>
+                <td>@receipt.ProviderName</td>
+                <td>@receipt.PaymentMethods</td>
+                <td>
+                    <ul>
+                        @foreach (var detail in receipt.Details)
+                        {
+                            <li>
+                                @{
+                                    var totalAmount = (detail.Quantity * detail.UnitCost);
+                                }
+                                $@totalAmount.ToString("F2")
+                            </li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="@Url.Action("Details", "Receipt", new { receiptId = receipt.ReceiptId })">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-secondary" onclick="window.history.back();">
+    🔙 Volver
+</button>
+
+
+

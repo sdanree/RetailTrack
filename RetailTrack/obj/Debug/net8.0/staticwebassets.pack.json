@@ -77,6 +77,10 @@
       "PackagePath": "staticwebassets\\js\\Receipt\\receipt.js"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\showTabs.js",
+      "PackagePath": "staticwebassets\\js\\Receipt\\showTabs.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\validateOrder.js",
       "PackagePath": "staticwebassets\\js\\Receipt\\validateOrder.js"
     },

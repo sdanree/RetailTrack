@@ -65,6 +65,15 @@ namespace RetailTrack.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Receipt>> GetReceiptsByMaterialIdAsync(Guid materialId)
+        {
+            return await _context.Receipts
+                .Where(r => r.Details.Any(d => d.MaterialId == materialId))
+                .Include(r => r.Provider)
+                .Include(r => r.Details)
+                    .ThenInclude(d => d.Size)
+                .ToListAsync();
+        }
 
         public async Task<PaymentMethod?> GetPaymentMethodByIdAsync(int paymentMethodId)
         {

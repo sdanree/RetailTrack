@@ -57,9 +57,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (result.success) {
                 window.location.reload();
+
             } else {
-                alert("Error al agregar el material: " + result.message);
+                    alert("Error al agregar el material: " + result.message);
             }
+            setTimeout(updateTotalAmount, 500);
         } catch (error) {
             console.error("Error al agregar el material:", error);
             alert("Ocurrió un error al intentar agregar el material.");
@@ -70,54 +72,56 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".material-quantity, .material-unitcost").forEach(input => {
         input.addEventListener("change", async function () {
             updateMaterial(this);
+            setTimeout(updateTotalAmount, 500);
         });
     });
 
-// Manejar eliminación de materiales
-document.querySelectorAll(".delete-material").forEach(button => {
-    button.addEventListener("click", async function () {
-        const materialId = button.getAttribute("data-material-id");
+    // Manejar eliminación de materiales
+    document.querySelectorAll(".delete-material").forEach(button => {
+        button.addEventListener("click", async function () {
+            const materialId = button.getAttribute("data-material-id");
 
-        if (!materialId) {
-            alert("Error: No se pudo identificar el material a eliminar.");
-            console.error("MaterialId no encontrado.");
-            return;
-        }
-
-        if (!confirm("¿Está seguro de que desea eliminar este material?")) {
-            return;
-        }
-
-        console.log("Eliminando material con ID:", materialId);
-
-        try {
-            const response = await fetch(`/Receipt/DeleteMaterial`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ MaterialId: materialId }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
+            if (!materialId) {
+                alert("Error: No se pudo identificar el material a eliminar.");
+                console.error("MaterialId no encontrado.");
+                return;
             }
 
-            const result = await response.json();
-
-            if (result.success) {
-                window.location.reload(); 
-            } else {
-                alert(`Error al eliminar el material: ${result.message}`);
-                console.error(result);
+            if (!confirm("¿Está seguro de que desea eliminar este material?")) {
+                return;
             }
-        } catch (error) {
-            console.error("Error al intentar eliminar el material:", error);
-            alert("Ocurrió un error al intentar eliminar el material.");
-        }
+
+            console.log("Eliminando material con ID:", materialId);
+
+            try {
+                const response = await fetch(`/Receipt/DeleteMaterial`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ MaterialId: materialId }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    setTimeout(updateTotalAmount, 500);
+                    window.location.reload(); 
+                } else {
+                    alert(`Error al eliminar el material: ${result.message}`);
+                    console.error(result);
+                }
+            } catch (error) {
+                console.error("Error al intentar eliminar el material:", error);
+                alert("Ocurrió un error al intentar eliminar el material.");
+            }
+        });
     });
-});
 
     // Agregar un nuevo método de pago
     document.getElementById("addPaymentButton").addEventListener("click", async function () {
@@ -224,9 +228,37 @@ document.querySelectorAll(".delete-material").forEach(button => {
             }
         });
     });
-    
 
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    let externalCodeInput = document.getElementById("ReceiptExternalCode");
+
+    if (externalCodeInput) {
+        externalCodeInput.addEventListener("change", function () {
+            fetch('/Receipt/UpdateExternalCode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ExternalCode: this.value }) 
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.message || "Error desconocido.");
+                }
+                console.log("Código externo guardado en sesión:", data.externalCode);
+            })
+            .catch(error => console.error("Error guardando código externo:", error.message));
+        });
+    }
+});
+
+
 
 // Actualizar un método de pago
 async function updatePayment(element) {
@@ -276,6 +308,7 @@ async function updatePayment(element) {
     }
 }
 
+// Actualizar Material
 async function updateMaterial(element) {
     if (!element) {
         console.error("Elemento no válido proporcionado a updateMaterial.");
@@ -341,3 +374,16 @@ async function updateMaterial(element) {
     }
 }
 
+//Actualizar importe Total
+function updateTotalAmount() {
+    let totalAmount = 0;
+
+    document.querySelectorAll(".material-row").forEach(row => {
+        const quantity = parseFloat(row.querySelector(".material-quantity").value) || 0;
+        const unitCost = parseFloat(row.querySelector(".material-unitcost").value) || 0;
+        totalAmount += quantity * unitCost;
+    });
+
+    // Actualiza el campo de total en la UI
+    document.getElementById("ReceiptTotalAmount").value = totalAmount.toFixed(2);
+}
