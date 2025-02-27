@@ -1,0 +1,25 @@
+@model List<OrderPaymentViewModel>
+
+<h3>Métodos de Pago</h3>
+<button type="button" class="btn btn-primary" id="addPayment">Añadir Pago</button>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Método de Pago</th>
+            <th>Monto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model)
+        {
+            <tr>
+                <td>@payment.PaymentMethodName</td>
+                <td>@payment.Amount.ToString("C2")</td>
+                <td>
+                    <button type="button" class="btn btn-danger">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

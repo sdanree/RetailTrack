@@ -1,0 +1,177 @@
+@model RetailTrack.ViewModels.PurchaseOrderCreateViewModel
+
+@{
+    ViewData["Title"] = "Crear Orden de Compra";
+}
+
+<h2>Crear Orden de Compra</h2>
+
+<form id="purchaseOrderForm">
+    <div class="form-group">
+        <label for="MaterialTypeId">Tipo de Material</label>
+        <select id="MaterialTypeId" class="form-control" required>
+            <option value="">Seleccione un tipo de material</option>
+            @foreach (var type in Model.MaterialTypes)
+            {
+                <option value="@type.Value">@type.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="MaterialId">Material</label>
+        <select id="MaterialId" class="form-control" required>
+            <option value="">Seleccione un material</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="SizeId">Tamaño</label>
+        <select id="SizeId" class="form-control" required>
+            <option value="">Seleccione un tamaño</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="UnitCost">Costo Unitario</label>
+        <input type="number" id="UnitCost" class="form-control" readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="providerSelect">Proveedor</label>
+        <div class="input-group">
+            <select id="providerSelect" class="form-control" required>
+                <option value="">Seleccione un proveedor</option>
+            </select>
+            <div class="input-group-append">
+                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#searchProviderModal"><i class="bi bi-search"></i></button>
+                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addProviderModal"><i class="bi bi-plus-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="Quantity">Cantidad</label>
+        <input type="number" id="Quantity" class="form-control" required min="1">
+    </div>
+
+    <button type="button" class="btn btn-success mt-4" onclick="addItem()">Agregar Material</button>
+</form>
+
+<!-- Tabla de materiales agregados -->
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>Tipo de Material</th>
+            <th>Material</th>
+            <th>Tamaño</th>
+            <th>Cantidad</th>
+            <th>Proveedor</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody id="orderItemsTable">
+        <!-- Aquí se agregarán dinámicamente los materiales -->
+    </tbody>
+</table>
+
+<!-- Botón para generar órdenes de compra -->
+<button type="button" class="btn btn-primary mt-4" onclick="generatePurchaseOrders()">Generar Órdenes de Compra</button>
+
+<!-- Modal para Agregar un Nuevo Proveedor -->
+<div class="modal fade" id="addProviderModal" tabindex="-1" role="dialog" aria-labelledby="addProviderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProviderModalLabel">Agregar Nuevo Proveedor</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addProviderForm">
+                    <div class="form-group">
+                        <label for="providerName">Razón Social</label>
+                        <input type="text" class="form-control" id="providerName" name="Name" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="providerBusinessName">Nombre Comercial</label>
+                        <input type="text" class="form-control" id="providerBusinessName" name="BusinessName" maxlength="150" required>
+                    </div>                        
+                    <div class="form-group">
+                        <label for="providerPhone">Teléfono</label>
+                        <input type="text" class="form-control" id="providerPhone" name="Phone" maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="providerRUT">RUT</label>
+                        <input type="text" class="form-control" id="providerRUT" name="RUT" maxlength="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="providerAddress">Dirección</label>
+                        <textarea class="form-control" id="providerAddress" name="Address" maxlength="300"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="providerDescription">Descripción</label>
+                        <textarea class="form-control" id="providerDescription" name="Description" maxlength="500"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="saveProviderButton">Guardar Proveedor</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Buscar un Proveedor Existente -->
+<div class="modal fade" id="searchProviderModal" tabindex="-1" role="dialog" aria-labelledby="searchProviderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchProviderModalLabel">Buscar Proveedor</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 class="fw-bold text-dark">Seleccionar Proveedor</h4>
+                <form id="searchProviderForm">
+                    <div class="form-group">
+                        <label for="modalProviderSelect">Proveedor:</label>
+                        <select id="modalProviderSelect" name="providerId" class="form-control">
+                            <option value="">Seleccione un proveedor</option>
+                            @foreach (var provider in Model.Providers)
+                            {
+                                <option value="@provider.Value">@provider.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="BusinessName">Nombre del Negocio:</label>
+                        <input type="text" id="BusinessName" name="pBusinessName" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="Phone">Teléfono:</label>
+                        <input type="text" id="Phone" name="pPhone" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="RUT">RUT:</label>
+                        <input type="text" id="RUT" name="pRUT" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="Address">Dirección:</label>
+                        <input type="text" id="Address" name="pAddress" class="form-control" readonly />
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="modalSelectProviderButton">Seleccionar Proveedor</button>
+            </div>
+        </div>
+    </div>
+</div>
+

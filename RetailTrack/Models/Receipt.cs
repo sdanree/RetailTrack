@@ -21,6 +21,8 @@ namespace RetailTrack.Models
 
         public ICollection<ReceiptDetail> Details { get; set; } = new List<ReceiptDetail>();
 
+        public List<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>(); // Órdenes de compra asociadas
+
         [Required]
         public Guid ProviderId {get;set;}
 

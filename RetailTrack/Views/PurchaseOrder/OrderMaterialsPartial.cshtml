@@ -1,0 +1,27 @@
+@model List<OrderMaterialViewModel>
+
+<h3>Materiales</h3>
+<button type="button" class="btn btn-primary" id="addMaterial">Añadir Material</button>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Material</th>
+            <th>Cantidad</th>
+            <th>Costo Unitario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var material in Model)
+        {
+            <tr>
+                <td>@material.MaterialName</td>
+                <td>@material.Quantity</td>
+                <td>@material.UnitCost.ToString("C2")</td>
+                <td>
+                    <button type="button" class="btn btn-danger">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

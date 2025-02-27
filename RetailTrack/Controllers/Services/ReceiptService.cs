@@ -75,6 +75,16 @@ namespace RetailTrack.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Provider>> GetProvidersByMaterialAsync(Guid materialId, int sizeId)
+        {
+            return await _context.Receipts
+                .Where(r => r.Details.Any(d => d.MaterialId == materialId && d.SizeId == sizeId))
+                .Select(r => r.Provider)
+                .Distinct()
+                .ToListAsync();
+        }
+
+
         public async Task<PaymentMethod?> GetPaymentMethodByIdAsync(int paymentMethodId)
         {
             return await _context.PaymentMethods.FirstOrDefaultAsync(pm => pm.PaymentMethodId == paymentMethodId);
@@ -117,6 +127,7 @@ namespace RetailTrack.Services
                         if (materialSize != null)
                         {
                             materialSize.Stock += detail.Quantity;
+                            materialSize.Cost = detail.UnitCost;
                             _context.MaterialSizes.Update(materialSize);
                         }
                         else
@@ -143,6 +154,7 @@ namespace RetailTrack.Services
 
                     // Guardar cambios y confirmar transacción
                     await _context.SaveChangesAsync();
+                    Console.WriteLine("################# Cambios guardados en la base de datos.");
                     await transaction.CommitAsync();
                 }
                 catch (Exception)

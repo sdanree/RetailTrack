@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RetailTrack.Data;
 
@@ -11,9 +12,11 @@ using RetailTrack.Data;
 namespace RetailTrack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221210502_AddPurchaseOrders")]
+    partial class AddPurchaseOrders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,12 +102,6 @@ namespace RetailTrack.Migrations
 
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("LastProviderId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("LastProviderName")
-                        .HasColumnType("longtext");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");

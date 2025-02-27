@@ -32,10 +32,13 @@ document.getElementById("saveProviderButton").addEventListener("click", async ()
     
         // Cerrar el modal
         $('#addProviderModal').modal('hide');
-    
+
+        console.log("Cerramos modal:");
+        
         // Agregar el nuevo proveedor al select de Receipt
         const providerSelect = document.getElementById("providerSelect");
         const newOption = new Option(result.providerName, result.providerId);
+        console.log("antes de agrgar :", newOption, "a providerSelect:", providerSelect);
         providerSelect.add(newOption);
     
         // Seleccionar automáticamente el proveedor recién agregado

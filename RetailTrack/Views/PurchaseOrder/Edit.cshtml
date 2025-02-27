@@ -1,0 +1,101 @@
+@model PurchaseOrderViewModel
+
+@{
+    ViewData["Title"] = "Editar Orden de Compra";
+    bool isEditable = Model.Status != "Completada"; // Solo editable si no está completada
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold">Editar Orden de Compra</h2>
+    
+    <form method="post" asp-action="Edit" asp-controller="PurchaseOrder">
+        <input type="hidden" asp-for="PurchaseOrderId" />
+
+        <!-- Información General -->
+        <div class="card p-4 mb-4 shadow">
+            <h4 class="fw-bold text-dark">Información General</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Número de Orden:</label>
+                    <input type="text" class="form-control" asp-for="OrderNumber" readonly />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha de Creación:</label>
+                    <input type="text" class="form-control" asp-for="OrderDate" readonly />
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos del Proveedor -->
+        <div class="card p-4 mb-4 shadow">
+            <h4 class="fw-bold text-dark">Proveedor</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Proveedor:</label>
+                    <select asp-for="ProviderId" asp-items="Model.Providers" class="form-control" @(isEditable ? "" : "disabled")></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Estado:</label>
+                    <input type="text" class="form-control" asp-for="Status" readonly />
+                </div>
+            </div>
+        </div>
+
+        <!-- Materiales -->
+        <div class="card p-4 mb-4 shadow">
+            <h4 class="fw-bold text-dark">Materiales</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Material</th>
+                        <th>Tamaño</th>
+                        <th>Cantidad</th>
+                        <th>Costo Unitario</th>
+                        @if (isEditable)
+                        {
+                            <th>Acciones</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.MaterialName</td>
+                            <td>@item.SizeName</td>
+                            <td>
+                                <input type="number" class="form-control" asp-for="Items[@item.Index].Quantity" @(isEditable ? "" : "readonly") />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" asp-for="Items[@item.Index].UnitCost" step="0.01" @(isEditable ? "" : "readonly") />
+                            </td>
+                            @if (isEditable)
+                            {
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(@item.Index)">🗑️</button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="text-end">
+            @if (isEditable)
+            {
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            }
+            <a href="@Url.Action("Index", "PurchaseOrder")" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function removeItem(index) {
+        if (confirm("¿Está seguro de eliminar este material de la orden?")) {
+            document.querySelector(`[name='Items[${index}].Quantity']`).closest("tr").remove();
+        }
+    }
+</script>

@@ -76,22 +76,85 @@ public class MaterialService
         }
     }
 
-        public async Task<MaterialSize?> GetMaterialSizeAsync(Guid materialId, int sizeId)
+    public async Task<List<MaterialSize>> GetMaterialSizesByMaterialIdWithLastPurchase(Guid materialId)
+    {
+        var materialSizes = await _context.MaterialSizes
+            .Where(ms => ms.MaterialId == materialId)
+            .Include(ms => ms.Size)
+            .ToListAsync();
+
+        foreach (var ms in materialSizes)
         {
-            return await _context.MaterialSizes
-                .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
+            // Obtener la última compra de este material y talla en los ReceiptDetails
+            var lastPurchase = await _context.ReceiptDetails
+                .Where(rd => rd.MaterialId == materialId && rd.SizeId == ms.SizeId)
+                .OrderByDescending(rd => rd.Receipt.ReceiptDate)
+                .Select(rd => new
+                {
+                    LastCost = rd.UnitCost,
+                    LastProviderId = rd.Receipt.ProviderId,
+                    LastProviderName = rd.Receipt.Provider.BusinessName
+                })
+                .FirstOrDefaultAsync();
+
+            // Si existe una compra previa, actualiza los valores
+            if (lastPurchase != null)
+            {
+                ms.Cost = lastPurchase.LastCost;
+                ms.LastProviderId = lastPurchase.LastProviderId;
+                ms.LastProviderName = lastPurchase.LastProviderName;
+            }
         }
 
-        public async Task UpdateMaterialSizeAsync(MaterialSize materialSize)
-        {
-            _context.MaterialSizes.Update(materialSize);
-            await _context.SaveChangesAsync();
-        }
+        return materialSizes;
+    }
 
-        public async Task AddMaterialSizeAsync(MaterialSize materialSize)
-        {
-            _context.MaterialSizes.Add(materialSize);
-            await _context.SaveChangesAsync();
-        }
+    public async Task<MaterialSize?> GetMaterialSizeAsync(Guid materialId, int sizeId)
+    {
+        return await _context.MaterialSizes
+            .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
+    }
+
+    public async Task UpdateMaterialSizeAsync(MaterialSize materialSize)
+    {
+        _context.MaterialSizes.Update(materialSize);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddMaterialSizeAsync(MaterialSize materialSize)
+    {
+        _context.MaterialSizes.Add(materialSize);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<MaterialType>> GetTypesByProviderAsync(Guid providerId)
+    {
+        return await _context.Receipts
+            .Include(r => r.Details)
+            .ThenInclude(d => d.Material)
+            .ThenInclude(m => m.MaterialType)
+            .Where(r => r.ProviderId == providerId)
+            .SelectMany(r => r.Details.Select(d => d.Material.MaterialType))
+            .Distinct()
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Material>> GetMaterialsByTypeAndProviderAsync(Guid materialTypeId, Guid providerId)
+    {
+        return await _context.Receipts
+            .Include(r => r.Details)
+            .ThenInclude(d => d.Material)
+            .Where(r => r.ProviderId == providerId && r.Details.Any(d => d.Material.MaterialTypeId == materialTypeId))
+            .SelectMany(r => r.Details.Select(d => d.Material))
+            .Distinct()
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Material>> GetMaterialsByTypeAsync(Guid materialTypeId)
+    {
+        return await _context.Materials
+            .Where(m => m.MaterialTypeId == materialTypeId)
+            .ToListAsync();
+    }
 
 }

@@ -23,6 +23,9 @@ namespace RetailTrack.Data
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ReceiptPayment> ReceiptPayments { get; set; }
         public DbSet<Provider> Providers {get;set;}
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrdersDetails { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrdersStatus { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

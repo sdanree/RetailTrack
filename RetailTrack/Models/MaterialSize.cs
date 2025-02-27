@@ -26,5 +26,8 @@ namespace RetailTrack.Models
 
         [Required]
         public decimal Cost { get; set; }
+
+        public Guid? LastProviderId { get; set; }
+        public string? LastProviderName { get; set; }        
     }
 }

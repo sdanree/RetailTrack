@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "UWu84hI1nEOw749CaOxHvVqxXWvNfSa5/FtDIG16PT4=",
+  "Hash": "mFqBv8moJjmVsn6S3Xd2mpwz+zL/t9/IysdkPU+dHPk=",
   "Source": "RetailTrack",
   "BasePath": "_content/RetailTrack",
   "Mode": "Default",
@@ -319,6 +319,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\ProviderNew.js"
+    },
+    {
+      "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\PurchaseOrder\\addMaterial.js",
+      "SourceId": "RetailTrack",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\",
+      "BasePath": "_content/RetailTrack",
+      "RelativePath": "js/PurchaseOrder/addMaterial.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\PurchaseOrder\\addMaterial.js"
     },
     {
       "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\clearReceiptSession.js",

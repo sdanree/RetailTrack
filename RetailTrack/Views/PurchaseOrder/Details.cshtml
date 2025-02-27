@@ -1,0 +1,45 @@
+@model RetailTrack.ViewModels.PurchaseOrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Detalle de Orden de Compra";
+}
+
+<h2>Detalle de Orden de Compra</h2>
+
+<div class="card p-4">
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Número de Orden:</strong> @Model.PurchaseOrderId</p>
+            <p><strong>Fecha:</strong> @Model.OrderDate.ToShortDateString()</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Proveedor:</strong> @Model.ProviderName</p>
+            <p><strong>Estado:</strong> @Model.Status</p>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-4">Materiales</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Material</th>
+            <th>Cantidad</th>
+            <th>Costo Unitario</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.MaterialName</td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitCost.ToString("C2")</td>
+                <td>@item.TotalCost.ToString("C2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Index", "PurchaseOrder")" class="btn btn-secondary">Volver a la lista</a>

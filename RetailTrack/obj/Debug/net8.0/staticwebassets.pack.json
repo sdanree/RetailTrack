@@ -65,6 +65,10 @@
       "PackagePath": "staticwebassets\\js\\ProviderNew.js"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\PurchaseOrder\\addMaterial.js",
+      "PackagePath": "staticwebassets\\js\\PurchaseOrder\\addMaterial.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\clearReceiptSession.js",
       "PackagePath": "staticwebassets\\js\\Receipt\\clearReceiptSession.js"
     },
