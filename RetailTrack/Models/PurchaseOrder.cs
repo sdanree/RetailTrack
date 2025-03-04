@@ -14,7 +14,7 @@ namespace RetailTrack.Models
         [Required]
         public DateTime OrderDate { get; set; } 
 
-        public string? OrderExternalCode { get; set; } 
+        public int? PurchaseOrderNumber { get; set; } 
 
         [Required]
         public Guid ProviderId { get; set; } 

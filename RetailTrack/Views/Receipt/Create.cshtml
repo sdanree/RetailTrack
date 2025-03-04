@@ -98,8 +98,11 @@
                                                                             <button type="button" class="btn btn-danger btn-sm delete-purchaseOrder" data-purchase-order-id="@order.PurchaseOrderId"><i class="bi bi-trash"></i></button>
                                                                         </td>                        
                                                                         <td>@order.OrderDate.ToShortDateString()</td>
-                                                                        <td></td>
+                                                                        <td>@order.PurchaseOrderNumber</td>
                                                                         <td>@order.Status</td>
+                                                                        <td>
+                                                                            <a href="@Url.Action("Details", "PurchaseOrder", new { id = order.PurchaseOrderId })" class="btn btn-info btn-sm"><i class="bi bi-search"></i></a>
+                                                                        </td>                                                                        
                                                                     </tr> 
                                                                 }
                                                             </tbody>
@@ -242,10 +245,11 @@
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="selectAll"></th>
+                                    <th>Nro. Orden</th>
                                     <th>Fecha</th>
                                     <th>Proveedor</th>
                                     <th>Estado</th>
-                                    <th>Total</th>
+                                    <th>Estimado</th>
                                 </tr>
                             </thead>
                             <tbody id="purchaseOrdersTableBody"></tbody>

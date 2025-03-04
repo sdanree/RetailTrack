@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedOrders = [];
     let materialList = [];
 
-    function GetPurchaseOrders() {
+    function GetPurchaseOrders() 
+    {
         fetch(`/Receipt/GetPurchaseOrdersByProviderIdAndStatus?providerId=${providerId}&status=1`)
             .then(response => response.json())
             .then(data => {
@@ -21,14 +22,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 data.forEach(order => {
+                    console.log("Orden de compra:", order);
                     const row = document.createElement("tr");
                     row.innerHTML = `
                         <td><input type="checkbox" class="order-checkbox" value="${order.purchaseOrderId}"'></td>
-                        <td>${order.purchaseOrderId}</td>
+                        <td>${order.purchaseOrderNumber}</td>
                         <td>${new Date(order.orderDate).toLocaleDateString()}</td>
                         <td>${order.providerName}</td>
                         <td>${order.status}</td>
                         <td>$${order.totalAmount.toFixed(2)}</td>
+                        <td>
+                            <a href="${window.location.origin}/PurchaseOrder/Details/${order.purchaseOrderId}" class="btn btn-info btn-sm">
+                                <i class="bi bi-search"></i>
+                            </a>
+                        </td>  
                     `;
                     purchaseOrdersTableBody.appendChild(row);
                 });

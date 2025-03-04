@@ -9,7 +9,7 @@
 <div class="card p-4">
     <div class="row">
         <div class="col-md-6">
-            <p><strong>Número de Orden:</strong> @Model.PurchaseOrderId</p>
+            <p><strong>Número de Orden:</strong> @Model.PurchaseOrderNumber</p>
             <p><strong>Fecha:</strong> @Model.OrderDate.ToShortDateString()</p>
         </div>
         <div class="col-md-6">
@@ -42,4 +42,6 @@
     </tbody>
 </table>
 
-<a href="@Url.Action("Index", "PurchaseOrder")" class="btn btn-secondary">Volver a la lista</a>
+<button class="btn btn-secondary" onclick="window.history.back();">
+    🔙 Volver
+</button>

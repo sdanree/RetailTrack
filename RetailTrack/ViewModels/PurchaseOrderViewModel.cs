@@ -8,7 +8,19 @@ namespace RetailTrack.ViewModels
 {
     public class PurchaseOrderIndexViewModel
     {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public Guid? SelectedProviderId { get; set; }
+        public string SelectedStatus { get; set; }
+        public int? SelectedPurchaseOrderNumber { get; set; }
+        public IEnumerable<SelectListItem> Providers { get; set; } = new List<SelectListItem>();
+        public List<PurchaseOrderIndexDetailViewModel> PurchaseOrders { get; set; } = new List<PurchaseOrderIndexDetailViewModel>();
+    }
+
+    public class PurchaseOrderIndexDetailViewModel
+    {
         public Guid PurchaseOrderId { get; set; }
+        public int? PurchaseOrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public string ProviderName { get; set; }
         public string Status { get; set; }
@@ -18,6 +30,7 @@ namespace RetailTrack.ViewModels
     public class PurchaseOrderDetailViewModel
     {
         public Guid PurchaseOrderId { get; set; }
+        public int PurchaseOrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public string ProviderName { get; set; }
         public string Status { get; set; }
@@ -54,7 +67,7 @@ namespace RetailTrack.ViewModels
     public class ReceiptSummaryViewModel
     {
         public Guid ReceiptId { get; set; }
-        public string ReceiptExternalCode { get; set; }
+        public int PurchaseOrderNumber { get; set; }
         public DateTime ReceiptDate { get; set; }
         public decimal TotalAmount { get; set; }
     }
@@ -62,6 +75,7 @@ namespace RetailTrack.ViewModels
     public class PurchaseOrderForReceipIndexViewModel
     {
         public Guid PurchaseOrderId { get; set; }
+        public int PurchaseOrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public string ProviderName { get; set; }
         public string Status { get; set; }

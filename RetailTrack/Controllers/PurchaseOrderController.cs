@@ -32,11 +32,40 @@ namespace RetailTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, Guid? providerId, string status)
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, Guid? providerId, string status, int? purchaseOrderNumber)
         {
-            var viewModel = await _purchaseOrderService.GetPurchaseOrdersAsync(startDate, endDate, providerId, status);
+            var purchaseOrders = await _purchaseOrderService.GetPurchaseOrdersAsync(startDate, endDate, providerId, status, purchaseOrderNumber);
+
+            // Obtener la lista de proveedores para el dropdown
+            var providersList = await _providerService.GetAllProvidersAsync();
+
+            // Construcción del ViewModel
+            var viewModel = new PurchaseOrderIndexViewModel
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                SelectedProviderId = providerId,
+                SelectedStatus = status,
+                SelectedPurchaseOrderNumber = purchaseOrderNumber,
+                Providers = providersList.Select(pv => new SelectListItem
+                {
+                    Value = pv.Id.ToString(),
+                    Text  = pv.BusinessName
+                }),
+                PurchaseOrders = purchaseOrders.Select(po => new PurchaseOrderIndexDetailViewModel
+                {
+                    PurchaseOrderId = po.PurchaseOrderId,
+                    PurchaseOrderNumber = po.PurchaseOrderNumber,
+                    OrderDate = po.OrderDate,
+                    ProviderName = po.ProviderName,
+                    Status = po.Status,
+                    TotalAmount = po.TotalAmount
+                }).ToList()
+            };
+
             return View(viewModel);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -149,12 +178,16 @@ namespace RetailTrack.Controllers
             {
                 return Json(new { success = false, message = "No hay materiales agregados para generar órdenes de compra." });
             }
+            var NewpurchaseOrderNumber = await _purchaseOrderService.GetLastPurchaseOrderNumberAsync() + 1;
+
+            Console.WriteLine($"ultimo nro de oreden = {NewpurchaseOrderNumber}");
 
             var groupedOrders = sessionItems.GroupBy(item => item.ProviderId)
                 .Select(group => new PurchaseOrder
                 {
                     PurchaseOrderId = Guid.NewGuid(),
                     OrderDate = DateTime.Now,
+                    PurchaseOrderNumber = NewpurchaseOrderNumber ,
                     ProviderId = group.Key,
                     Status = PurchaseOrderStatus.Pending,
                     Details = group.Select(item => new PurchaseOrderDetail

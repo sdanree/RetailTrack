@@ -35,7 +35,6 @@ namespace RetailTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int? paymentMethodId, Guid? InproviderId, string? InExternalCode)
         {
-            Console.WriteLine($"InproviderId _ {InproviderId}");
             var Receipts = await _receiptService.GetAllReceiptsAsync();
 
             if (startDate.HasValue)
@@ -122,7 +121,7 @@ namespace RetailTrack.Controllers
                             Quantity = item.Quantity,
                             UnitCost = item.UnitCost
                         }).ToList(),
-                PurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>(),
+                PurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexDetailViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexDetailViewModel>(),
                 Payments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>(),
                 Providers = _providerService.GetAllProvidersAsync().Result.Select(p => new SelectListItem
                 {
@@ -653,21 +652,31 @@ namespace RetailTrack.Controllers
         {
             if (!Enum.TryParse(typeof(PurchaseOrderStatus), status, true, out var parsedStatus))
             {
-                 Console.WriteLine($"El estado '{status}' no es válido.");
+                Console.WriteLine($"El estado '{status}' no es válido.");
                 return BadRequest($"El estado '{status}' no es válido.");
             }          
 
+            // Obtener todas las órdenes de compra del proveedor y estado desde el servicio
             var orders = await _purchaseOrderService.GetPurchaseOrdersByProviderAndStatusAsync(providerId, (PurchaseOrderStatus)parsedStatus);
 
-            return Json(orders.Select(o => new
+            // Obtener las órdenes de compra ya asignadas desde la sesión
+            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderDetailViewModel>>("PurchaseOrders") 
+                ?? new List<PurchaseOrderDetailViewModel>();
+
+            // Filtrar las órdenes que **NO** están en la sesión
+            var filteredOrders = orders.Where(o => !sessionPurchaseOrders.Any(s => s.PurchaseOrderId == o.PurchaseOrderId)).ToList();
+
+            return Json(filteredOrders.Select(o => new
             {
                 o.PurchaseOrderId,
+                o.PurchaseOrderNumber,
                 o.OrderDate,
                 o.TotalAmount,
                 o.ProviderName,
                 o.Status
             }));
         }
+
 
         [HttpPost]
         [Produces("application/json")]
@@ -679,7 +688,7 @@ namespace RetailTrack.Controllers
             }
 
             var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
-            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>();
+            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderDetailViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderDetailViewModel>();
 
             foreach (var purchaseOrderId in purchaseOrderIds)
             {
@@ -693,13 +702,13 @@ namespace RetailTrack.Controllers
                 // Agregar la orden a la lista de órdenes seleccionadas si aún no está
                 if (!sessionPurchaseOrders.Any(po => po.PurchaseOrderId == purchaseOrderId))
                 {
-                    sessionPurchaseOrders.Add(new PurchaseOrderIndexViewModel
+                    sessionPurchaseOrders.Add(new PurchaseOrderDetailViewModel
                     {
                         PurchaseOrderId = purchaseOrder.PurchaseOrderId,
+                        PurchaseOrderNumber = purchaseOrder.PurchaseOrderNumber,
                         OrderDate = purchaseOrder.OrderDate,
                         ProviderName = purchaseOrder.ProviderName,
                         Status = purchaseOrder.Status.ToString()
-                        //TotalAmount = purchaseOrder.Details.Sum(d => d.Quantity * d.UnitCost)
                     });
                 }
 
@@ -738,8 +747,8 @@ namespace RetailTrack.Controllers
             return Json(new
             {
                 success = true,
-                items = sessionItems ?? new List<ReceiptDetailViewModel>(),  // Asegura que nunca sea null
-                purchaseOrders = sessionPurchaseOrders ?? new List<PurchaseOrderIndexViewModel>()  // Asegura que nunca sea null
+                items = sessionItems ?? new List<ReceiptDetailViewModel>(),
+                purchaseOrders = sessionPurchaseOrders ?? new List<PurchaseOrderDetailViewModel>()  
             });
 
         }
@@ -754,7 +763,7 @@ namespace RetailTrack.Controllers
                 return Json(new { success = false, message = "ID de orden de compra no válido." });
             }
 
-            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>();
+            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderDetailViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderDetailViewModel>();
             var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
 
             var purchaseOrderToRemove = sessionPurchaseOrders.FirstOrDefault(po => po.PurchaseOrderId == purchaseOrderId);

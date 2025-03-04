@@ -18,7 +18,7 @@ namespace RetailTrack.Services
             _context = context;
         }
 
-        public async Task<List<PurchaseOrderIndexViewModel>> GetPurchaseOrdersAsync(DateTime? startDate, DateTime? endDate, Guid? providerId, string status)
+        public async Task<List<PurchaseOrderIndexDetailViewModel>> GetPurchaseOrdersAsync(DateTime? startDate, DateTime? endDate, Guid? providerId, string status, int? purchaseOrderNumber)
         {
             var query = _context.PurchaseOrders
                 .Include(po => po.Provider)
@@ -34,12 +34,16 @@ namespace RetailTrack.Services
             if (providerId.HasValue)
                 query = query.Where(po => po.ProviderId == providerId.Value);
 
-            if (!string.IsNullOrEmpty(status))
-                query = query.Where(po => po.Status.ToString() == status);
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<PurchaseOrderStatus>(status, out var statusEnum))
+                query = query.Where(po => po.Status == statusEnum);
 
-            return await query.Select(po => new PurchaseOrderIndexViewModel
+            if(purchaseOrderNumber.HasValue)            
+                query = query.Where(po => po.PurchaseOrderNumber == purchaseOrderNumber);
+
+            return await query.Select(po => new PurchaseOrderIndexDetailViewModel
             {
                 PurchaseOrderId = po.PurchaseOrderId,
+                PurchaseOrderNumber = po.PurchaseOrderNumber,
                 OrderDate = po.OrderDate,
                 ProviderName = po.Provider.BusinessName,
                 Status = po.Status.ToString(),
@@ -61,6 +65,7 @@ namespace RetailTrack.Services
             return new PurchaseOrderDetailViewModel
             {
                 PurchaseOrderId = purchaseOrder.PurchaseOrderId,
+                PurchaseOrderNumber = purchaseOrder.PurchaseOrderNumber ?? 0,
                 OrderDate = purchaseOrder.OrderDate,
                 ProviderName = purchaseOrder.Provider.BusinessName,
                 Status = purchaseOrder.Status.ToString(),
@@ -114,6 +119,7 @@ namespace RetailTrack.Services
             return await query.Select(po => new PurchaseOrderForReceipIndexViewModel
             {
                 PurchaseOrderId = po.PurchaseOrderId,
+                PurchaseOrderNumber = po.PurchaseOrderNumber ?? 0,
                 OrderDate = po.OrderDate,
                 ProviderName = po.Provider.BusinessName,
                 Status = po.Status.ToString(),
@@ -121,6 +127,41 @@ namespace RetailTrack.Services
             }).ToListAsync();
         }
 
+        public async Task<int> GetLastPurchaseOrderNumberAsync()
+        {
+            return await _context.PurchaseOrders
+                .Where(po => po.PurchaseOrderNumber.HasValue)
+                .MaxAsync(po => (int?)po.PurchaseOrderNumber) ?? 0;
+        }
+
+
+        public async Task<PurchaseOrderDetailViewModel> GetPurchaseOrderByNumberAsync(int number)
+        {
+            var purchaseOrder = await _context.PurchaseOrders
+                .Include(po => po.Provider)
+                .Include(po => po.Details)
+                    .ThenInclude(d => d.Material)
+                .FirstOrDefaultAsync(po => po.PurchaseOrderNumber == number);
+
+            if (purchaseOrder == null)
+                return null;
+
+            return new PurchaseOrderDetailViewModel
+            {
+                PurchaseOrderId = purchaseOrder.PurchaseOrderId,
+                PurchaseOrderNumber = purchaseOrder.PurchaseOrderNumber ?? 0,
+                OrderDate = purchaseOrder.OrderDate,
+                ProviderName = purchaseOrder.Provider.BusinessName,
+                Status = purchaseOrder.Status.ToString(),
+                Items = purchaseOrder.Details.Select(d => new PurchaseOrderItemViewModel
+                {
+                    MaterialId = d.MaterialId,
+                    MaterialName = d.Material.Name,
+                    Quantity = d.Quantity,
+                    UnitCost = d.UnitCost
+                }).ToList()
+            };                
+        }
 
     }
 }
