@@ -53,10 +53,6 @@
       "PackagePath": "staticwebassets\\js\\GetMaterial.js"
     },
     {
-      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetMaterials.js",
-      "PackagePath": "staticwebassets\\js\\GetMaterials.js"
-    },
-    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetProvider.js",
       "PackagePath": "staticwebassets\\js\\GetProvider.js"
     },
