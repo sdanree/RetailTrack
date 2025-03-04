@@ -106,6 +106,7 @@ namespace RetailTrack.ViewModels
         public IEnumerable<SelectListItem> Providers { get; set; } = new List<SelectListItem>();
         public List<ReceiptPaymentViewModel> Payments { get; set; } = new List<ReceiptPaymentViewModel>();
         public List<ReceiptItemViewModel> Items { get; set; } = new List<ReceiptItemViewModel>();
+        public List<PurchaseOrderIndexViewModel> PurchaseOrders { get; set; } = new List<PurchaseOrderIndexViewModel>();
 
         // Campos del formulario de Receipt
         public int PaymentMethodId { get; set; }

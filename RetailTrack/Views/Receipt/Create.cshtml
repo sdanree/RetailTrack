@@ -24,6 +24,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link hidden" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">Métodos de Pago</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link hidden" id="purchaseorders-tab" data-bs-toggle="tab" data-bs-target="#purchaseorders" type="button" role="tab" aria-controls="purchseorders" aria-selected="false">Ordenes de compras</button>
+                    </li>                    
                 </ul>
                 <div class="tab-content mt-3">
                     <!-- Pestaña Info. gral -->
@@ -32,7 +35,6 @@
                             <div class="card p-3">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h4 class="fw-bold text-dark">Información de Factura</h4>
                                         <div class="card p-3">
                                             <div class="mb-3">
                                                 <label for="ReceiptExternalCode" class="form-label fw-bold">Nro. Factura:</label>
@@ -55,7 +57,7 @@
                                                             <div class="col-md-6">
                                                                 <div class="row">
                                                                     <div class="col-md-6">
-                                                                        <p><strong>Nombre del Negocio:</strong> @Model.SelectedProviderDetails.BusinessName</p>
+                                                                        <p><strong>Nombre Comercial:</strong> @Model.SelectedProviderDetails.BusinessName</p>
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <p><strong>RUT:</strong> @Model.SelectedProviderDetails.RUT</p>
@@ -71,9 +73,42 @@
                                                                 </div>
                                                             </div>
                                                         </div>        
-                                                    </div>
-                                                </div>
+                                                    </div>                                        
+                                                </div>                                                        
                                             </div>
+                                            <div class="mt-4">
+                                                <h5 class="fw-bold text-dark"> Ordenes de compras <button id="togglePurchaseOrders" class="btn btn-sm btn-success" onclick="GetPurchaseOrders()"><i class="bi bi-plus-circle"></i></button></h5>
+                                                    <div id="selectedOrdersContainer" class="mt-2">
+                                                    @if (Model.PurchaseOrders != null || Model.PurchaseOrders.Count > 0)
+                                                    {
+                                                        <table class="table table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th>Fecha</th>
+                                                                    <th>Nro. Orden</th>
+                                                                    <th>Estado</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var order in Model.PurchaseOrders)
+                                                                {
+                                                                    <tr class="purchaseorder-row">
+                                                                        <td>
+                                                                            <button type="button" class="btn btn-danger btn-sm delete-purchaseOrder" data-purchase-order-id="@order.PurchaseOrderId"><i class="bi bi-trash"></i></button>
+                                                                        </td>                        
+                                                                        <td>@order.OrderDate.ToShortDateString()</td>
+                                                                        <td></td>
+                                                                        <td>@order.Status</td>
+                                                                    </tr> 
+                                                                }
+                                                            </tbody>
+                                                        </table>                                                            
+                                                    }else{
+                                                        <p class="text-muted">No hay órdenes seleccionadas.</p>
+                                                    }    
+                                                    </div>
+                                            </div>                                            
                                         }else{        
                                             <form method="post" action="@Url.Action("AddProvider", "Receipt")" asp-controller="Receipt">
                                                 <div class="row g-2">
@@ -200,6 +235,25 @@
                             </div>
                         </form>
                     </div>
+                   <!-- Pestaña Ordenes de compra -->
+                    <div class="tab-pane fade" id="purchaseorders" role="tabpanel" aria-labelledby="purchaseoredes-tab">
+                        <h1>Ordenes de compra</h1>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll"></th>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseOrdersTableBody"></tbody>
+                        </table>
+
+                        <button id="processSelectedOrders" class="btn btn-primary mt-3">Procesar Seleccionados</button>
+                        
+                    </div>                    
                 </div>                      
             </div>
         </div>
@@ -267,7 +321,7 @@
             </div>
         </div>
 
-        <!-- Lista Metodos de pago -->
+        <!-- Listas Metodos de pago y Materiales -->
         <div class="card p-4 mb-5 shadow">
             <div>
                 <h5 class="fw-bold text-dark"> Métodos de Pago <button id="togglePayments" class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button> </h5> 

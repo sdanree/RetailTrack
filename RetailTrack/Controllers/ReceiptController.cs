@@ -20,14 +20,16 @@ namespace RetailTrack.Controllers
         private readonly ProductService _productService;
         private readonly SizeService _sizeService;
         private readonly ProviderService _providerService;
+        private readonly PurchaseOrderService _purchaseOrderService;
 
-        public ReceiptController(MaterialService materialService, ReceiptService receiptService, ProductService productService, SizeService sizeService, ProviderService providerService)
+        public ReceiptController(MaterialService materialService, ReceiptService receiptService, ProductService productService, SizeService sizeService, ProviderService providerService, PurchaseOrderService purchaseOrderService)
         {
-            _materialService    = materialService;
-            _receiptService     = receiptService;
-            _productService     = productService;
-            _sizeService        = sizeService;
-            _providerService    = providerService;
+            _materialService        = materialService;
+            _receiptService         = receiptService;
+            _productService         = productService;
+            _sizeService            = sizeService;
+            _providerService        = providerService;
+            _purchaseOrderService   = purchaseOrderService;
         }
 
         [HttpGet]
@@ -120,7 +122,7 @@ namespace RetailTrack.Controllers
                             Quantity = item.Quantity,
                             UnitCost = item.UnitCost
                         }).ToList(),
-                
+                PurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>(),
                 Payments = HttpContext.Session.GetObjectFromJson<List<ReceiptPaymentViewModel>>("ReceiptPayments") ?? new List<ReceiptPaymentViewModel>(),
                 Providers = _providerService.GetAllProvidersAsync().Result.Select(p => new SelectListItem
                 {
@@ -646,5 +648,194 @@ namespace RetailTrack.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPurchaseOrdersByProviderIdAndStatus(Guid providerId, string status)
+        {
+            if (!Enum.TryParse(typeof(PurchaseOrderStatus), status, true, out var parsedStatus))
+            {
+                 Console.WriteLine($"El estado '{status}' no es válido.");
+                return BadRequest($"El estado '{status}' no es válido.");
+            }          
+
+            var orders = await _purchaseOrderService.GetPurchaseOrdersByProviderAndStatusAsync(providerId, (PurchaseOrderStatus)parsedStatus);
+
+            return Json(orders.Select(o => new
+            {
+                o.PurchaseOrderId,
+                o.OrderDate,
+                o.TotalAmount,
+                o.ProviderName,
+                o.Status
+            }));
+        }
+
+        [HttpPost]
+        [Produces("application/json")]
+        public async Task<IActionResult> AddItemFromPurchaseOrders([FromBody] List<Guid> purchaseOrderIds)
+        {
+            if (purchaseOrderIds == null || !purchaseOrderIds.Any())
+            {
+                return Json(new { success = false, message = "No se recibieron órdenes de compra válidas." });
+            }
+
+            var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
+            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>();
+
+            foreach (var purchaseOrderId in purchaseOrderIds)
+            {
+                var purchaseOrder = await _purchaseOrderService.GetPurchaseOrderByIdAsync(purchaseOrderId);
+
+                if (purchaseOrder == null)
+                {
+                    return Json(new { success = false, message = $"Orden de compra {purchaseOrderId} no encontrada." });
+                }
+
+                // Agregar la orden a la lista de órdenes seleccionadas si aún no está
+                if (!sessionPurchaseOrders.Any(po => po.PurchaseOrderId == purchaseOrderId))
+                {
+                    sessionPurchaseOrders.Add(new PurchaseOrderIndexViewModel
+                    {
+                        PurchaseOrderId = purchaseOrder.PurchaseOrderId,
+                        OrderDate = purchaseOrder.OrderDate,
+                        ProviderName = purchaseOrder.ProviderName,
+                        Status = purchaseOrder.Status.ToString()
+                        //TotalAmount = purchaseOrder.Details.Sum(d => d.Quantity * d.UnitCost)
+                    });
+                }
+
+                foreach (var item in purchaseOrder.Items)
+                {
+                    var material = await _materialService.GetMaterialByIdAsync(item.MaterialId);
+                    if (material == null)
+                    {
+                        return Json(new { success = false, message = $"Material con ID {item.MaterialId} no encontrado." });
+                    }
+
+                    var selectedMaterialType = await _productService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
+                    var selectedSize = await _sizeService.GetSizeByIdAsync(item.SizeId);
+
+                    var unitCost = item.UnitCost > 0 ? item.UnitCost : 9999999;
+
+                    var itemToAdd = new ReceiptDetailViewModel
+                    {
+                        MaterialId = material.Id,
+                        MaterialName = material.Name,
+                        MaterialTypeName = selectedMaterialType?.Name ?? "N/A",
+                        SizeId = selectedSize?.Size_Id ?? 0,
+                        SizeName = selectedSize?.Size_Name ?? "N/A",
+                        Quantity = item.Quantity,
+                        UnitCost = unitCost
+                    };
+
+                    sessionItems.Add(itemToAdd);
+                }
+            }
+
+            // Guardar en la sesión
+            HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
+            HttpContext.Session.SetObjectAsJson("PurchaseOrders", sessionPurchaseOrders);
+
+            return Json(new
+            {
+                success = true,
+                items = sessionItems ?? new List<ReceiptDetailViewModel>(),  // Asegura que nunca sea null
+                purchaseOrders = sessionPurchaseOrders ?? new List<PurchaseOrderIndexViewModel>()  // Asegura que nunca sea null
+            });
+
+        }
+
+        [HttpPost]
+        [Produces("application/json")]
+        public async Task<IActionResult> DeletePurchaseOrderFromReceipt([FromBody] Guid purchaseOrderId)
+        {
+            Console.WriteLine($"DeletePurchaseOrderFromReceipt - START -----> purchaseOrderId: {purchaseOrderId}");
+            if (purchaseOrderId == Guid.Empty)
+            {
+                return Json(new { success = false, message = "ID de orden de compra no válido." });
+            }
+
+            var sessionPurchaseOrders = HttpContext.Session.GetObjectFromJson<List<PurchaseOrderIndexViewModel>>("PurchaseOrders") ?? new List<PurchaseOrderIndexViewModel>();
+            var sessionItems = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
+
+            var purchaseOrderToRemove = sessionPurchaseOrders.FirstOrDefault(po => po.PurchaseOrderId == purchaseOrderId);
+            
+            if (purchaseOrderToRemove == null)
+            {
+                return Json(new { success = false, message = "Orden de compra no encontrada en la sesión." });
+            }
+
+            var purchaseOrder = await _purchaseOrderService.GetPurchaseOrderByIdAsync(purchaseOrderId);
+
+            if (purchaseOrder == null)
+            {
+                return Json(new { success = false, message = "Orden de compra no encontrada en la base de datos." });
+            }
+
+            // Obtener los materiales de la orden a eliminar
+            foreach (var item in purchaseOrder.Items)
+            {
+                var existingMaterial = sessionItems.FirstOrDefault(m => m.MaterialId == item.MaterialId && m.SizeId == item.SizeId);
+
+                if (existingMaterial != null)
+                {
+                    var totalQuantityFromOtherOrders = sessionPurchaseOrders
+                        .Where(po => po.PurchaseOrderId != purchaseOrderId)
+                        .SelectMany(po => purchaseOrder.Items.Where(d => d.MaterialId == item.MaterialId && d.SizeId == item.SizeId))
+                        .Sum(d => d.Quantity);
+
+                    if (totalQuantityFromOtherOrders == 0)
+                    {
+                        // Caso 1: Material solo existe en esta orden
+                        if (existingMaterial.Quantity == item.Quantity)
+                        {
+                            // 1.a - Eliminar el material si tiene la misma cantidad exacta
+                            sessionItems.Remove(existingMaterial);
+                        }
+                        else if (existingMaterial.Quantity > item.Quantity)
+                        {
+                            // 1.b - Restar la cantidad de la orden eliminada
+                            existingMaterial.Quantity -= item.Quantity;
+                        }
+                        else
+                        {
+                            // 1.c - Mostrar confirmación si la cantidad en la lista de materiales es menor
+                            return Json(new { 
+                                success = false, 
+                                confirmationRequired = true,
+                                message = $"La cantidad en la lista de materiales ({existingMaterial.Quantity}) es menor que la de la orden a eliminar ({item.Quantity}). ¿Desea eliminar este material?" 
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // Caso 2: Material existe en otras órdenes de compra
+                        if (existingMaterial.Quantity >= item.Quantity)
+                        {
+                            existingMaterial.Quantity -= item.Quantity;
+                        }
+                        else
+                        {
+                            return Json(new { 
+                                success = false, 
+                                confirmationRequired = true,
+                                message = $"La cantidad en la lista de materiales ({existingMaterial.Quantity}) es menor que la de la orden a eliminar ({item.Quantity}). ¿Desea eliminar este material?" 
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Eliminar la orden de compra de la lista de órdenes seleccionadas
+            sessionPurchaseOrders.Remove(purchaseOrderToRemove);
+
+            // Guardar en sesión las listas actualizadas
+            HttpContext.Session.SetObjectAsJson("PurchaseOrders", sessionPurchaseOrders);
+            HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionItems);
+
+            return Json(new { success = true, message = "Orden de compra eliminada correctamente.", items = sessionItems, purchaseOrders = sessionPurchaseOrders });
+        }
+
+
     }
+
 }

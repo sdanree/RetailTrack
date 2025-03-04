@@ -46,7 +46,7 @@ namespace RetailTrack.Services
                 TotalAmount = po.Details.Sum(d => d.Quantity * d.UnitCost)
             }).ToListAsync();
         }
-
+    
         public async Task<PurchaseOrderDetailViewModel> GetPurchaseOrderByIdAsync(Guid id)
         {
             var purchaseOrder = await _context.PurchaseOrders
@@ -66,6 +66,7 @@ namespace RetailTrack.Services
                 Status = purchaseOrder.Status.ToString(),
                 Items = purchaseOrder.Details.Select(d => new PurchaseOrderItemViewModel
                 {
+                    MaterialId = d.MaterialId,
                     MaterialName = d.Material.Name,
                     Quantity = d.Quantity,
                     UnitCost = d.UnitCost
@@ -96,6 +97,28 @@ namespace RetailTrack.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<List<PurchaseOrderForReceipIndexViewModel>> GetPurchaseOrdersByProviderAndStatusAsync(Guid? providerId, PurchaseOrderStatus status)
+        {
+            var query = _context.PurchaseOrders
+                .Include(po => po.Provider)
+                .Include(po => po.Details)
+                .AsQueryable();
+
+            if (providerId.HasValue)
+                query = query.Where(po => po.ProviderId == providerId.Value);
+
+            query = query.Where(po => po.Status == status);
+
+            return await query.Select(po => new PurchaseOrderForReceipIndexViewModel
+            {
+                PurchaseOrderId = po.PurchaseOrderId,
+                OrderDate = po.OrderDate,
+                ProviderName = po.Provider.BusinessName,
+                Status = po.Status.ToString(),
+                TotalAmount = po.Details.Sum(d => d.Quantity * d.UnitCost)
+            }).ToListAsync();
         }
 
 

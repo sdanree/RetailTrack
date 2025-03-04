@@ -77,6 +77,10 @@
       "PackagePath": "staticwebassets\\js\\Receipt\\editReceiptLists.js"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\invoiceOrders.js",
+      "PackagePath": "staticwebassets\\js\\Receipt\\invoiceOrders.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Receipt\\receipt.js",
       "PackagePath": "staticwebassets\\js\\Receipt\\receipt.js"
     },

@@ -58,4 +58,13 @@ namespace RetailTrack.ViewModels
         public DateTime ReceiptDate { get; set; }
         public decimal TotalAmount { get; set; }
     }
+
+    public class PurchaseOrderForReceipIndexViewModel
+    {
+        public Guid PurchaseOrderId { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string ProviderName { get; set; }
+        public string Status { get; set; }
+        public decimal TotalAmount { get; set; }
+    }    
 }

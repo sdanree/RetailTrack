@@ -124,14 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error al cargar los detalles del proveedor:", error);
             alert(`Hubo un error al cargar los detalles del proveedor:\n${error.message}`);
         }
-/*
-        if (selectedOption.value) {
-            document.getElementById("BusinessName").value = selectedOption.dataset.businessName || "";
-            document.getElementById("Phone").value = selectedOption.dataset.phone || "";
-            document.getElementById("RUT").value = selectedOption.dataset.rut || "";
-            document.getElementById("Address").value = selectedOption.dataset.address || "";
-        }
-*/
     });
 
     selectProviderButton.addEventListener("click", function () {
