@@ -4,14 +4,31 @@ using RetailTrack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var environment = builder.Environment.EnvironmentName;
+
 // Configura el DbContext con MySQL
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+    
+// Obtener la cadena de conexión según el entorno
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    .EnableSensitiveDataLogging()
+    .LogTo(Console.WriteLine, LogLevel.Information)
+);
+/*
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine, LogLevel.Information)
 );
-
+*/
 // Otros servicios
 builder.Services.AddScoped<ProductService>(); 
 builder.Services.AddScoped<MovementService>();
