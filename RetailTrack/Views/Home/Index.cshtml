@@ -2,11 +2,20 @@
     ViewData["Title"] = "Página principal";
 }
 
-<h1>Bienvenido a RetailTrack</h1>
+<h1>Bienvenido a RetailTrack, @Model?.UserEmail</h1>
+
+@if (!string.IsNullOrEmpty(Model?.UserEmail))
+{
+    <img src="@Model.UserEmail" alt="Perfil" width="100" />
+}
+
+<p>Email: @Model?.UserEmail</p>
 <p>Gestiona tus productos y movimientos aquí.</p>
 <a href="@Url.Action("Index", "Product")" class="btn btn-primary">Productos</a>
 <a href="@Url.Action("Index", "Design")" class="btn btn-primary">Diseños</a>
 <a href="@Url.Action("Index", "Material")" class="btn btn-primary">Materiales</a>
 <a href="@Url.Action("Index", "Receipt")" class="btn btn-primary">Facturas</a>
 <a href="@Url.Action("Index","Settings")" class="btn btn-primary">Configuracion</a>
+<a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Cerrar Sesión</a>
+
 

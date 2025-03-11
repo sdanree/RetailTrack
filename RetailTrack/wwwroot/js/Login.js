@@ -56,7 +56,7 @@ function checkAuth() {
 
 function logout() {
     localStorage.removeItem("access_token");
-    window.location.href = "/"; // Redirige a la página de login
+    window.location.href = "/Account/Login"; // Redirige a la página de login
 }
 
 document.getElementById("login").addEventListener("click", login);

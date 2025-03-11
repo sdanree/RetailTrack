@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using RetailTrack.Models;
 using RetailTrack.Services;
 using RetailTrack.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class SettingsController : Controller
     {
         private readonly ApplicationDbContext _context; 

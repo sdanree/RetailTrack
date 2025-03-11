@@ -6,9 +6,11 @@ using RetailTrack.Helpers;
 using System;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class ProviderController : Controller
     {
         private readonly ProviderService _providerService;

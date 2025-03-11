@@ -14,13 +14,26 @@
 <body>
     <!-- Navbar con Bootstrap -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Home</a>
-        <a href="@Url.Action("Index", "Product")" class="navbar-brand">Productos</a>
-        <a href="@Url.Action("Index", "Design")" class="navbar-brand">Diseños</a>
-        <a href="@Url.Action("Index", "Material")" class="navbar-brand">Materiales</a>
-        <a href="@Url.Action("Index", "PurchaseOrder")" class="navbar-brand">Ordenes de Compra</a>
-        <a href="@Url.Action("Index", "Receipt")" class="navbar-brand">Facturas</a>
-        <a href="@Url.Action("Index","Settings")" class="navbar-brand">Configuracion</a>        
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Home</a>
+            <a href="@Url.Action("Index", "Product")" class="navbar-brand">Productos</a>
+            <a href="@Url.Action("Index", "Design")" class="navbar-brand">Diseños</a>
+            <a href="@Url.Action("Index", "Material")" class="navbar-brand">Materiales</a>
+            <a href="@Url.Action("Index", "PurchaseOrder")" class="navbar-brand">Ordenes de Compra</a>
+            <a href="@Url.Action("Index", "Receipt")" class="navbar-brand">Facturas</a>
+            <a href="@Url.Action("Index","Settings")" class="navbar-brand">Configuracion</a>     
+            <div class="ms-auto d-flex align-items-center">   
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span class="fw-bold text-white me-3">Bienvenido, @User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value</span>
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Cerrar Sesión</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">Iniciar Sesión</a>
+                }
+            </div>
+        </div>    
     </nav>
 
     <!-- Contenido Principal -->
@@ -40,7 +53,7 @@
             addMaterialUrl: '@Url.Action("AddMaterial", "Receipt")'
         };
     </script>    
-    <script src="~/js/GetProvider.js"></script>
+    <script src="~/js/GetPr ovider.js"></script>
     <script src="~/js/ProviderNew.js"></script>
     <script src="~/js/GetMaterial.js"></script>
     <script src="~/js/Receipt/showTabs.js"></script>   

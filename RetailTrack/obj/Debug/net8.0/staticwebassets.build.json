@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "xZf3BSVLR+XX89b16mp+jSmE/dvniaP5LTeWxinlfj8=",
+  "Hash": "772LX/8ST9aYxvna56TnbF2EDOeIymAeVferFnJ5d7Y=",
   "Source": "RetailTrack",
   "BasePath": "_content/RetailTrack",
   "Mode": "Default",
@@ -281,6 +281,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\GetProvider.js"
+    },
+    {
+      "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Login.js",
+      "SourceId": "RetailTrack",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\",
+      "BasePath": "_content/RetailTrack",
+      "RelativePath": "js/Login.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Login.js"
     },
     {
       "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\ProviderNew.js",

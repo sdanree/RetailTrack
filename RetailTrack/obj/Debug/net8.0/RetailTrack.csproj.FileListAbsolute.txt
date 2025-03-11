@@ -415,3 +415,13 @@ C:\Proyectos\fabricaRopa\RetailTrack\obj\Debug\net8.0\ref\RetailTrack.dll
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\appsettings.Development.json
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\appsettings.Production.json
 C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\appsettings.Testing.json
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Auth0.AspNetCore.Authentication.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Proyectos\fabricaRopa\RetailTrack\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

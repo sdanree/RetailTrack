@@ -1,8 +1,17 @@
 
 <body>
     <h1>Bienvenido a RetailTrack</h1>
-    <button id="login" class="btn btn-success">Iniciar Sesión</button>
-    <button id="logout" style="display: none;" class="btn btn-success">Cerrar Sesión</button>
+    <form method="post" action="/Account/Login">
+        <label for="email">Email:</label>
+        <input type="email" name="email" required />
+
+        <label for="password">Contraseña:</label>
+        <input type="password" name="password" required />
+
+        <button id="login" class="btn btn-success">Iniciar Sesión</button>
+        <button id="logout" style="display: none;" class="btn btn-success">Cerrar Sesión</button>
+    </form>
+
     <p id="status">No autenticado</p>
 </body>
 

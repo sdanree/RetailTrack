@@ -9,9 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class PurchaseOrderController : Controller
     {
         private readonly PurchaseOrderService _purchaseOrderService;

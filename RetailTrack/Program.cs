@@ -1,6 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RetailTrack.Data; 
 using RetailTrack.Services;
+using Auth0.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +24,93 @@ builder.Configuration
 // Obtener la cadena de conexión según el entorno
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    })   
+    .AddCookie(options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = true;
+    })
+    .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+    {
+        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+        options.ClientId = builder.Configuration["Auth0:ClientId"];
+        options.ClientSecret = builder.Configuration["Auth0:ClientSecret"];
+        var auth0Audience = builder.Configuration["Auth0:Audience"];
+        options.ResponseType = "code";
+
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        options.CallbackPath = "/callback";
+        options.SignedOutCallbackPath = "/logout";
+        options.SaveTokens = true;
+        options.UseTokenLifetime = true;
+
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            RequireExpirationTime = true,
+            RequireSignedTokens = true,
+            ValidAudience = builder.Configuration["Auth0:ClientId"],
+            ValidIssuer = $"https://{builder.Configuration["Auth0:Domain"]}/"
+        };
+
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRedirectToIdentityProvider = context =>
+            {
+                Console.WriteLine("🔹 Enviando solicitud de autenticación con audience:");
+                Console.WriteLine($"   Audience: {auth0Audience}");
+
+                context.ProtocolMessage.SetParameter("audience", auth0Audience);
+                return Task.CompletedTask;
+            }
+        };
+
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+        options.ClaimActions.MapJsonKey("picture", "picture");        
+        options.ClaimActions.MapJsonKey("roles", $"https://{builder.Configuration["Auth0:Domain"]}/claims/roles");
+    });
+
+builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.Events.OnTokenValidated = context =>
+    {
+        var claims = context.Principal.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+        Console.WriteLine("🔹 Claims del Usuario Autenticado:");
+        claims.ForEach(c => Console.WriteLine($"   {c}"));
+
+        return Task.CompletedTask;
+    };
+});    
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserAproved", policy =>
+        policy.RequireClaim("https://retailtrack.com/roles", "UserAproved"));
+});
+   
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Account/AccessDenied"; 
+});
+
+// Configura el DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     .EnableSensitiveDataLogging()
@@ -75,7 +170,7 @@ app.UseRouting();
 
 // Agrega el middleware para habilitar la sesión
 app.UseSession();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

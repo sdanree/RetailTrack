@@ -57,6 +57,10 @@
       "PackagePath": "staticwebassets\\js\\GetProvider.js"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Login.js",
+      "PackagePath": "staticwebassets\\js\\Login.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\ProviderNew.js",
       "PackagePath": "staticwebassets\\js\\ProviderNew.js"
     },

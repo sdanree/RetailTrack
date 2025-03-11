@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using RetailTrack.Models;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class MovementController : Controller
     {
         private static List<Movement> Movements = new List<Movement>();

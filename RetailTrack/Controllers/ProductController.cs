@@ -7,9 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class ProductController : Controller
     {
         private readonly ProductService _productService;

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using RetailTrack.Models;
 using RetailTrack.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
+    [Authorize(Policy = "UserAproved")]
     public class DesignController : Controller
     {
         private readonly DesignService _designService;
