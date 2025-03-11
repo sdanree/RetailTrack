@@ -86,6 +86,22 @@ builder.Services
         options.ClaimActions.MapJsonKey("roles", $"https://{builder.Configuration["Auth0:Domain"]}/claims/roles");
     });
 
+var authConfig = new
+{
+    auth0Domain = builder.Configuration["Auth0:Domain"],
+    clientId = builder.Configuration["Auth0:ClientId"],
+    audience = builder.Configuration["Auth0:Audience"]
+};
+
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+var configJsonPath = Path.Combine(wwwrootPath, "config.json");
+
+// Asegurar que la carpeta wwwroot existe
+Directory.CreateDirectory(wwwrootPath);
+
+// Escribir el archivo config.json
+File.WriteAllText(configJsonPath, System.Text.Json.JsonSerializer.Serialize(authConfig));
+
 builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
     options.Events.OnTokenValidated = context =>
