@@ -10,6 +10,7 @@ namespace RetailTrack.ViewModels
         public string? Design { get; set; }
         public string? MaterialType { get; set; }
         public string? Material { get; set; }
+        public string? MaterialSize { get; set; }
         public string? Status { get; set; }
     }
 }

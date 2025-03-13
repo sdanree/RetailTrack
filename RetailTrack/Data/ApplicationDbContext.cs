@@ -22,23 +22,100 @@ namespace RetailTrack.Data
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; } 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ReceiptPayment> ReceiptPayments { get; set; }
-        public DbSet<Provider> Providers {get;set;}
+        public DbSet<Provider> Providers { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        public DbSet<PurchaseOrder> PurchaseOrdersDetails { get; set; }
-        public DbSet<PurchaseOrder> PurchaseOrdersStatus { get; set; }
-        
+        public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<ProductStock> ProductStocks { get; set; }
+        public DbSet<OrderPayment> OrderPayments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configurar la relación entre MaterialType y Material
+            base.OnModelCreating(modelBuilder);
+            
+            // Sincronizar los valores del Enum con la base de datos
+            modelBuilder.Entity<OrderStatus>().HasData(
+                new OrderStatus { Id = (int)OrderStatusEnum.Pendiente, Name = "Pendiente" },
+                new OrderStatus { Id = (int)OrderStatusEnum.EnProceso, Name = "En Proceso" },
+                new OrderStatus { Id = (int)OrderStatusEnum.ProntoParaEntrega, Name = "Pronto Para Entrega" },
+                new OrderStatus { Id = (int)OrderStatusEnum.Finalizado, Name = "Finalizado" }
+            );
+
+            modelBuilder.Entity<ProductStatus>().HasData(
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.EnProduccion, Status_Name = "En Producción" },
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.ListoParaVenta, Status_Name = "Listo Para Venta" },
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.Vendido, Status_Name = "Vendido" },
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.Devuelto, Status_Name = "Devuelto" }
+            );
+
+
+            // Relación entre Order y OrderStatus
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Status)
+                .WithMany()
+                .HasForeignKey(o => o.OrderStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación entre Order y OrderDetail
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Order)
+                .WithMany(o => o.OrderDetails)
+                .HasForeignKey(od => od.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación entre OrderDetail y Product
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Product)
+                .WithMany()
+                .HasForeignKey(od => od.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación entre Order y OrderPayment
+            modelBuilder.Entity<OrderPayment>()
+                .HasOne(op => op.Order)
+                .WithMany(o => o.OrderPayments)
+                .HasForeignKey(op => op.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación entre OrderPayment y PaymentMethod
+            modelBuilder.Entity<OrderPayment>()
+                .HasOne(op => op.PaymentMethod)
+                .WithMany()
+                .HasForeignKey(op => op.PaymentMethodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación entre Product y ProductStatus
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Status)
+                .WithMany()
+                .HasForeignKey(p => p.ProductStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación entre ProductStock y Product
+            modelBuilder.Entity<ProductStock>()
+                .HasOne(ps => ps.Product)
+                .WithMany()
+                .HasForeignKey(ps => ps.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.MaterialSize)
+                .WithMany()
+                .HasForeignKey(p => new { p.MaterialId, p.SizeId })
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            // Configuración de la relación entre MaterialType y Material
             modelBuilder.Entity<Material>()
                 .HasOne(m => m.MaterialType)
                 .WithMany(mt => mt.Materials)
                 .HasForeignKey(m => m.MaterialTypeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configurar la relación entre MaterialSize y Material
+            // Configuración de la relación entre MaterialSize y Material
             modelBuilder.Entity<MaterialSize>()
-                .HasKey(ms => new { ms.MaterialId, ms.SizeId }); // Clave compuesta
+                .HasKey(ms => new { ms.MaterialId, ms.SizeId });
 
             modelBuilder.Entity<MaterialSize>()
                 .HasOne(ms => ms.Material)
@@ -46,7 +123,6 @@ namespace RetailTrack.Data
                 .HasForeignKey(ms => ms.MaterialId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configurar la relación entre MaterialSize y Size
             modelBuilder.Entity<MaterialSize>()
                 .HasOne(ms => ms.Size)
                 .WithMany()
@@ -57,9 +133,9 @@ namespace RetailTrack.Data
             modelBuilder.Entity<Receipt>()
                 .HasKey(gr => gr.ReceiptId);
 
-            // Configurar la relación entre Receipt y ReceiptDetail
+            // Relación entre Receipt y ReceiptDetail
             modelBuilder.Entity<ReceiptDetail>()
-                .HasKey(grd => new { grd.ReceiptId, grd.MaterialId }); // Clave compuesta
+                .HasKey(grd => new { grd.ReceiptId, grd.MaterialId });
 
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(grd => grd.Receipt)
@@ -67,18 +143,10 @@ namespace RetailTrack.Data
                 .HasForeignKey(grd => grd.ReceiptId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configurar la relación entre ReceiptDetail y Material
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(grd => grd.Material)
                 .WithMany()
                 .HasForeignKey(grd => grd.MaterialId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configurar la relación entre ReceiptDetail y Size
-            modelBuilder.Entity<ReceiptDetail>()
-                .HasOne(grd => grd.Size)
-                .WithMany()
-                .HasForeignKey(grd => grd.SizeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ReceiptPayment>()

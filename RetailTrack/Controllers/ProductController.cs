@@ -58,15 +58,18 @@ namespace RetailTrack.Controllers
             Console.WriteLine(viewModelJson);
 
             // Validar y asignar propiedades relacionadas
-            if (product.MaterialId != Guid.Empty)
+
+            // Validar MaterialSize usando MaterialId y SizeId
+            if (product.MaterialId != Guid.Empty && product.SizeId > 0)
             {
-                product.Material = await _productService.GetMaterialByIdAsync(product.MaterialId);
-                if (product.Material == null)
+                product.MaterialSize = await _productService.GetMaterialSizeByIdAsync(product.MaterialId, product.SizeId);
+                if (product.MaterialSize == null)
                 {
-                    ModelState.AddModelError("MaterialId", "El material seleccionado no es válido.");
+                    ModelState.AddModelError("MaterialId", "El material y tamaño seleccionado no es válido.");
                 }
             }
 
+            // Validar Diseño
             if (product.DesignId != Guid.Empty)
             {
                 product.Design = await _designService.GetDesignByIdAsync(product.DesignId);
@@ -76,6 +79,7 @@ namespace RetailTrack.Controllers
                 }
             }
 
+            // Validar Estado del Producto
             if (product.ProductStatusId > 0)
             {
                 product.Status = await _productService.GetProductStatusByIdAsync(product.ProductStatusId);
@@ -109,6 +113,7 @@ namespace RetailTrack.Controllers
             TempData["Message"] = "Producto creado con éxito.";
             return RedirectToAction("Index");
         }
+
 
 
 
@@ -155,10 +160,10 @@ namespace RetailTrack.Controllers
                 Id                  = product.Id,
                 Name                = product.Name,
                 Description         = product.Description,
-                QuantityRequested   = product.QuantityRequested,
                 Design              = product.Design?.Name,
-                Material            = product.Material?.Name,
-                MaterialType        = product.Material?.MaterialType?.Name,
+                Material            = product.MaterialSize?.Material.Name,
+                MaterialType        = product.MaterialSize?.Material.MaterialType.Name,
+                MaterialSize        = product.MaterialSize?.Size.Size_Name,
                 Status              = product.Status?.Status_Name
             }).ToList();
 
@@ -179,10 +184,10 @@ namespace RetailTrack.Controllers
                 Id                  = product.Id,
                 Name                = product.Name,
                 Description         = product.Description,
-                QuantityRequested   = product.QuantityRequested,
                 Design              = product.Design?.Name,
-                Material            = product.Material?.Name,
-                MaterialType        = product.Material?.MaterialType?.Name,
+                Material            = product.MaterialSize?.Material.Name,
+                MaterialType        = product.MaterialSize?.Material.MaterialType.Name,
+                MaterialSize        = product.MaterialSize?.Size.Size_Name,
                 Status              = product.Status?.Status_Name
             };
 

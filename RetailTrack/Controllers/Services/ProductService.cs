@@ -20,7 +20,8 @@ namespace RetailTrack.Services
         {
             return _context.Products
                 .Include(p => p.Status)
-                .Include(p => p.Material)
+                .Include(p => p.MaterialSize)
+                    .ThenInclude(ms => ms.Material) 
                     .ThenInclude(m => m.MaterialType)
                 .Include(p => p.Design)
                 .AsNoTracking()
@@ -31,7 +32,8 @@ namespace RetailTrack.Services
         {
             return _context.Products
                 .Include(p => p.Status)
-                .Include(p => p.Material)
+                .Include(p => p.MaterialSize)
+                    .ThenInclude(ms => ms.Material) 
                     .ThenInclude(m => m.MaterialType)
                 .Include(p => p.Design)
                 .AsNoTracking()
@@ -56,19 +58,19 @@ namespace RetailTrack.Services
                 }
             }
 
-            // Validar y establecer el estado de Material
-            if (product.Material != null)
+            // Validar y establecer el estado de MaterialSize
+            if (product.MaterialSize != null)
             {
-                var trackedMaterial = _context.ChangeTracker.Entries<Material>()
-                    .FirstOrDefault(e => e.Entity.Id == product.Material.Id);
+                var trackedMaterialSize = _context.ChangeTracker.Entries<MaterialSize>()
+                    .FirstOrDefault(e => e.Entity.Id == product.MaterialSize.Id);
 
-                if (trackedMaterial != null)
+                if (trackedMaterialSize != null)
                 {
-                    trackedMaterial.State = EntityState.Unchanged;
+                    trackedMaterialSize.State = EntityState.Unchanged;
                 }
                 else
                 {
-                    _context.Entry(product.Material).State = EntityState.Unchanged;
+                    _context.Entry(product.MaterialSize).State = EntityState.Unchanged;
                 }
             }
 
@@ -92,7 +94,6 @@ namespace RetailTrack.Services
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
-
 
 
         public void UpdateProduct(Product product)
@@ -132,11 +133,13 @@ namespace RetailTrack.Services
                 .ToListAsync();
         }
 
-        public async Task<Material?> GetMaterialByIdAsync(Guid materialId)
+        public async Task<MaterialSize?> GetMaterialSizeByIdAsync(Guid materialId, int sizeId)
         {
-            return await _context.Materials
+            return await _context.MaterialSizes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == materialId);
+                .Include(ms => ms.Material) // Incluye el Material relacionado
+                .Include(ms => ms.Size)     // Incluye el Size relacionado
+                .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
         }
 
     }
