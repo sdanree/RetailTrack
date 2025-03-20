@@ -76,6 +76,15 @@ public class MaterialService
         }
     }
 
+    public async Task<List<MaterialSize>> GetAllMaterialSizesAsync()
+    {
+        return await _context.MaterialSizes
+            .Include(ms => ms.Material)
+            .Include(ms => ms.Size)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<List<MaterialSize>> GetMaterialSizesByMaterialIdWithLastPurchase(Guid materialId)
     {
         var materialSizes = await _context.MaterialSizes
@@ -112,6 +121,9 @@ public class MaterialService
     public async Task<MaterialSize?> GetMaterialSizeAsync(Guid materialId, int sizeId)
     {
         return await _context.MaterialSizes
+            .Include(ms => ms.Material)
+                .Include(ms => ms.Material.MaterialType)
+            .Include(ms => ms.Size)
             .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
     }
 
@@ -156,5 +168,24 @@ public class MaterialService
             .Where(m => m.MaterialTypeId == materialTypeId)
             .ToListAsync();
     }
+
+    public async Task<List<MaterialSize>> GetMaterialSizesByMaterialAsync(Guid materialId)
+    {
+        return await _context.MaterialSizes
+            .Where(ms => ms.MaterialId == materialId)
+            .Include(ms => ms.Size)  // Asegura que Size esté cargado
+            .Where(ms => ms.Size != null) // Evita nulos en Size
+            .ToListAsync();
+    }
+
+    public async Task<MaterialType?> GetMaterialTypeByMaterialIdAsync(Guid materialId)
+    {
+        return await _context.Materials
+                    .Where(m => m.Id == materialId)
+                    .Select(m => m.MaterialType)
+                    .FirstOrDefaultAsync();
+        
+    }    
+
 
 }

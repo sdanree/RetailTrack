@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const materialTypeId = this.value.trim();
         if (!materialTypeId) return;
         
-        fetch(`/PurchaseOrder/GetMaterialsByType?materialTypeId=${materialTypeId}`)
+        fetch(`/Material/GetMaterialsByType?materialTypeId=${materialTypeId}`)
             .then(response => response.json())
             .then(data => {
                 data.forEach(material => {

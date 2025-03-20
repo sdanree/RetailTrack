@@ -72,5 +72,30 @@ namespace RetailTrack.Controllers
                 return StatusCode(500, new { success = false, message = "Error interno del servidor." });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProviderDetails(Guid providerId)
+        {
+            System.Console.WriteLine($"providerId {providerId}");
+
+            var provider = await _providerService.GetProviderByIdAsync(providerId);
+            
+            // Loggear el payload para depuración
+            var providerJson = System.Text.Json.JsonSerializer.Serialize(provider, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            Console.WriteLine("provider encontrado:");
+            Console.WriteLine(providerJson);
+            return Json(new
+            {
+                provider.Name,
+                provider.Address,
+                provider.Phone,
+                provider.BusinessName,
+                provider.RUT
+            });
+        }
+
     }
 }

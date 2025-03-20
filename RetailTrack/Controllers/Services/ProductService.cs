@@ -1,146 +1,173 @@
+using Microsoft.EntityFrameworkCore;
 using RetailTrack.Data;
 using RetailTrack.Models;
-using Microsoft.EntityFrameworkCore;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RetailTrack.Services
 {
     public class ProductService
     {
         private readonly ApplicationDbContext _context;
-        private readonly DesignService _designService;
 
-        public ProductService(ApplicationDbContext context, DesignService designService)
+        public ProductService(ApplicationDbContext context)
         {
-            _context        = context;
-            _designService  = designService;
+            _context = context;
         }
 
-         public List<Product> GetAllProducts()
-        {
-            return _context.Products
-                .Include(p => p.Status)
-                .Include(p => p.MaterialSize)
-                    .ThenInclude(ms => ms.Material) 
-                    .ThenInclude(m => m.MaterialType)
-                .Include(p => p.Design)
-                .AsNoTracking()
-                .ToList();
-        }
-
-        public Product? GetProductById(Guid id)
-        {
-            return _context.Products
-                .Include(p => p.Status)
-                .Include(p => p.MaterialSize)
-                    .ThenInclude(ms => ms.Material) 
-                    .ThenInclude(m => m.MaterialType)
-                .Include(p => p.Design)
-                .AsNoTracking()
-                .FirstOrDefault(p => p.Id == id);
-        }
-
+        // Crear un producto
         public async Task AddProductAsync(Product product)
         {
-            // Validar y establecer el estado de ProductStatus
-            if (product.Status != null)
-            {
-                var trackedStatus = _context.ChangeTracker.Entries<ProductStatus>()
-                    .FirstOrDefault(e => e.Entity.Status_Id == product.Status.Status_Id);
-
-                if (trackedStatus != null)
-                {
-                    trackedStatus.State = EntityState.Unchanged;
-                }
-                else
-                {
-                    _context.Entry(product.Status).State = EntityState.Unchanged;
-                }
-            }
-
-            // Validar y establecer el estado de MaterialSize
-            if (product.MaterialSize != null)
-            {
-                var trackedMaterialSize = _context.ChangeTracker.Entries<MaterialSize>()
-                    .FirstOrDefault(e => e.Entity.Id == product.MaterialSize.Id);
-
-                if (trackedMaterialSize != null)
-                {
-                    trackedMaterialSize.State = EntityState.Unchanged;
-                }
-                else
-                {
-                    _context.Entry(product.MaterialSize).State = EntityState.Unchanged;
-                }
-            }
-
-            // Validar y establecer el estado de Design
-            if (product.Design != null)
-            {
-                var trackedDesign = _context.ChangeTracker.Entries<Design>()
-                    .FirstOrDefault(e => e.Entity.Id == product.Design.Id);
-
-                if (trackedDesign != null)
-                {
-                    trackedDesign.State = EntityState.Unchanged;
-                }
-                else
-                {
-                    _context.Entry(product.Design).State = EntityState.Unchanged;
-                }
-            }
-
-            // Agregar el producto y guardar cambios
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
 
-
-        public void UpdateProduct(Product product)
+        
+        public async Task AddProductStocksAsync(List<ProductStock> productStocks)
         {
-            _context.Products.Update(product);
-            _context.SaveChanges();
-        }
-
-        public void DeleteProduct(Guid id)
-        {
-            var product = _context.Products.FirstOrDefault(p => p.Id == id);
-            if (product != null)
+            if (productStocks == null || !productStocks.Any())
             {
-                _context.Products.Remove(product);
-                _context.SaveChanges();
+                throw new ArgumentException("La lista de variantes de productos (ProductStock) está vacía o es nula.");
             }
+
+            // Asegurar que las referencias a MaterialSize sean correctas
+            foreach (var stock in productStocks)
+            {
+                var existingMaterialSize = await _context.MaterialSizes
+                    .FirstOrDefaultAsync(ms => ms.MaterialId == stock.MaterialId && ms.SizeId == stock.SizeId);
+
+                if (existingMaterialSize == null)
+                {
+                    throw new InvalidOperationException($"No se encontró MaterialSize para MaterialId {stock.MaterialId} y SizeId {stock.SizeId}.");
+                }
+
+                stock.MaterialSize = existingMaterialSize;
+            }
+
+            // Agregar los ProductStock en la BD
+            await _context.ProductStocks.AddRangeAsync(productStocks);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<ProductStatus?> GetProductStatusByIdAsync(int statusId)
+        // Obtener todos los productos con sus variantes
+        public async Task<List<Product>> GetAllProductsAsync()
         {
-            return await _context.ProductStatuses
-                .AsNoTracking() 
-                .FirstOrDefaultAsync(s => s.Status_Id == statusId);
-        }
-
-        public async Task<MaterialType?> GetMaterialTypeByIdAsync(Guid materialTypeId)
-        {
-            return await _context.MaterialTypes //.ToListAsync();
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == materialTypeId);
-        }
-
-        public async Task<List<Material>> GetMaterialsByTypeAsync(Guid materialTypeId)
-        {
-            return await _context.Materials
-                .Where(m => m.MaterialTypeId == materialTypeId)
+            return await _context.Products
+                .Include(p => p.Design)
+                .Include(p => p.Status)
+                .Include(p => p.Variants) // Incluir las variantes del producto
+                    .ThenInclude(v => v.MaterialSize)
+                        .ThenInclude(ms => ms.Material) // Incluir Material dentro de MaterialSize
+                .Include(p => p.Variants)
+                    .ThenInclude(v => v.MaterialSize)
+                        .ThenInclude(ms => ms.Size) // Incluir Size dentro de MaterialSize
                 .ToListAsync();
         }
 
-        public async Task<MaterialSize?> GetMaterialSizeByIdAsync(Guid materialId, int sizeId)
+        // Obtener un producto por ID con sus variantes
+        public async Task<Product?> GetProductByIdAsync(Guid id)
+        {
+            return await _context.Products
+                .Include(p => p.Design)
+                .Include(p => p.Status)
+                .Include(p => p.Variants) // Incluir las variantes del producto
+                    .ThenInclude(v => v.MaterialSize)
+                        .ThenInclude(ms => ms.Material) // Incluir Material dentro de MaterialSize
+                .Include(p => p.Variants)
+                    .ThenInclude(v => v.MaterialSize)
+                        .ThenInclude(ms => ms.Size) // Incluir Size dentro de MaterialSize
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        // Actualizar un producto
+        public async Task UpdateProductAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
+        // Eliminar un producto
+        public async Task DeleteProductAsync(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<ProductStatus>> GetAllProductStatusesAsync()
+        {
+            if (!await _context.ProductStatuses.AnyAsync())
+            {
+                var defaultStatuses = Enum.GetValues<ProductStatusEnum>()
+                    .Select(e => new ProductStatus
+                    {
+                        Status_Id = (int)e,
+                        Status_Name = e.GetDescription() // Usa la descripción en lugar del nombre del enum
+                    })
+                    .ToList();
+
+                await _context.ProductStatuses.AddRangeAsync(defaultStatuses);
+                await _context.SaveChangesAsync();
+
+                return defaultStatuses;
+            }
+
+            return await _context.ProductStatuses.ToListAsync();
+        }
+
+        // Obtener un estado de producto por ID
+        public async Task<ProductStatus?> GetProductStatusByIdAsync(int id)
+        {
+            return await _context.ProductStatuses.FindAsync(id);
+        }
+
+        // Obtener todos los diseños
+        public async Task<List<Design>> GetAllDesignsAsync()
+        {
+            return await _context.Designs.ToListAsync();
+        }
+
+        // Obtener un diseño por ID
+        public async Task<Design?> GetDesignByIdAsync(Guid id)
+        {
+            return await _context.Designs.FindAsync(id);
+        }
+
+        // Obtener todos los MaterialSizes
+        public async Task<List<MaterialSize>> GetAllMaterialSizesAsync()
         {
             return await _context.MaterialSizes
-                .AsNoTracking()
-                .Include(ms => ms.Material) // Incluye el Material relacionado
-                .Include(ms => ms.Size)     // Incluye el Size relacionado
-                .FirstOrDefaultAsync(ms => ms.MaterialId == materialId && ms.SizeId == sizeId);
+                .Include(ms => ms.Material)
+                .Include(ms => ms.Size)
+                .ToListAsync();
         }
+
+        // Obtener un MaterialSize por ID
+        public async Task<MaterialSize?> GetMaterialSizeByIdAsync(Guid id)
+        {
+            return await _context.MaterialSizes
+                .Include(ms => ms.Material)
+                .Include(ms => ms.Size)
+                .FirstOrDefaultAsync(ms => ms.Id == id);
+        }
+
+        public async Task<List<ProductStock>> GetProductStocksByProductIdAsync(Guid productId)
+        {
+            return await _context.ProductStocks
+                .Where(ps => ps.ProductId == productId)
+                .Include(ps => ps.MaterialSize)
+                    .ThenInclude(ms => ms.Material)
+                        .ThenInclude(m => m.MaterialType)
+                .Include(ps => ps.MaterialSize)
+                    .ThenInclude(ms => ms.Size)
+                .ToListAsync();
+        }
+
 
     }
 }

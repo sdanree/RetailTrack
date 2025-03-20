@@ -16,30 +16,21 @@ namespace RetailTrack.Models
         [MaxLength(500)]
         public string? Description { get; set; }
 
-        public decimal Price { get; set; }
-
         [Required]
         public Guid DesignId { get; set; }
 
         [ForeignKey(nameof(DesignId))]
         public Design Design { get; set; } = null!;
 
-        // Referencias a la clave compuesta de MaterialSize
-        [Required]
-        public Guid MaterialId { get; set; } 
-
-        [Required]
-        public int SizeId { get; set; } 
-
-        [ForeignKey("MaterialId, SizeId")]
-        public MaterialSize MaterialSize { get; set; } = null!; 
-
+        public decimal? GeneralPrice { get; set; }
+        
         [Required]
         public int ProductStatusId { get; set; }
 
         [ForeignKey(nameof(ProductStatusId))]
         public ProductStatus Status { get; set; } = null!;
 
-        public ICollection<Movement> Movements { get; set; } = new List<Movement>();
+        public ICollection<ProductStock> Variants { get; set; } = new List<ProductStock>();
     }
+
 }

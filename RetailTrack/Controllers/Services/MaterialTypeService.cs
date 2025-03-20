@@ -17,4 +17,11 @@ public class MaterialTypeService
         await _context.MaterialTypes.AddRangeAsync(materialTypes);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<MaterialType> GetMaterialTypeByIdAsync(Guid materialTypesId)
+    {
+        return await _context.MaterialTypes
+                    .FirstOrDefaultAsync(mt => mt.Id == materialTypesId);
+        
+    }    
 }

@@ -44,10 +44,9 @@ namespace RetailTrack.Data
             );
 
             modelBuilder.Entity<ProductStatus>().HasData(
-                new ProductStatus { Status_Id = (int)ProductStatusEnum.EnProduccion, Status_Name = "En Producción" },
-                new ProductStatus { Status_Id = (int)ProductStatusEnum.ListoParaVenta, Status_Name = "Listo Para Venta" },
-                new ProductStatus { Status_Id = (int)ProductStatusEnum.Vendido, Status_Name = "Vendido" },
-                new ProductStatus { Status_Id = (int)ProductStatusEnum.Devuelto, Status_Name = "Devuelto" }
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.Available, Status_Name = "Habilitado" },
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.OutStock, Status_Name = "Sin stock" },
+                new ProductStatus { Status_Id = (int)ProductStatusEnum.Unavailable, Status_Name = "Descontinuado" }
             );
 
 
@@ -93,19 +92,20 @@ namespace RetailTrack.Data
                 .HasForeignKey(p => p.ProductStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Relación entre ProductStock y Product
+            // Relación entre Product y ProductStock
             modelBuilder.Entity<ProductStock>()
                 .HasOne(ps => ps.Product)
-                .WithMany()
+                .WithMany(p => p.Variants) // Cada producto puede tener muchas variantes
                 .HasForeignKey(ps => ps.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); // Si se elimina un producto, se eliminan sus variantes
 
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.MaterialSize)
+            // Relación entre ProductStock y MaterialSize
+            modelBuilder.Entity<ProductStock>()
+                .HasOne(ps => ps.MaterialSize)
                 .WithMany()
-                .HasForeignKey(p => new { p.MaterialId, p.SizeId })
+                .HasForeignKey(ps => new { ps.MaterialId, ps.SizeId })
                 .OnDelete(DeleteBehavior.Restrict);
-                
+                                
             // Configuración de la relación entre MaterialType y Material
             modelBuilder.Entity<Material>()
                 .HasOne(m => m.MaterialType)

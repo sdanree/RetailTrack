@@ -53,7 +53,7 @@
             addMaterialUrl: '@Url.Action("AddMaterial", "Receipt")'
         };
     </script>    
-    <script src="~/js/GetPr ovider.js"></script>
+    <script src="~/js/GetProvider.js"></script>
     <script src="~/js/ProviderNew.js"></script>
     <script src="~/js/GetMaterial.js"></script>
     <script src="~/js/Receipt/showTabs.js"></script>   
@@ -62,6 +62,7 @@
     <script src="~/js/Receipt/invoiceOrders.js"></script>    
     <script src="~/js/Receipt/clearReceiptSession.js"></script>
     <script src="~/js/Receipt/editReceiptLists.js"></script>
-    <script src="~/js/PurchaseOrder/addMaterial.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

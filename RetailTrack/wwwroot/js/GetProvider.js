@@ -8,7 +8,7 @@ document.getElementById('providerSelect').addEventListener('change', async funct
 
     try {
         // Realizamos la solicitud para obtener los detalles del proveedor
-        const response = await fetch(`/Receipt/GetProviderDetails?providerId=${providerId}`);
+        const response = await fetch(`/Provider/GetProviderDetails?providerId=${providerId}`);
         if (!response.ok) {
             throw new Error(`Error al obtener los detalles del proveedor. Status: ${response.status}`);
         }

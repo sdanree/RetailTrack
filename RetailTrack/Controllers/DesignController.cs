@@ -46,8 +46,14 @@ namespace RetailTrack.Controllers
             if (Image != null && Image.Length > 0)
             {
                 var uploadsFolder = Path.Combine(_environment.WebRootPath, "img");
-                Directory.CreateDirectory(uploadsFolder);
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+
+                // Verificar si la carpeta 'img' existe y crearla si es necesario
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(Image.FileName)}";
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -55,13 +61,15 @@ namespace RetailTrack.Controllers
                     await Image.CopyToAsync(stream);
                 }
 
-                design.ImageUrl = Path.Combine("img", fileName).Replace("\\", "/");
+                // Guardamos solo la ruta relativa para evitar problemas con rutas absolutas
+                design.ImageUrl = $"/img/{fileName}";
             }
             else
             {
-                // Si no se subió ninguna imagen, asigna un valor predeterminado
-                design.ImageUrl = "img/mono_trabajando.jpeg"; 
+                // Si no se subió ninguna imagen, asignamos una imagen predeterminada
+                design.ImageUrl = "/img/mono_trabajando.jpeg";
             }
+
 
             var success = await _designService.AddDesignAsync(design);
             if (!success)
@@ -74,6 +82,7 @@ namespace RetailTrack.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]        
         public async Task<IActionResult> Details(Guid id)
         {
             if (id == null)
@@ -90,5 +99,29 @@ namespace RetailTrack.Controllers
 
             return View(design);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDesignDetails(Guid designId)
+        {
+            System.Console.WriteLine($"designId {designId}");
+
+            var design = await _designService.GetDesignByIdAsync(designId);
+            
+            // Loggear el payload para depuración
+            var designJson = System.Text.Json.JsonSerializer.Serialize(design, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            Console.WriteLine("design encontrado:");
+            Console.WriteLine(designJson);
+            return Json(new
+            {
+                design.Name,
+                design.Description,
+                design.Price,
+                design.Comision,
+                design.ImageUrl
+            });
+        }        
     }
 }

@@ -1,33 +1,114 @@
-@model IEnumerable<RetailTrack.ViewModels.ProductDetailsViewModel>
+@model RetailTrack.ViewModels.ProductFilterViewModel
 
 <h2>Lista de Productos</h2>
-<a href="@Url.Action("Create", "Product")" class="btn btn-primary">Nuevo Producto</a>
-<table class="table">
+
+<!-- Filtros -->
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="row mt-3">
+        <!-- Primera fila: Nombre, Diseño y Estado -->
+        <div class="col-md-3">
+            <label for="ProductName">Nombre del Producto</label>
+            <input type="text" name="ProductName" class="form-control" value="@Model.ProductName" placeholder="Buscar por nombre">
+        </div>
+        <div class="col-md-3">
+            <label for="DesignId">Diseño</label>
+            <select name="DesignId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var design in Model.Designs)
+                {
+                    <option value="@design.Value" selected="@(Model.SelectedDesignId.HasValue && Model.SelectedDesignId.ToString() == design.Value)">
+                        @design.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="StatusId">Estado</label>
+            <select name="StatusId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var status in Model.Statuses)
+                {
+                    <option value="@status.Value" selected="@(Model.SelectedStatusId.HasValue && Model.SelectedStatusId.ToString() == status.Value)">
+                        @status.Text
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <!-- Segunda fila: Tipo de Material, Material y Talle -->
+        <div class="col-md-3">
+            <label for="MaterialTypeId">Tipo de Material</label>
+            <select id="MaterialTypeId" name="MaterialTypeId" class="form-control" onchange="getMaterialsByType(this.value)">
+                <option value="">Todos</option>
+                @foreach (var materialType in Model.MaterialTypes)
+                {
+                    <option value="@materialType.Value" selected="@(Model.SelectedMaterialTypeId.HasValue && Model.SelectedMaterialTypeId.ToString() == materialType.Value)">
+                        @materialType.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="MaterialId">Material</label>
+            <select id="MaterialId" name="MaterialId" class="form-control" onchange="getMaterialSizesByMaterial(this.value)">
+                <option value="">Todos</option>
+                @foreach (var material in Model.Materials)
+                {
+                    <option value="@material.Value" selected="@(Model.SelectedMaterialId.HasValue && Model.SelectedMaterialId.ToString() == material.Value)">
+                        @material.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="SizeId">Talle</label>
+            <select id="SizeId" name="SizeId" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var size in Model.sizesList)
+                {
+                    <option value="@size.Value" selected="@(Model.SelectedSizeId.HasValue && Model.SelectedSizeId.ToString() == size.Value)">
+                        @size.Text
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+
+
+    <!-- Acciones: Filtrar y Limpiar, alineados a la derecha -->
+    <div class="row mt-3">
+        <div class="col text-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">Limpiar</a>
+        </div>
+    </div>
+</form>
+
+<!-- Botón de Crear Nuevo Producto -->
+<div class="mb-3 text-start">
+    <a href="@Url.Action("Create", "Product")" class="btn btn-success">Nuevo Producto</a>
+</div>
+
+<!-- Tabla de Productos -->
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Nombre</th>
-            <th>Cantidad</th>
             <th>Diseño</th>
-            <th>Talle</th>
-            <th>Tipo producto</th>
-            <th>Material</th>
             <th>Estado</th>
-            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var product in Model)
+        @foreach (var product in Model.Products)
         {
             <tr>
                 <td>@product.Name</td>
-                <td>@product.QuantityRequested</td>
-                <td>@product.Design</td>
-                <td>@product.Size</td>
-                <td>@product.MaterialType</td>
-                <td>@product.Material</td>
+                <td>@product.DesignName</td>
                 <td>@product.Status</td>
                 <td>
-                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info">Ver</a>
+                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info"><i class="bi bi-search"></i></a>
                 </td>
             </tr>
         }

@@ -1,6 +1,9 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 
 namespace RetailTrack.Models
 {
@@ -14,9 +17,24 @@ namespace RetailTrack.Models
 
     public enum ProductStatusEnum
     {
-        EnProduccion = 1,
-        ListoParaVenta = 2,
-        Vendido = 3,
-        Devuelto = 4
+        [Description("Habilitado")]
+        Available = 1,
+
+        [Description("Sin stock")]
+        OutStock = 2,
+
+        [Description("Descontinuado")]
+        Unavailable = 3,
+    }    
+
+    public static class EnumExtensions
+    {
+        public static string GetDescription(this Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+            return attribute?.Description ?? value.ToString();
+        }
     }    
 }

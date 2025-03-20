@@ -18,15 +18,17 @@ namespace RetailTrack.Controllers
     public class ReceiptController : Controller
     {
         private readonly MaterialService _materialService;
+        private readonly MaterialTypeService _matrialTypeService;
         private readonly ReceiptService _receiptService;
         private readonly ProductService _productService;
         private readonly SizeService _sizeService;
         private readonly ProviderService _providerService;
         private readonly PurchaseOrderService _purchaseOrderService;
 
-        public ReceiptController(MaterialService materialService, ReceiptService receiptService, ProductService productService, SizeService sizeService, ProviderService providerService, PurchaseOrderService purchaseOrderService)
+        public ReceiptController(MaterialService materialService, MaterialTypeService materialtypeService, ReceiptService receiptService, ProductService productService, SizeService sizeService, ProviderService providerService, PurchaseOrderService purchaseOrderService)
         {
             _materialService        = materialService;
+            _matrialTypeService     = materialtypeService;
             _receiptService         = receiptService;
             _productService         = productService;
             _sizeService            = sizeService;
@@ -106,8 +108,7 @@ namespace RetailTrack.Controllers
         public IActionResult Create()
         {
             var items = HttpContext.Session.GetObjectFromJson<List<ReceiptDetailViewModel>>("ReceiptItems") ?? new List<ReceiptDetailViewModel>();
-            var receiptExternalCode = HttpContext.Session.GetString("ReceiptExternalCode") ?? "";   
-            Console.WriteLine($" Nro. Factura_{receiptExternalCode}");     
+            var receiptExternalCode = HttpContext.Session.GetString("ReceiptExternalCode") ?? "";    
 
             var viewModel = new ReceiptCreateViewModel
             {
@@ -173,7 +174,7 @@ namespace RetailTrack.Controllers
                 return Json(new { success = false, message = "Material no válido." });
             }
 
-            var selectedMaterialType = await _productService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
+            var selectedMaterialType = await _matrialTypeService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
             var selectedSize = await _sizeService.GetSizeByIdAsync(newItem.SizeId);
 
             // Crear el nuevo ítem a partir del material y los datos recibidos
@@ -352,30 +353,6 @@ namespace RetailTrack.Controllers
             }
 
             return RedirectToAction("Create");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetProviderDetails(Guid providerId)
-        {
-            System.Console.WriteLine($"providerId {providerId}");
-
-            var provider = await _providerService.GetProviderByIdAsync(providerId);
-            
-            // Loggear el payload para depuración
-            var providerJson = System.Text.Json.JsonSerializer.Serialize(provider, new System.Text.Json.JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            Console.WriteLine("provider encontrado:");
-            Console.WriteLine(providerJson);
-            return Json(new
-            {
-                provider.Name,
-                provider.Address,
-                provider.Phone,
-                provider.BusinessName,
-                provider.RUT
-            });
         }
 
         private async Task RecargarListas<T>(T viewModel) where T : class
@@ -722,7 +699,7 @@ namespace RetailTrack.Controllers
                         return Json(new { success = false, message = $"Material con ID {item.MaterialId} no encontrado." });
                     }
 
-                    var selectedMaterialType = await _productService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
+                    var selectedMaterialType = await _matrialTypeService.GetMaterialTypeByIdAsync(material.MaterialTypeId);
                     var selectedSize = await _sizeService.GetSizeByIdAsync(item.SizeId);
 
                     var unitCost = item.UnitCost > 0 ? item.UnitCost : 9999999;

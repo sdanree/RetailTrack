@@ -175,7 +175,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="Materials" class="form-label">Material:</label>
-                                    <select id="Materials" name="NewItem.MaterialId" class="form-control">
+                                    <select id="MaterialId" name="NewItem.MaterialId" class="form-control">
                                         <option value="">Seleccione un material</option>
                                         @foreach (var material in Model.Materials)
                                         {
@@ -360,7 +360,7 @@
             </div>
             
             <!-- Lista Materiales -->
-            <h5 class="fw-bold text-dark"> Materiales <button id="toggleMaterials" class="btn btn-sm btn-success"> <i class="bi bi-plus-circle"></i></button></h5>
+            <h5 class="fw-bold text-dark"> Materiales <button id="toggleMaterials" class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></h5>
             <div class="mt-5">                
                 @if (Model.Items != null && Model.Items.Count > 0)
                 {

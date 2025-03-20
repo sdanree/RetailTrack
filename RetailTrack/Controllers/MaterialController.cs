@@ -26,128 +26,122 @@ namespace RetailTrack.Controllers
             _receiptService = receiptService;
         }
 
-    [HttpGet]
-    public async Task<IActionResult> Index(Guid? InMaterialId, Guid? InMaterialtypeId, int? InSizeId, bool? InOutOfStock, string InMaterialName)
-    {
-        var materialsQuery = _materialService.GetMaterialQuery();
-
-        // Aplicar filtros
-        if (InMaterialtypeId.HasValue)
+        [HttpGet]
+        public async Task<IActionResult> Index(Guid? InMaterialId, Guid? InMaterialtypeId, int? InSizeId, bool? InOutOfStock, string InMaterialName)
         {
-            materialsQuery = materialsQuery.Where(m => m.MaterialTypeId == InMaterialtypeId.Value);
-        }
+            var materialsQuery = _materialService.GetMaterialQuery();
 
-        if (InMaterialId.HasValue)
-        {
-            materialsQuery = materialsQuery.Where(m => m.Id == InMaterialId.Value);
-        }
-
-        if (InOutOfStock.HasValue && InOutOfStock.Value)
-        {
-            materialsQuery = materialsQuery
-                .Where(m => m.MaterialSizes.Any(ms => ms.Stock == 0))
-                .Select(m => new Material
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    MaterialType = m.MaterialType,
-                    MaterialSizes = m.MaterialSizes.Where(ms => ms.Stock == 0).ToList()
-                });
-        }
-
-        if (InSizeId.HasValue)
-        {
-            materialsQuery = materialsQuery
-                .Where(m => m.MaterialSizes.Any(ms => ms.SizeId == InSizeId.Value))
-                .Select(m => new Material
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    MaterialType = m.MaterialType,
-                    MaterialSizes = m.MaterialSizes.Where(ms => ms.SizeId == InSizeId.Value).ToList()
-                });
-        }
-
-        if (!string.IsNullOrEmpty(InMaterialName))
-        {
-            materialsQuery = materialsQuery.Where(m => m.Name.Contains(InMaterialName));
-        }
-
-        var materials = await materialsQuery.ToListAsync();
-
-        // Obtener listas para los filtros
-        var materialTypes = await _materialService.GetAllMaterialTypesAsync();
-        var sizes = await _sizeService.GetAllSizesAsync();
-
-        var viewModel = new MaterialIndexViewModel
-        {
-            Materials = materials,
-            MaterialTypes = materialTypes.Select(mt => new SelectListItem
+            // Aplicar filtros
+            if (InMaterialtypeId.HasValue)
             {
-                Value = mt.Id.ToString(),
-                Text = mt.Name
-            }),
-            Sizes = sizes.Select(sz => new SelectListItem
+                materialsQuery = materialsQuery.Where(m => m.MaterialTypeId == InMaterialtypeId.Value);
+            }
+
+            if (InMaterialId.HasValue)
             {
-                Value = sz.Size_Id.ToString(),
-                Text = sz.Size_Name
-            }),
-            SelectedMaterialTypeId = InMaterialtypeId,
-            SelectedSize = InSizeId,
-            SelectedMaterial = InMaterialId,
-            SelectedOutOfStock = InOutOfStock,
-            MaterialNameFilter = InMaterialName
-        };
+                materialsQuery = materialsQuery.Where(m => m.Id == InMaterialId.Value);
+            }
 
-        return View(viewModel);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> PurchaseHistory(Guid materialId)
-    {
-        var material = await _materialService.GetMaterialByIdAsync(materialId);
-
-        if (material == null)
-        {
-            TempData["ErrorMessage"] = "El material no existe.";
-            return RedirectToAction("Index");
-        }
-
-        var receipts = await _receiptService.GetReceiptsByMaterialIdAsync(materialId);
-
-        var viewModel = new PurchaseHistoryViewModel
-        {
-            MaterialName = material.Name,
-            MaterialType = material.MaterialType.Name,
-            Receipts = receipts.Select(gr => new ReceiptIndexDetailViewModel
+            if (InOutOfStock.HasValue && InOutOfStock.Value)
             {
-                ReceiptId = gr.ReceiptId,
-                ReceiptDate = gr.ReceiptDate,
-                ProviderName = gr.Provider?.BusinessName ?? "Sin Proveedor",
-                PaymentMethods = string.Join(", ", gr.Payments.Select(p => p.PaymentMethod.Name)),
-                Details = gr.Details
-                    .Where(d => d.MaterialId == materialId)
-                    .Select(detail => new ReceiptDetailViewModel
+                materialsQuery = materialsQuery
+                    .Where(m => m.MaterialSizes.Any(ms => ms.Stock == 0))
+                    .Select(m => new Material
                     {
-                        MaterialId = detail.MaterialId,
-                        MaterialName = detail.Material.Name,
-                        MaterialTypeName = detail.Material.MaterialType.Name,
-                        SizeId = detail.SizeId,
-                        SizeName = detail.Size.Size_Name,
-                        Quantity = detail.Quantity,
-                        UnitCost = detail.UnitCost
-                    }).ToList()
-            }).ToList()
-        };
+                        Id = m.Id,
+                        Name = m.Name,
+                        MaterialType = m.MaterialType,
+                        MaterialSizes = m.MaterialSizes.Where(ms => ms.Stock == 0).ToList()
+                    });
+            }
 
-        return View(viewModel);
-    }
+            if (InSizeId.HasValue)
+            {
+                materialsQuery = materialsQuery
+                    .Where(m => m.MaterialSizes.Any(ms => ms.SizeId == InSizeId.Value))
+                    .Select(m => new Material
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        MaterialType = m.MaterialType,
+                        MaterialSizes = m.MaterialSizes.Where(ms => ms.SizeId == InSizeId.Value).ToList()
+                    });
+            }
 
+            if (!string.IsNullOrEmpty(InMaterialName))
+            {
+                materialsQuery = materialsQuery.Where(m => m.Name.Contains(InMaterialName));
+            }
 
+            var materials = await materialsQuery.ToListAsync();
 
+            // Obtener listas para los filtros
+            var materialTypes = await _materialService.GetAllMaterialTypesAsync();
+            var sizes = await _sizeService.GetAllSizesAsync();
 
+            var viewModel = new MaterialIndexViewModel
+            {
+                Materials = materials,
+                MaterialTypes = materialTypes.Select(mt => new SelectListItem
+                {
+                    Value = mt.Id.ToString(),
+                    Text = mt.Name
+                }),
+                Sizes = sizes.Select(sz => new SelectListItem
+                {
+                    Value = sz.Size_Id.ToString(),
+                    Text = sz.Size_Name
+                }),
+                SelectedMaterialTypeId = InMaterialtypeId,
+                SelectedSize = InSizeId,
+                SelectedMaterial = InMaterialId,
+                SelectedOutOfStock = InOutOfStock,
+                MaterialNameFilter = InMaterialName
+            };
 
+            return View(viewModel);
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> PurchaseHistory(Guid materialId)
+        {
+            var material = await _materialService.GetMaterialByIdAsync(materialId);
+
+            if (material == null)
+            {
+                TempData["ErrorMessage"] = "El material no existe.";
+                return RedirectToAction("Index");
+            }
+
+            var receipts = await _receiptService.GetReceiptsByMaterialIdAsync(materialId);
+
+            var viewModel = new PurchaseHistoryViewModel
+            {
+                MaterialName = material.Name,
+                MaterialType = material.MaterialType.Name,
+                Receipts = receipts.Select(gr => new ReceiptIndexDetailViewModel
+                {
+                    ReceiptId = gr.ReceiptId,
+                    ReceiptDate = gr.ReceiptDate,
+                    ProviderName = gr.Provider?.BusinessName ?? "Sin Proveedor",
+                    PaymentMethods = string.Join(", ", gr.Payments.Select(p => p.PaymentMethod.Name)),
+                    Details = gr.Details
+                        .Where(d => d.MaterialId == materialId)
+                        .Select(detail => new ReceiptDetailViewModel
+                        {
+                            MaterialId = detail.MaterialId,
+                            MaterialName = detail.Material.Name,
+                            MaterialTypeName = detail.Material.MaterialType.Name,
+                            SizeId = detail.SizeId,
+                            SizeName = detail.Size.Size_Name,
+                            Quantity = detail.Quantity,
+                            UnitCost = detail.UnitCost
+                        }).ToList()
+                }).ToList()
+            };
+
+            return View(viewModel);
+        }
 
         //Crear Material
         [HttpGet]
@@ -256,5 +250,40 @@ namespace RetailTrack.Controllers
 
             return Json(new { success = true });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMaterialsByType(Guid materialTypeId)
+        {
+            var materials = await _materialService.GetMaterialsByTypeAsync(materialTypeId);
+
+            if (materials == null || !materials.Any())
+            {
+                return Json(new { success = false, message = "No hay materiales disponibles.", data = new List<object>() });
+            }
+
+            return Json(new { success = true, data = materials.Select(m => new { m.Id, m.Name }) });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMaterialSizesByMaterial(Guid materialId)
+        {
+            var materialSizes = await _materialService.GetMaterialSizesByMaterialAsync(materialId);
+
+            if (!materialSizes.Any())
+            {
+                return Json(new { success = false, message = "No hay talles disponibles.", data = new List<object>() });
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = materialSizes.Select(ms => new
+                {
+                    ms.SizeId,
+                    SizeName = ms.Size.Size_Name // Se garantiza que Size no será NULL
+                })
+            });
+        }
+      
     }
 }

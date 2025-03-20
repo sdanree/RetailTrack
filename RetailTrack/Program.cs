@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
 
 
@@ -180,6 +181,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+var staticFileOptions = new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = ""
+};
 app.UseStaticFiles();
 
 app.UseRouting();

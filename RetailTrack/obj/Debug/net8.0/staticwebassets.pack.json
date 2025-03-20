@@ -53,6 +53,10 @@
       "PackagePath": "staticwebassets\\img\\mono_trabajando.jpg"
     },
     {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetDesign.js",
+      "PackagePath": "staticwebassets\\js\\GetDesign.js"
+    },
+    {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\GetMaterial.js",
       "PackagePath": "staticwebassets\\js\\GetMaterial.js"
     },
@@ -63,6 +67,26 @@
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Login.js",
       "PackagePath": "staticwebassets\\js\\Login.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\ProductHeader.js",
+      "PackagePath": "staticwebassets\\js\\Product\\ProductHeader.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\addProductFilters.js",
+      "PackagePath": "staticwebassets\\js\\Product\\addProductFilters.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\editVariantList.js",
+      "PackagePath": "staticwebassets\\js\\Product\\editVariantList.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\showTabs.js",
+      "PackagePath": "staticwebassets\\js\\Product\\showTabs.js"
+    },
+    {
+      "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\validateProduct.js",
+      "PackagePath": "staticwebassets\\js\\Product\\validateProduct.js"
     },
     {
       "Id": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\ProviderNew.js",

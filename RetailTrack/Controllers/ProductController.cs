@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RetailTrack.Models;
 using RetailTrack.Services;
 using RetailTrack.ViewModels;
+using RetailTrack.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
@@ -16,182 +18,395 @@ namespace RetailTrack.Controllers
     {
         private readonly ProductService _productService;
         private readonly DesignService _designService;
-        private readonly SizeService _sizeService;
         private readonly MaterialService _materialService;
+        private readonly MaterialTypeService _materialtypeService;
+        private readonly SizeService _sizeService;
 
-        public ProductController(ProductService productService, DesignService designService, SizeService sizeService, MaterialService materialService)
+        public ProductController(ProductService productService, DesignService designService, MaterialService materialService, MaterialTypeService materialtypeService, SizeService sizeService)
         {
-            _productService     = productService;
-            _designService      = designService;
-            _sizeService        = sizeService;        
-            _materialService    = materialService;
+            _productService         = productService;
+            _designService          = designService;
+            _materialService        = materialService;
+            _materialtypeService    = materialtypeService;
+            _sizeService            = sizeService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // Obtener los datos necesarios para el formulario
+            var sessionVariants = HttpContext.Session.GetObjectFromJson<List<ProductStockViewModel>>("Variants") ?? new List<ProductStockViewModel>();
             var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
+            var statuses        = await _productService.GetAllProductStatusesAsync() ?? new List<ProductStatus>();
             var materialTypes   = await _materialService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
+           
+            Guid selectedDesignId   = Guid.Empty;
+            var designIdString      = HttpContext.Session.GetString("SelectedDesignId");
 
-            // Crear el ViewModel con los datos cargados
+            if (!string.IsNullOrEmpty(designIdString) && Guid.TryParse(designIdString, out var parsedDesignId))
+            {
+                selectedDesignId = parsedDesignId;
+            }
+
+            var sessionDesignDetails = HttpContext.Session.GetObjectFromJson<Design>("SelectedDesignDetails") ?? new Design();
             var viewModel = new ProductCreateViewModel
             {
-                Designs         = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name }),
-                MaterialTypes   = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name })
+                SelectedDesignId        = selectedDesignId,   
+                SelectedDescription     = HttpContext.Session.GetString("SelectedDescription") ?? "",   
+                SelectedGeneralPrice    = decimal.TryParse(HttpContext.Session.GetString("SelectedGeneralPrice"), out var price) ? price : 0,
+                SelectedProductName     = HttpContext.Session.GetString("SelectedProductName") ?? "",      
+                SelectedDesignDetails   = sessionDesignDetails,
+                Designs                 = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name }),
+
+                Statuses = statuses.Select(s => new SelectListItem
+                {
+                    Value = s.Status_Id.ToString(),
+                    Text  = s.Status_Name
+                }),
+
+                MaterialTypes = materialTypes.Select(mt => new SelectListItem
+                {
+                    Value = mt.Id.ToString(),
+                    Text  = mt.Name
+                }),
+
+                // Los materiales y tamaños se cargarán dinámicamente en la UI con AJAX
+                Materials = new List<SelectListItem>(),
+                Sizes = new List<SelectListItem>(),
+                Variants = sessionVariants.Select(variant => new ProductStockViewModel
+                                {
+                                        MaterialId          = variant.MaterialId,
+                                        SizeId              = variant.SizeId,
+                                        MaterialName        = variant.MaterialName,
+                                        MaterialTypeName    = variant.MaterialTypeName,
+                                        MaterialSizeName    = variant.MaterialSizeName,
+                                        CustomPrice         = variant.CustomPrice,
+                                        Cost                = variant.Cost,
+                                        Stock               = variant.Stock
+                                }).ToList(),
             };
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProductCreateViewModel viewModel)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateViewModel viewModel)
         {
-            var product = viewModel.Product;
-
-            // Loggear el payload para depuración
-            var viewModelJson = System.Text.Json.JsonSerializer.Serialize(viewModel, new System.Text.Json.JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            Console.WriteLine("Payload recibido:");
-            Console.WriteLine(viewModelJson);
-
-            // Validar y asignar propiedades relacionadas
-
-            // Validar MaterialSize usando MaterialId y SizeId
-            if (product.MaterialId != Guid.Empty && product.SizeId > 0)
-            {
-                product.MaterialSize = await _productService.GetMaterialSizeByIdAsync(product.MaterialId, product.SizeId);
-                if (product.MaterialSize == null)
-                {
-                    ModelState.AddModelError("MaterialId", "El material y tamaño seleccionado no es válido.");
-                }
+            var sessionDesignDetails = HttpContext.Session.GetObjectFromJson<Design>("SelectedDesignDetails") ?? new Design();
+            if(sessionDesignDetails == null){
+                Console.WriteLine("Obejeto Design vacio");
+                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(sessionDesignDetails, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                return Json(new { success = false, message = "Obejeto Design vacio. Por favor, revise e intente nuevamente."});
             }
 
-            // Validar Diseño
-            if (product.DesignId != Guid.Empty)
+            var sessionVariants = HttpContext.Session.GetObjectFromJson<List<ProductStockViewModel>>("Variants") ?? new List<ProductStockViewModel>();
+            if(sessionVariants == null || sessionVariants.Count < 1){
+                Console.WriteLine("no hay variantes ingresadas");
+                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(sessionVariants, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                return Json(new { success = false, message = "No hay variantes asignadas, minimo debe de haber una variante. Por favor, revise e intente nuevamente."});
+            }
+
+            try
             {
+                var product = new Product
+                {
+                    Id              = Guid.NewGuid(),
+                    Name            = viewModel.Product.Name,
+                    Description     = viewModel.Product.Description ?? string.Empty,
+                    GeneralPrice    = viewModel.Product.GeneralPrice,
+                    DesignId        = viewModel.Product.DesignId,
+                    ProductStatusId = (int)ProductStatusEnum.Available 
+                };
+
                 product.Design = await _designService.GetDesignByIdAsync(product.DesignId);
                 if (product.Design == null)
                 {
-                    ModelState.AddModelError("DesignId", "El diseño seleccionado no es válido.");
+                    return Json(new { success = false, message = "El diseño seleccionado no es válido." });
                 }
-            }
 
-            // Validar Estado del Producto
-            if (product.ProductStatusId > 0)
-            {
-                product.Status = await _productService.GetProductStatusByIdAsync(product.ProductStatusId);
-                if (product.Status == null)
+                await _productService.AddProductAsync(product);
+
+                var productStocks = new List<ProductStock>();
+
+                foreach (var variant in sessionVariants)
                 {
-                    ModelState.AddModelError("ProductStatusId", "El estado seleccionado no es válido.");
-                }
-            }
-
-            product.Description ??= string.Empty;
-
-            if (!ModelState.IsValid)
-            {
-                Console.WriteLine("Fallo el modelo. Recargando listas...");
-
-                // Loggear los errores en ModelState para entender el problema
-                foreach (var error in ModelState)
-                {
-                    if (error.Value.Errors.Count > 0)
+                    var materialSize = await _materialService.GetMaterialSizeAsync(variant.MaterialId, variant.SizeId);
+                    if (materialSize == null)
                     {
-                        Console.WriteLine($"Error en {error.Key}: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
+                        Console.WriteLine($"Advertencia: El material y tamaño seleccionado para la variante {variant.MaterialId}-{variant.SizeId} no es válido. Se omitirá.");
+                        continue;
                     }
+
+                    productStocks.Add(new ProductStock
+                    {
+                        Id          = Guid.NewGuid(),
+                        ProductId   = product.Id,
+                        MaterialId  = variant.MaterialId,
+                        SizeId      = variant.SizeId,
+                        CustomPrice = variant.CustomPrice,
+                        Cost        = variant.Cost,
+                        Stock       = variant.Stock,
+                        Available   = true
+                    });
                 }
 
-                await RecargarListas(viewModel);
-                return View(viewModel);
+                if (productStocks.Any())
+                {
+                    await _productService.AddProductStocksAsync(productStocks);
+                }
+
+                return Json(new { success = true, message = "Producto creado con éxito." });
             }
-
-            await _productService.AddProductAsync(product);
-
-            TempData["Message"] = "Producto creado con éxito.";
-            return RedirectToAction("Index");
-        }
-
-
-
-
-        private async Task RecargarListas(ProductCreateViewModel viewModel)
-        {
-            var designs         = await _designService.GetAllDesignsAsync() ?? new List<Design>();
-            var materialTypes   = await _materialService.GetAllMaterialTypesAsync() ?? new List<MaterialType>();
-
-            viewModel.Designs       = designs.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name });
-            viewModel.MaterialTypes = materialTypes.Select(mt => new SelectListItem { Value = mt.Id.ToString(), Text = mt.Name });
-
-            if (!string.IsNullOrEmpty(viewModel.MaterialTypeId))
+            catch (Exception ex)
             {
-                var materials = await _productService.GetMaterialsByTypeAsync(Guid.Parse(viewModel.MaterialTypeId));
-                viewModel.Materials = materials.Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Name });
+                Console.WriteLine($"Error en la creación del producto: {ex.Message}");
+                return Json(new { success = false, message = $"Error interno: {ex.Message}" });
             }
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> GetMaterialsByType(Guid materialTypeId)
+        public async Task<IActionResult> Index(string? productName, Guid? designId, Guid? materialTypeId, Guid? materialId, int? sizeId, int? statusId)
         {
-            if (materialTypeId == Guid.Empty)
+            var products = await _productService.GetAllProductsAsync();
+
+            if (!string.IsNullOrEmpty(productName))
             {
-                return Json(new { success = false, message = "ID de tipo de material inválido." });
+                products = products.Where(p => !string.IsNullOrWhiteSpace(p.Name) && p.Name.Contains(productName, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            var materials = await _productService.GetMaterialsByTypeAsync(materialTypeId);
-            if (materials == null || !materials.Any())
+            if (designId.HasValue)
             {
-                return Json(new { success = false, message = "No se encontraron materiales para este tipo." });
+                products = products.Where(p => p.DesignId == designId.Value).ToList();
             }
 
-            return Json(new { success = true, data = materials });
-        }
-
-        [HttpGet]
-        public IActionResult Index()
-        {
-            var products = _productService.GetAllProducts();
-
-            var viewModel = products.Select(product => new ProductDetailsViewModel
+            if (statusId.HasValue)
             {
-                Id                  = product.Id,
-                Name                = product.Name,
-                Description         = product.Description,
-                Design              = product.Design?.Name,
-                Material            = product.MaterialSize?.Material.Name,
-                MaterialType        = product.MaterialSize?.Material.MaterialType.Name,
-                MaterialSize        = product.MaterialSize?.Size.Size_Name,
-                Status              = product.Status?.Status_Name
-            }).ToList();
+                products = products.Where(p => p.ProductStatusId == statusId.Value).ToList();
+            }
+
+            if (materialTypeId.HasValue || materialId.HasValue || sizeId.HasValue)
+            {
+                products = products
+                    .Where(p => p.Variants.Any(v =>
+                        (!materialTypeId.HasValue || v.MaterialSize.Material.MaterialTypeId == materialTypeId.Value) &&
+                        (!materialId.HasValue || v.MaterialId == materialId.Value) &&
+                        (!sizeId.HasValue || v.SizeId == sizeId.Value)
+                    )).ToList();
+            }
+
+            var designs         = await _designService.GetAllDesignsAsync();
+            var materialTypes   = await _materialService.GetAllMaterialTypesAsync();
+            var materials       = await _materialService.GetAllMaterialsAsync();
+            var sizes           = await _sizeService.GetAllSizesAsync();
+            var statuses        = await _productService.GetAllProductStatusesAsync();
+
+            var viewModel = new ProductFilterViewModel
+            {
+                Products = products.Select(product => new ProductDetailsViewModel
+                {
+                    Id              = product.Id,
+                    Name            = product.Name,
+                    Description     = product.Description,
+                    DesignName      = product.Design?.Name,
+                    Design          = product.Design,
+                    Status          = product.Status?.Status_Name,
+                    Variants        = product.Variants.Select(v => new ProductStockViewModel
+                    {
+                        MaterialTypeName    = v.MaterialSize.Material.MaterialType.Name,
+                        MaterialName        = v.MaterialSize.Material.Name,
+                        MaterialSizeName    = v.MaterialSize.Size.Size_Name,
+                        CustomPrice         = v.CustomPrice,
+                        Cost                = v.Cost,
+                        Stock               = v.Stock
+                    }).ToList()
+                }).ToList(),
+                Designs = designs.Select(d => new SelectListItem
+                {
+                    Value = d.Id.ToString(),
+                    Text = d.Name
+                }),
+                MaterialTypes = materialTypes.Select(mt => new SelectListItem
+                {
+                    Value = mt.Id.ToString(),
+                    Text = mt.Name
+                }),
+                Materials = materials.Select(m => new SelectListItem
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Name
+                }),
+                sizesList = sizes.Select(ms => new SelectListItem
+                {
+                    Value = ms.Size_Id.ToString(),
+                    Text = ms.Size_Name
+                }),
+                Statuses = statuses.Select(s => new SelectListItem
+                {
+                    Value = s.Status_Id.ToString(),
+                    Text = s.Status_Name
+                }),
+                ProductName             = productName,
+                SelectedDesignId        = designId,
+                SelectedMaterialTypeId  = materialTypeId,
+                SelectedMaterialId      = materialId,
+                SelectedSizeId          = sizeId,
+                SelectedStatusId        = statusId
+            };
 
             return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult Details(Guid id)
+        public async Task<IActionResult> Details(Guid id)
         {
-            var product = _productService.GetProductById(id);
+            var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
+            // Obtener variantes (ProductStock) del producto
+            var productStocks = await _productService.GetProductStocksByProductIdAsync(product.Id);
+
             var viewModel = new ProductDetailsViewModel
             {
-                Id                  = product.Id,
-                Name                = product.Name,
-                Description         = product.Description,
-                Design              = product.Design?.Name,
-                Material            = product.MaterialSize?.Material.Name,
-                MaterialType        = product.MaterialSize?.Material.MaterialType.Name,
-                MaterialSize        = product.MaterialSize?.Size.Size_Name,
-                Status              = product.Status?.Status_Name
+                Id          = product.Id,
+                Name        = product.Name,
+                Description = product.Description,
+                Price       = product.GeneralPrice ?? 0,
+                Status      = product.Status?.Status_Name,
+                DesignName  = product.Design?.Name,
+                Design      = product.Design,
+
+
+                // Cargar variantes del producto
+                Variants = productStocks.Select(ps => new ProductStockViewModel
+                {
+                    MaterialTypeName = ps.MaterialSize.Material.MaterialType.Name,
+                    MaterialName     = ps.MaterialSize.Material.Name,
+                    MaterialSizeName = ps.MaterialSize.Size.Size_Name,
+                    Stock            = ps.Stock,
+                    CustomPrice      = ps.CustomPrice,
+                    Cost             = ps.Cost
+                }).ToList()
             };
 
             return View(viewModel);
         }
+
+
+        [HttpPost]
+        [Produces("application/json")]
+        public async Task<IActionResult> AddVariant([FromBody] ProductStockViewModel variant)
+        {
+            if (variant == null || variant.MaterialId == Guid.Empty || variant.SizeId == 0)
+            {
+                return Json(new { success = false, message = "Error en datos" });
+            }
+            
+            var sessionVariants = HttpContext.Session.GetObjectFromJson<List<ProductStockViewModel>>("Variants") ?? new List<ProductStockViewModel>();
+            var materialSize    = await _materialService.GetMaterialSizeAsync(variant.MaterialId, variant.SizeId);
+
+            if (materialSize == null)
+            {
+                return Json(new { success = false, message = "Material y/o Tamaño no válido" });
+            }
+
+            var newVariant = new ProductStockViewModel
+            {
+                MaterialId          = variant.MaterialId,
+                SizeId              = variant.SizeId,
+                MaterialName        = materialSize.Material?.Name ?? "N/A",
+                MaterialTypeName    = materialSize.Material?.MaterialType.Name ?? "N/A",
+                MaterialSizeName    = materialSize.Size?.Size_Name ?? "N/A",
+                CustomPrice         = variant.CustomPrice,
+                Cost                = materialSize.Cost,
+                Stock               = variant.Stock
+            };
+
+            sessionVariants.Add(newVariant);
+            HttpContext.Session.SetObjectAsJson("Variants", sessionVariants);
+
+            return Json(new { success = true, VariantList = sessionVariants });
+
+        }        
+
+        [HttpDelete]
+        public IActionResult DeleteVariant([FromBody] DeleteVariantRequest request)
+        {
+            if (request == null || request.MaterialId == Guid.Empty)
+            {
+                return Json(new { success = false, message = "MaterialId inválido." });
+            }
+
+            try
+            {
+                var sessionVariants = HttpContext.Session.GetObjectFromJson<List<ProductStockViewModel>>("Variants") ?? new List<ProductStockViewModel>();
+                var updatedVariants = sessionVariants.Where(item => item.MaterialId != request.MaterialId).ToList();
+                HttpContext.Session.SetObjectAsJson("Variants", updatedVariants);
+
+                return Json(new { success = true, message = "Variant eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al eliminar el variante: {ex.Message}" });
+            }
+        }
+
+       [HttpPost]
+        public IActionResult UpdateVariant([FromBody] ProductStockViewModel updatedVariant)
+        {
+            var sessionVariants = HttpContext.Session.GetObjectFromJson<List<ProductStockViewModel>>("Variants") ?? new List<ProductStockViewModel>();
+            var variant         = sessionVariants.FirstOrDefault(m => m.MaterialId == updatedVariant.MaterialId);
+            
+            if (variant != null)
+            {
+                variant.Stock       = updatedVariant.Stock;
+                variant.CustomPrice = updatedVariant.CustomPrice;
+
+                HttpContext.Session.SetObjectAsJson("ReceiptItems", sessionVariants);
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+   
+        [HttpPost]
+        public async Task<IActionResult> UpdateProductHeader([FromBody] ProductHeaderViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(model.SelectedProductName))
+                {
+                    HttpContext.Session.SetString("SelectedProductName", model.SelectedProductName);
+                }
+
+                if (model.SelectedGeneralPrice.HasValue)
+                {
+                    HttpContext.Session.SetString("SelectedGeneralPrice", model.SelectedGeneralPrice.ToString());
+                }
+
+                if (!string.IsNullOrEmpty(model.SelectedDescription))
+                {
+                    HttpContext.Session.SetString("SelectedDescription", model.SelectedDescription);
+                }
+
+                if (model.SelectedDesignId != null)
+                {
+                    HttpContext.Session.SetString("SelectedDesignId", model.SelectedDesignId.ToString());
+                    Guid DesignId   = model.SelectedDesignId.Value;
+                    var design      = await _designService.GetDesignByIdAsync(DesignId);
+                    HttpContext.Session.SetObjectAsJson("SelectedDesignDetails", design);
+                }
+
+                return Json(new { success = true});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en Product Header: {ex.Message}");
+                return Json(new { success = false, message = "Error al actualizar el Product header." });
+            }
+        }  
+         
     }
 }
