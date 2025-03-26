@@ -40,6 +40,8 @@ namespace RetailTrack.ViewModels
         public decimal? CustomPrice { get; set; } = 0;
         public decimal Cost { get; set; } = 0; 
         public int Stock { get; set; } = 0;
+        public bool Available { get; set; }
+        public string AvailableDescription {get; set;}
     }
 
     public class ProductDetailsViewModel
@@ -88,5 +90,35 @@ namespace RetailTrack.ViewModels
         public string SelectedDescription { get; set; } = string.Empty;
         public Guid? SelectedDesignId { get; set; }
         public Design SelectedDesignDetails {get; set;}
+    }
+
+    public class ProductEditViewModel
+    {
+        public Product Product { get; set; }
+
+        // Variantes del producto (ProductStock)
+        public List<ProductStockViewModel> Variants { get; set; } = new List<ProductStockViewModel>();
+
+        // Diseño asociado
+        public Design? SelectedDesignDetails { get; set; }
+
+        // Listas de selección
+        public IEnumerable<SelectListItem> Designs { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Statuses { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> MaterialTypes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Materials { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Sizes { get; set; } = new List<SelectListItem>();
+
+        // Propiedades auxiliares para mantener estado tras recarga
+        public Guid? SelectedDesignId { get; set; }
+        public string? SelectedProductName { get; set; }
+        public string? SelectedDescription { get; set; }
+        public decimal? SelectedGeneralPrice { get; set; }
+
+        // Filtros seleccionados en cascada para variantes
+        public Guid? SelectedMaterialTypeId { get; set; }
+        public Guid? SelectedMaterialId { get; set; }
+        public int? SelectedSizeId { get; set; }
+        public int SelectedState {get; set;}
     }
 }

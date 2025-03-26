@@ -11,43 +11,17 @@ namespace RetailTrack.Services
     public class ProductService
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductService(ApplicationDbContext context)
+        private readonly MaterialService _materialService;
+        public ProductService(ApplicationDbContext context, MaterialService materialService)
         {
             _context = context;
+            _materialService = materialService;
         }
 
         // Crear un producto
         public async Task AddProductAsync(Product product)
         {
             _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-        }
-
-        
-        public async Task AddProductStocksAsync(List<ProductStock> productStocks)
-        {
-            if (productStocks == null || !productStocks.Any())
-            {
-                throw new ArgumentException("La lista de variantes de productos (ProductStock) está vacía o es nula.");
-            }
-
-            // Asegurar que las referencias a MaterialSize sean correctas
-            foreach (var stock in productStocks)
-            {
-                var existingMaterialSize = await _context.MaterialSizes
-                    .FirstOrDefaultAsync(ms => ms.MaterialId == stock.MaterialId && ms.SizeId == stock.SizeId);
-
-                if (existingMaterialSize == null)
-                {
-                    throw new InvalidOperationException($"No se encontró MaterialSize para MaterialId {stock.MaterialId} y SizeId {stock.SizeId}.");
-                }
-
-                stock.MaterialSize = existingMaterialSize;
-            }
-
-            // Agregar los ProductStock en la BD
-            await _context.ProductStocks.AddRangeAsync(productStocks);
             await _context.SaveChangesAsync();
         }
 
@@ -166,6 +140,63 @@ namespace RetailTrack.Services
                 .Include(ps => ps.MaterialSize)
                     .ThenInclude(ms => ms.Size)
                 .ToListAsync();
+        }
+
+        public async Task UpSertProductStocksByProductIdAsync(Guid productId, List<ProductStock> inVariants)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var localVariants = await _context.ProductStocks
+                    .Where(ps => ps.ProductId == productId)
+                    .ToListAsync();
+
+                foreach (var incoming in inVariants)
+                {
+                    var existing = localVariants.FirstOrDefault(lv =>
+                        lv.MaterialId == incoming.MaterialId && lv.SizeId == incoming.SizeId);
+                    var units = 0;
+
+                    if (existing != null)
+                    {
+                        // Si hay diferencias, actualizamos
+                        if (existing.CustomPrice != incoming.CustomPrice ||
+                            existing.Cost != incoming.Cost ||
+                            existing.Stock != incoming.Stock ||
+                            existing.Available != incoming.Available)
+                        {
+                            existing.CustomPrice = incoming.CustomPrice;
+                            existing.Cost = incoming.Cost;
+                            existing.Stock = incoming.Stock;
+                            existing.Available = incoming.Available;
+
+                            _context.ProductStocks.Update(existing);
+
+                            // Actualiza el stock del material size
+                            units = existing.Stock * (-1);
+                            await _materialService.UpdateMaterialSizeStockAsync(existing.MaterialId, existing.SizeId, units);
+                        }
+                    }
+                    else
+                    {
+                        incoming.ProductId = productId;
+                        _context.ProductStocks.Add(incoming);
+
+                        // También actualiza stock del material size al insertar
+                        units = incoming.Stock *(-1);
+                        await _materialService.UpdateMaterialSizeStockAsync(incoming.MaterialId, incoming.SizeId, units);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"Error en UpSertProductStocksByProductIdAsync: {ex.Message}");
+                throw; // Propaga el error para que lo capture el controlador
+            }
         }
 
 

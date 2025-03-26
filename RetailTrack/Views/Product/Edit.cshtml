@@ -1,0 +1,193 @@
+@model RetailTrack.ViewModels.ProductEditViewModel
+
+@section Scripts {
+    <script src="~/js/Product/showTabs.js"></script>
+    <script src="~/js/GetDesign.js"></script>
+    <script src="~/js/Product/editVariantList.js"></script>
+    <script src="~/js/Product/ProductHeader.js"></script>    
+    <script src="~/js/Product/validateProductUpd.js"></script>
+}
+
+<div class="container">
+    <div class="card p-4 shadow">
+        <!-- Navegación de pestañas -->
+        <ul class="nav nav-tabs" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="product-info-tab" data-bs-toggle="tab" data-bs-target="#product-info" type="button" role="tab" aria-controls="product-info" aria-selected="true">Datos del Producto</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="product-variants-tab" data-bs-toggle="tab" data-bs-target="#product-variants" type="button" role="tab" aria-controls="product-variants" aria-selected="false"></button>
+            </li>
+        </ul>    
+
+        <form asp-action="EditProduct" method="post">
+            <input type="hidden" name="Product.Id" value="@Model.Product.Id" />
+            <input type="hidden" name="Product.DesignId" value="@Model.Product.DesignId" />
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade show active" id="product-info" role="tabpanel" aria-labelledby="product-info-tab">
+                    <div class="row">
+                        <!-- Datos Generales del Producto -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Product.Name">Nombre del Producto</label>
+                                <input class="form-control" id="SelectedProductName" name="SelectedProductName" value="@Model.SelectedProductName"/>
+                                <span asp-validation-for="Product.Name" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Product.GeneralPrice">Precio de Venta General</label>
+                                <input type="number" asp-for="Product.GeneralPrice" id="SelectedGeneralPrice" class="form-control" value="@Model.SelectedGeneralPrice.ToString().Replace(",", ".")" step="0.01" />
+                                <span asp-validation-for="Product.GeneralPrice" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Product.Description">Descripción</label>
+                                <textarea asp-for="Product.Description" id="SelectedDescription" class="form-control">@Model.SelectedDescription</textarea>
+                                <span asp-validation-for="Product.Description" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Product.ProductStatusId">Estado</label>
+                                <select asp-for="Product.ProductStatusId" id="SelectedState" class="form-control">
+                                    @foreach (var status in Model.Statuses)
+                                    {
+                                        <option value="@status.Value" selected="@(Model.SelectedState.ToString() == status.Value ? "selected" : null)">
+                                            @status.Text
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Product.ProductStatusId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Diseño Seleccionado -->
+                        <div class="col-md-6 shadow">
+                            <div class="mb-3">
+                                <label for="designDescription" class="form-label fw-bold">Diseño: </label>
+                                @Model.SelectedDesignDetails?.Name
+                            </div>
+                            <div class="mb-3">
+                                <label for="designDescription" class="form-label fw-bold">Descripción: </label>
+                                @Model.SelectedDesignDetails?.Description
+                            </div>
+                            <div class="mb-3">
+                                <label for="designPrice" class="form-label fw-bold">Costo: </label>
+                                $ @Model.SelectedDesignDetails?.Price.ToString("F2")
+                            </div>
+                            <div class="mb-3">
+                                <label for="designImageUrl" class="form-label fw-bold">Imagen</label>
+                                <div id="designImageContainer">
+                                    <img id="designImage" src="@Url.Content($"~/{Model.SelectedDesignDetails?.ImageUrl}")" alt="Diseño" width="100" class="img-fluid border rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pestaña: Variantes -->
+                <div class="tab-pane fade" id="product-variants" role="tabpanel" aria-labelledby="product-variants-tab">
+                    <h4 class="fw-bold text-dark mt-3">Variantes del Producto</h4>
+                    <div id="variants-container">
+                        <div class="row mb-2 variant-entry">
+                            <div class="col-md-4">
+                                <label>Tipo de Material</label>
+                                <select class="form-control material-type-select" name="MaterialTypeId" onchange="getMaterialsByType(this.value)">
+                                    <option value="">Seleccione un tipo de material</option>
+                                    @foreach (var materialType in Model.MaterialTypes)
+                                    {
+                                        <option value="@materialType.Value">@materialType.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Material</label>
+                                <select id="MaterialId" name="MaterialId" class="form-control" onchange="getMaterialSizesByMaterial(this.value)">
+                                    <option value="">Todos</option>
+                                    @foreach (var material in Model.Materials)
+                                    {
+                                        <option value="@material.Value" selected="@(Model.SelectedMaterialId.HasValue && Model.SelectedMaterialId.ToString() == material.Value)">
+                                            @material.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Talle</label>
+                                <select id="SizeId" name="SizeId" class="form-control">
+                                    <option value="">Todos</option>
+                                    @foreach (var size in Model.Sizes)
+                                    {
+                                        <option value="@size.Value" selected="@(Model.SelectedSizeId.HasValue && Model.SelectedSizeId.ToString() == size.Value)">
+                                            @size.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Stock</label>
+                                <input type="number" name="Stock" class="form-control stock-input" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Precio de Venta</label>
+                                <input type="number" name="Price" class="form-control price-input" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Botón para agregar más variantes -->
+                    <div class="row mb-3">
+                        <div class="col text-end">
+                            <button type="button" class="btn btn-success" id="add-variant">Agregar Variante</button>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Nuevo Material</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Lista de Variantes -->
+            <h4 class="mt-5 mb-3">Variantes del Producto <button type="button" id="toggleVariants" class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></h4>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Hab.</th>                        
+                            <th>Tipo de Material</th>
+                            <th>Material</th>
+                            <th>Talle</th>
+                            <th>Precio</th>
+                            <th>Costo</th>
+                            <th>Stock</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="variants-container">
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <tr class="variant-row">
+                               <td>
+                                    <input type="checkbox" class="form-check-input variant-available" data-material-id="@variant.MaterialId" data-size-id="@variant.SizeId" @(variant.Available ? "checked" : "") />
+                                </td>                            
+                                <td>@variant.MaterialTypeName</td>
+                                <td>@variant.MaterialName</td>
+                                <td>@variant.MaterialSizeName</td>
+                                <td>
+                                    <input type="number" class="form-control variant-unitcost" value="@variant.CustomPrice?.ToString("0.##")" step="0.01" data-material-id="@variant.MaterialId" onchange="updateVariant(this)"/>
+                                </td>
+                                <td>@variant.Cost.ToString("F2")</td>
+                                <td>
+                                    <input type="number" class="form-control variant-quantity" value="@variant.Stock" data-material-id="@variant.MaterialId" onchange="updateVariant(this)"/>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Acciones -->
+            <div class="row mt-4">
+                <div class="col text-end">
+                    <button type="button" id="saveProductButton" class="btn btn-success">Guardar Cambios</button>
+                    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,5 +1,9 @@
 @model RetailTrack.ViewModels.ProductFilterViewModel
 
+@section Scripts {
+    <script src="~/js/Product/cleanProductSession.js"></script>
+}
+
 <h2>Lista de Productos</h2>
 
 <!-- Filtros -->
@@ -36,47 +40,6 @@
         </div>
     </div>
 
-    <div class="row mt-3">
-        <!-- Segunda fila: Tipo de Material, Material y Talle -->
-        <div class="col-md-3">
-            <label for="MaterialTypeId">Tipo de Material</label>
-            <select id="MaterialTypeId" name="MaterialTypeId" class="form-control" onchange="getMaterialsByType(this.value)">
-                <option value="">Todos</option>
-                @foreach (var materialType in Model.MaterialTypes)
-                {
-                    <option value="@materialType.Value" selected="@(Model.SelectedMaterialTypeId.HasValue && Model.SelectedMaterialTypeId.ToString() == materialType.Value)">
-                        @materialType.Text
-                    </option>
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="MaterialId">Material</label>
-            <select id="MaterialId" name="MaterialId" class="form-control" onchange="getMaterialSizesByMaterial(this.value)">
-                <option value="">Todos</option>
-                @foreach (var material in Model.Materials)
-                {
-                    <option value="@material.Value" selected="@(Model.SelectedMaterialId.HasValue && Model.SelectedMaterialId.ToString() == material.Value)">
-                        @material.Text
-                    </option>
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="SizeId">Talle</label>
-            <select id="SizeId" name="SizeId" class="form-control">
-                <option value="">Todos</option>
-                @foreach (var size in Model.sizesList)
-                {
-                    <option value="@size.Value" selected="@(Model.SelectedSizeId.HasValue && Model.SelectedSizeId.ToString() == size.Value)">
-                        @size.Text
-                    </option>
-                }
-            </select>
-        </div>
-    </div>
-
-
     <!-- Acciones: Filtrar y Limpiar, alineados a la derecha -->
     <div class="row mt-3">
         <div class="col text-end">
@@ -87,8 +50,8 @@
 </form>
 
 <!-- Botón de Crear Nuevo Producto -->
-<div class="mb-3 text-start">
-    <a href="@Url.Action("Create", "Product")" class="btn btn-success">Nuevo Producto</a>
+<div class="mb-3 text-start">   
+    <button id="newProductButton" class="btn btn-success btn-block">Ingresar producto</button>
 </div>
 
 <!-- Tabla de Productos -->
@@ -108,7 +71,8 @@
                 <td>@product.DesignName</td>
                 <td>@product.Status</td>
                 <td>
-                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info"><i class="bi bi-search"></i></a>
+                    <button  id="editProductButton" href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info btn-block" ><i class="bi bi-search"></i></button>
+                    <button class="btn btn-info btn-block editProductButton" data-product-id="@product.Id"><i class="bi bi-pencil"></i></button>
                 </td>
             </tr>
         }

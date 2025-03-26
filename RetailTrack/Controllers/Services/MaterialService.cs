@@ -187,5 +187,14 @@ public class MaterialService
         
     }    
 
-
+    public async Task UpdateMaterialSizeStockAsync (Guid materialId, int sizeId, int units )
+    {
+        var materialsize = await GetMaterialSizeAsync(materialId, sizeId);
+        if (materialsize == null)
+        {
+            throw new InvalidOperationException($"No se encontró MaterialSize para MaterialId {materialId} y SizeId {sizeId}");
+        }
+        materialsize.Stock += units;
+        await UpdateMaterialSizeAsync(materialsize); 
+    }
 }

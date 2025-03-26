@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RetailTrack.Data; 
 using RetailTrack.Services;
-using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
-
+using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,89 +37,61 @@ builder.Services
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.HttpOnly = true;
     })
+
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
-        options.ClientId = builder.Configuration["Auth0:ClientId"];
-        options.ClientSecret = builder.Configuration["Auth0:ClientSecret"];
-        var auth0Audience = builder.Configuration["Auth0:Audience"];
-        options.ResponseType = "code";
+        var keycloakConfig = builder.Configuration.GetSection("Authentication:Keycloak");
+
+        options.Authority            = keycloakConfig["Authority"];
+        options.RequireHttpsMetadata = bool.Parse(keycloakConfig["RequireHttpsMetadata"] ?? "true");
+        options.ClientId             = keycloakConfig["ClientId"];
+        options.ClientSecret         = keycloakConfig["ClientSecret"];
+        options.CallbackPath         = keycloakConfig["CallbackPath"];
+        options.ResponseType         = keycloakConfig["ResponseType"];
+        options.SaveTokens           = bool.Parse(keycloakConfig["SaveTokens"] ?? "true");
 
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
 
-        options.CallbackPath = "/callback";
-        options.SignedOutCallbackPath = "/logout";
-        options.SaveTokens = true;
-        options.UseTokenLifetime = true;
-
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.GetClaimsFromUserInfoEndpoint = true;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            RequireExpirationTime = true,
-            RequireSignedTokens = true,
-            ValidAudience = builder.Configuration["Auth0:ClientId"],
-            ValidIssuer = $"https://{builder.Configuration["Auth0:Domain"]}/"
+            ValidateAudience = false,
+            ValidateLifetime = true
         };
 
-        options.Events = new OpenIdConnectEvents
-        {
-            OnRedirectToIdentityProvider = context =>
-            {
-                Console.WriteLine("🔹 Enviando solicitud de autenticación con audience:");
-                Console.WriteLine($"   Audience: {auth0Audience}");
-
-                context.ProtocolMessage.SetParameter("audience", auth0Audience);
-                return Task.CompletedTask;
-            }
-        };
+        // Mapeo de claims personalizados
+        options.ClaimActions.DeleteClaim("roles");
+        options.ClaimActions.MapJsonKey("roles", "roles");
+        options.ClaimActions.MapUniqueJsonKey("roles", "roles");
 
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-        options.ClaimActions.MapJsonKey("picture", "picture");        
-        options.ClaimActions.MapJsonKey("roles", $"https://{builder.Configuration["Auth0:Domain"]}/claims/roles");
+
+        // Verificar claims en consola
+        options.Events.OnTokenValidated = context =>
+        {
+            var identity = (ClaimsIdentity)context.Principal.Identity;
+
+            Console.WriteLine(" Claims del Usuario Autenticado:");
+            foreach (var claim in identity.Claims)
+            {
+                Console.WriteLine($"   {claim.Type}: {claim.Value}");
+            }
+
+            return Task.CompletedTask;
+        };
     });
-
-var authConfig = new
-{
-    auth0Domain = builder.Configuration["Auth0:Domain"],
-    clientId = builder.Configuration["Auth0:ClientId"],
-    audience = builder.Configuration["Auth0:Audience"]
-};
-
-var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-var configJsonPath = Path.Combine(wwwrootPath, "config.json");
-
-// Asegurar que la carpeta wwwroot existe
-Directory.CreateDirectory(wwwrootPath);
-
-// Escribir el archivo config.json
-File.WriteAllText(configJsonPath, System.Text.Json.JsonSerializer.Serialize(authConfig));
-
-builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
-{
-    options.Events.OnTokenValidated = context =>
-    {
-        var claims = context.Principal.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
-        Console.WriteLine("🔹 Claims del Usuario Autenticado:");
-        claims.ForEach(c => Console.WriteLine($"   {c}"));
-
-        return Task.CompletedTask;
-    };
-});    
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("UserAproved", policy =>
-        policy.RequireClaim("https://retailtrack.com/roles", "UserAproved"));
+        policy.RequireClaim("roles", "UserAproved"));
 });
-   
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

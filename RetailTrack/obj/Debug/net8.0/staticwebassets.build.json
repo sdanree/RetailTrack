@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "q+Ya9cctOG9aEouU6m2OkUwK5g+7OBP0DmWlsZSg0Fo=",
+  "Hash": "XYcsN4gXo9aBfB/C6EBqVdLCYJ8YJNpqyZRjS7ao990=",
   "Source": "RetailTrack",
   "BasePath": "_content/RetailTrack",
   "Mode": "Default",
@@ -359,6 +359,25 @@
       "OriginalItemSpec": "wwwroot\\js\\Product\\addProductFilters.js"
     },
     {
+      "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\cleanProductSession.js",
+      "SourceId": "RetailTrack",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\",
+      "BasePath": "_content/RetailTrack",
+      "RelativePath": "js/Product/cleanProductSession.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Product\\cleanProductSession.js"
+    },
+    {
       "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\editVariantList.js",
       "SourceId": "RetailTrack",
       "SourceType": "Discovered",
@@ -433,6 +452,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\Product\\validateProduct.js"
+    },
+    {
+      "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\Product\\validateProductUpd.js",
+      "SourceId": "RetailTrack",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\",
+      "BasePath": "_content/RetailTrack",
+      "RelativePath": "js/Product/validateProductUpd.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Product\\validateProductUpd.js"
     },
     {
       "Identity": "C:\\Proyectos\\fabricaRopa\\RetailTrack\\wwwroot\\js\\ProviderNew.js",
