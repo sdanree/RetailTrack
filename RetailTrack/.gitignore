@@ -1,0 +1,23 @@
+# .NET
+**/bin/
+**/obj/
+**/publish/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Docker - Volúmenes persistentes
+keycloak/data/
+nginx/volumes/
+
+# Logs y configuración
+*.log
+.env
+.env.*
+
+# Sistema
+.DS_Store
+Thumbs.db
