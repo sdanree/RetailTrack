@@ -12,6 +12,14 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Fix para handshake SSL con Keycloak detrás de NGINX (ECDSA + proxy)
+if (!builder.Environment.IsDevelopment())
+{
+    AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", false);
+    System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+    Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
+}
+
 var environment = builder.Environment.EnvironmentName;
 
 // Configura el DbContext con MySQL
