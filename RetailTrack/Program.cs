@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.HttpOverrides;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -169,6 +171,11 @@ var staticFileOptions = new StaticFileOptions
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+});
 
 // Agrega el middleware para habilitar la sesión
 app.UseSession();
