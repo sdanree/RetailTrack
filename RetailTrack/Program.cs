@@ -10,8 +10,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 //Fix para handshake SSL con Keycloak detrás de NGINX (ECDSA + proxy)
@@ -24,14 +22,12 @@ if (!builder.Environment.IsDevelopment())
 
 var environment = builder.Environment.EnvironmentName;
 
-// Configura el DbContext con MySQL
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
-    
-// Obtener la cadena de conexión según el entorno
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services
@@ -47,7 +43,6 @@ builder.Services
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.HttpOnly = true;
     })
-
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
         var keycloakConfig = builder.Configuration.GetSection("Authentication:Keycloak");
@@ -74,7 +69,6 @@ builder.Services
             ValidateLifetime = true
         };
 
-        // Mapeo de claims personalizados
         options.ClaimActions.DeleteClaim("roles");
         options.ClaimActions.MapJsonKey("roles", "roles");
         options.ClaimActions.MapUniqueJsonKey("roles", "roles");
@@ -82,7 +76,6 @@ builder.Services
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
 
-        // Verificar claims en consola
         options.Events.OnTokenValidated = context =>
         {
             var identity = (ClaimsIdentity)context.Principal.Identity;
@@ -108,14 +101,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied"; 
 });
 
-// Configura el DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine, LogLevel.Information)
 );
 
-// Otros servicios
 builder.Services.AddScoped<ProductService>(); 
 builder.Services.AddScoped<MovementService>();
 builder.Services.AddScoped<DesignService>();
@@ -126,15 +117,13 @@ builder.Services.AddScoped<SizeService>();
 builder.Services.AddScoped<ProviderService>();
 builder.Services.AddScoped<PurchaseOrderService>();
 
-// Configura Razor Runtime Compilation
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
-// Configura la sesión
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de vida de la sesión
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -146,7 +135,6 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();
 
-// 🔄 Reenvío de encabezados (debe ir antes que nada relacionado con routing/auth)
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
@@ -156,42 +144,42 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     KnownProxies = { }
 });
 
-// Manejo de errores
+// 🌐 Leer publicOrigin para ajustar Scheme y Host según el entorno
+if (!app.Environment.IsDevelopment())
+{
+    var publicOrigin = builder.Configuration.GetSection("App")["PublicOrigin"];
+    if (!string.IsNullOrEmpty(publicOrigin))
+    {
+        var uri = new Uri(publicOrigin);
+        app.Use(async (context, next) =>
+        {
+            context.Request.Scheme = uri.Scheme;
+            context.Request.Host = new HostString(uri.Host, (uri.Port == 80 || uri.Port == 443) ? 0 : uri.Port);
+            await next();
+        });
+    }
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
-// 🔒 Redirección HTTPS
 app.UseHttpsRedirection();
-
-// Archivos estáticos
 app.UseStaticFiles();
-
-// Ruteo
 app.UseRouting();
-
-// Sesión
 app.UseSession();
-
-// Autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Logging de todas las solicitudes (opcional)
-/*
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path} | Scheme: {context.Request.Scheme}");
-    await next();
-});
-*/
 
 app.Use(async (context, next) =>
 {
