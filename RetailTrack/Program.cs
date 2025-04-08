@@ -146,6 +146,15 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+    ForwardLimit = null,
+    RequireHeaderSymmetry = false,
+    KnownNetworks = { },
+    KnownProxies = { }
+});
+
 // Middleware para registrar todas las solicitudes en consola
 app.Use(async (context, next) =>
 {
@@ -172,10 +181,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+/*
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
+*/
 
 // Agrega el middleware para habilitar la sesión
 app.UseSession();
