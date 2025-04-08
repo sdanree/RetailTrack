@@ -185,65 +185,27 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Logging de todas las solicitudes (opcional)
+/*
 app.Use(async (context, next) =>
 {
     Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path} | Scheme: {context.Request.Scheme}");
     await next();
 });
+*/
 
-app.Run();
-
-/*
-var app = builder.Build();
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
-    ForwardLimit = null,
-    RequireHeaderSymmetry = false,
-    KnownNetworks = { },
-    KnownProxies = { }
-});
-
-// Middleware para registrar todas las solicitudes en consola
 app.Use(async (context, next) =>
 {
-    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
-    await next();
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"EXCEPCIÓN EN REQUEST: {context.Request.Path}");
+        Console.WriteLine($"ERROR: {ex.Message}");
+        Console.WriteLine($"STACKTRACE: {ex.StackTrace}");
+        throw;
+    }
 });
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-var staticFileOptions = new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = ""
-};
-app.UseStaticFiles();
-
-app.UseRouting();
-
-//app.UseForwardedHeaders(new ForwardedHeadersOptions
-//{
-//    ForwardedHeaders = ForwardedHeaders.XForwardedProto
-//});
-
-// Agrega el middleware para habilitar la sesión
-app.UseSession();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
 app.Run();
-*/
