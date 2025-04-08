@@ -146,6 +146,56 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();
 
+// 🔄 Reenvío de encabezados (debe ir antes que nada relacionado con routing/auth)
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+    ForwardLimit = null,
+    RequireHeaderSymmetry = false,
+    KnownNetworks = { },
+    KnownProxies = { }
+});
+
+// Manejo de errores
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+// 🔒 Redirección HTTPS
+app.UseHttpsRedirection();
+
+// Archivos estáticos
+app.UseStaticFiles();
+
+// Ruteo
+app.UseRouting();
+
+// Sesión
+app.UseSession();
+
+// Autenticación y autorización
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Rutas
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Logging de todas las solicitudes (opcional)
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path} | Scheme: {context.Request.Scheme}");
+    await next();
+});
+
+app.Run();
+
+/*
+var app = builder.Build();
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
@@ -181,12 +231,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-/*
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto
-});
-*/
+//app.UseForwardedHeaders(new ForwardedHeadersOptions
+//{
+//    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+//});
 
 // Agrega el middleware para habilitar la sesión
 app.UseSession();
@@ -198,3 +246,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+*/
