@@ -89,6 +89,11 @@ builder.Services
 
             return Task.CompletedTask;
         };
+        options.Events.OnRemoteFailure = context =>
+        {
+            Console.WriteLine($"OpenID error: {context.Failure?.Message}");
+            return Task.CompletedTask;
+        };        
     });
 
 builder.Services.AddAuthorization(options =>
@@ -134,6 +139,13 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -155,7 +167,6 @@ if (!app.Environment.IsDevelopment())
         app.Use(async (context, next) =>
         {
             context.Request.Scheme = uri.Scheme;
-            //context.Request.Host = new HostString(uri.Host, (uri.Port == 80 || uri.Port == 443) ? 0 : uri.Port);
             context.Request.Host = uri.IsDefaultPort ? new HostString(uri.Host) : new HostString(uri.Host, uri.Port);
             await next();
         });
