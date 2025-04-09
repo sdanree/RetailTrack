@@ -155,7 +155,8 @@ if (!app.Environment.IsDevelopment())
         app.Use(async (context, next) =>
         {
             context.Request.Scheme = uri.Scheme;
-            context.Request.Host = new HostString(uri.Host, (uri.Port == 80 || uri.Port == 443) ? 0 : uri.Port);
+            //context.Request.Host = new HostString(uri.Host, (uri.Port == 80 || uri.Port == 443) ? 0 : uri.Port);
+            context.Request.Host = uri.IsDefaultPort ? new HostString(uri.Host) : new HostString(uri.Host, uri.Port);
             await next();
         });
     }
