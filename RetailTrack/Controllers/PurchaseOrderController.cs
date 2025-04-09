@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
-    [Authorize(Policy = "UserAproved")]
+    [Authorize(Roles = "UserApproved")]
     public class PurchaseOrderController : Controller
     {
         private readonly PurchaseOrderService _purchaseOrderService;

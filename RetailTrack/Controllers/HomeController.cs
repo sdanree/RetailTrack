@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
-    // [Authorize(Policy = "UserAproved")]
     [Authorize]
     public class HomeController : Controller
     {

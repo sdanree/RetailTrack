@@ -66,7 +66,8 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
             ValidateAudience = false,
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            RoleClaimType = ClaimTypes.Role
         };
 
         options.ClaimActions.DeleteClaim("roles");
@@ -92,7 +93,7 @@ builder.Services
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("UserAproved", policy =>
+    options.AddPolicy("UserApproved", policy =>
         policy.RequireClaim("roles", "UserAproved"));
 });
 
@@ -144,7 +145,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     KnownProxies = { }
 });
 
-// 🌐 Leer publicOrigin para ajustar Scheme y Host según el entorno
+//  Leer publicOrigin para ajustar Scheme y Host según el entorno
 if (!app.Environment.IsDevelopment())
 {
     var publicOrigin = builder.Configuration.GetSection("App")["PublicOrigin"];

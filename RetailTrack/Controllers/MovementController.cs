@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace RetailTrack.Controllers
 {
-    [Authorize(Policy = "UserAproved")]
+    [Authorize(Roles = "UserApproved")]
     public class MovementController : Controller
     {
         private static List<Movement> Movements = new List<Movement>();
