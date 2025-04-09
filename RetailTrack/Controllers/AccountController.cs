@@ -41,7 +41,7 @@ public class AccountController : Controller
     }
 
 
-    [Authorize(Policy = "UserAproved")]
+    [Authorize(Roles = "UserApproved")]
     public IActionResult Profile()
     {
         return View(new
