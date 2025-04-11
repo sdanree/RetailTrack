@@ -34,6 +34,31 @@ namespace RetailTrack.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Forzar nombres de tabla en minúsculas para coincidir con MySQL en Linux
+            modelBuilder.Entity<Product>().ToTable("products");
+            modelBuilder.Entity<Design>().ToTable("designs");
+            modelBuilder.Entity<MaterialType>().ToTable("materialtypes");
+            modelBuilder.Entity<Material>().ToTable("materials");
+            modelBuilder.Entity<MaterialSize>().ToTable("materialsizes");
+            modelBuilder.Entity<Movement>().ToTable("movements");
+            modelBuilder.Entity<MovementType>().ToTable("movementtypes");
+            modelBuilder.Entity<Size>().ToTable("sizes");
+            modelBuilder.Entity<ProductStatus>().ToTable("productstatuses");
+            modelBuilder.Entity<Receipt>().ToTable("receipts");
+            modelBuilder.Entity<ReceiptDetail>().ToTable("receiptdetails");
+            modelBuilder.Entity<ReceiptPayment>().ToTable("receiptpayments");
+            modelBuilder.Entity<PaymentMethod>().ToTable("paymentmethods");
+            modelBuilder.Entity<Provider>().ToTable("providers");
+            modelBuilder.Entity<PurchaseOrder>().ToTable("purchaseorders");
+            modelBuilder.Entity<PurchaseOrderDetail>().ToTable("purchaseorderdetails");
+            modelBuilder.Entity<Order>().ToTable("orders");
+            modelBuilder.Entity<OrderStatus>().ToTable("orderstatuses");
+            modelBuilder.Entity<OrderDetail>().ToTable("orderdetails");
+            modelBuilder.Entity<ProductStock>().ToTable("productstocks");
+            modelBuilder.Entity<OrderPayment>().ToTable("orderpayments");
+
+
             
             // Sincronizar los valores del Enum con la base de datos
             modelBuilder.Entity<OrderStatus>().HasData(
