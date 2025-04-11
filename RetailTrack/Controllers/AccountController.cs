@@ -31,13 +31,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Logout()
     {
-        var returnUrl = Url.Action("Login", "Account", null, Request.Scheme);
-        var auth0Domain = _configuration["Auth0:Domain"];
-        var auth0ClientId = _configuration["Auth0:ClientId"];
-
-        var auth0LogoutUrl = $"https://{auth0Domain}/v2/logout?client_id={auth0ClientId}&returnTo={Uri.EscapeDataString(returnUrl)}";
-
-        return Redirect(auth0LogoutUrl);
+        return SignOut(new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("Login", "Account", null, Request.Scheme)
+        },
+        "Cookies", "OpenIdConnect");
     }
 
 
