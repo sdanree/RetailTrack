@@ -55,6 +55,17 @@ builder.Services
         options.ResponseType         = keycloakConfig["ResponseType"];
         options.SaveTokens           = bool.Parse(keycloakConfig["SaveTokens"] ?? "true");
 
+        
+        options.SignedOutCallbackPath = "/signout-callback-oidc";
+
+        // Forzar SameSite=None y Secure para las cookies OIDC
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.NonceCookie.SameSite       = SameSiteMode.None;
+        options.NonceCookie.SecurePolicy   = CookieSecurePolicy.Always;
+
+
+      
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");

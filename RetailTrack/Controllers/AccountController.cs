@@ -4,65 +4,77 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Auth0.AspNetCore.Authentication;
 
-[Route("[controller]/[action]")]
-public class AccountController : Controller
+namespace RetailTrack.Controllers
 {
-
-    private readonly IConfiguration _configuration;
-
-    public AccountController(IConfiguration configuration)
+    [Route("[controller]/[action]")]
+    public class AccountController : Controller
     {
-        _configuration = configuration;
-    }
+        private readonly IConfiguration _configuration;
 
-    [AllowAnonymous]
-    public IActionResult Login(string returnUrl = "/")
-    {
-        var authenticationProperties = new AuthenticationProperties
+        public AccountController(IConfiguration configuration)
         {
-            RedirectUri = returnUrl
-        };
+            _configuration = configuration;
+        }
 
-        return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
-    }
-
-    [AllowAnonymous]
-    public IActionResult Logout()
-    {
-        return SignOut(new AuthenticationProperties
+        [AllowAnonymous]
+        public IActionResult Login(string returnUrl = "/")
         {
-            RedirectUri = Url.Action("Login", "Account", null, Request.Scheme)
-        },
-        "Cookies", "OpenIdConnect");
-    }
+            var authenticationProperties = new AuthenticationProperties
+            {
+                RedirectUri = returnUrl
+            };
 
+            return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
+        }
 
-    [Authorize(Roles = "UserApproved")]
-    public IActionResult Profile()
-    {
-        return View(new
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
-            Name = User.Identity.Name,
-            EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-            ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
-        });
-    }
+            // 1) Notifica a Keycloak que cierre la sesión OIDC
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-    [AllowAnonymous]
-    [HttpGet]
-    public IActionResult Callback()
-    {
-        return User.Identity.IsAuthenticated
-            ? RedirectToAction("Index", "Home")
-            : RedirectToAction("Login");
-    }
+            // 2) Luego elimina la cookie de sesión local
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-    [AllowAnonymous]
-    public IActionResult AccessDenied()
-    {
-        return View();
-    }
+            // 3) Redirige al Home
+            return RedirectToAction("Index", "Home");
+        }
 
+        [AllowAnonymous]
+        [HttpGet("/signout-callback-oidc")]
+        public IActionResult SignedOutCallback()
+        {
+            // Keycloak redirige aquí tras cerrar sesión
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize(Roles = "UserApproved")]
+        public IActionResult Profile()
+        {
+            return View(new
+            {
+                Name = User.Identity.Name,
+                EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
+                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Callback()
+        {
+            return User.Identity.IsAuthenticated
+                ? RedirectToAction("Index", "Home")
+                : RedirectToAction("Login");
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+    }
 }
