@@ -17,20 +17,26 @@ namespace RetailTrack.Controllers
                              OpenIdConnectDefaults.AuthenticationScheme);
         }
 
+        // GET handler to catch any unexpected GET calls and redirect
         [AllowAnonymous]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        [HttpGet]
+        public IActionResult Logout()
         {
-            // 1) Notifica a Keycloak que cierre sesión
-            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-            // 2) Elimina cookie local
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            // 3) Redirige al home
             return RedirectToAction("Index", "Home");
         }
 
-        // Recibe la redirección tras logout en Keycloak
+        // POST handler to initiate OIDC logout
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogoutPost()
+        {
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Callback endpoint for post-logout redirect
         [AllowAnonymous]
         [HttpGet("/signout-callback-oidc")]
         public IActionResult SignedOutCallback()

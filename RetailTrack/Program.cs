@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RetailTrack.Data; 
+using RetailTrack.Data;
 using RetailTrack.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de entorno, tiempo y PII
+// Fix para handshake SSL con Keycloak detrás de NGINX (ECDSA + proxy)
 if (!builder.Environment.IsDevelopment())
 {
     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", false);
@@ -18,10 +18,12 @@ if (!builder.Environment.IsDevelopment())
     Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
 }
 
+var environment = builder.Environment.EnvironmentName;
+
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", false, true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -42,6 +44,8 @@ builder.Services
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
         var kc = builder.Configuration.GetSection("Authentication:Keycloak");
+        var publicOrigin = builder.Configuration["App:PublicOrigin"]; // e.g. "https://retail-test.duckdns.org"
+
         options.Authority            = kc["Authority"];
         options.RequireHttpsMetadata = bool.Parse(kc["RequireHttpsMetadata"] ?? "true");
         options.ClientId             = kc["ClientId"];
@@ -50,13 +54,13 @@ builder.Services
         options.ResponseType         = kc["ResponseType"];
         options.SaveTokens           = bool.Parse(kc["SaveTokens"] ?? "true");
 
-        // <-- Nuevos ajustes para logout y cookies OIDC -->
+        // Ajustes para logout y cookies OIDC
         options.SignedOutCallbackPath = "/signout-callback-oidc";
+        options.PostLogoutRedirectUri = $"{publicOrigin}/signout-callback-oidc";
         options.CorrelationCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.NonceCookie.SameSite       = SameSiteMode.None;
         options.NonceCookie.SecurePolicy   = CookieSecurePolicy.Always;
-        // <-- fin ajustes -->
 
         options.Scope.Add("openid");
         options.Scope.Add("profile");
@@ -72,12 +76,12 @@ builder.Services
             RoleClaimType            = ClaimTypes.Role
         };
 
-        // Logging de tokens y errores
         options.Events.OnTokenValidated = context =>
         {
             var id = (ClaimsIdentity)context.Principal.Identity;
             Console.WriteLine("Claims validados:");
-            foreach (var c in id.Claims) Console.WriteLine($" - {c.Type}: {c.Value}");
+            foreach (var c in id.Claims)
+                Console.WriteLine($" - {c.Type}: {c.Value}");
             return Task.CompletedTask;
         };
         options.Events.OnRemoteFailure = context =>
@@ -99,7 +103,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
         .LogTo(Console.WriteLine, LogLevel.Information));
 
 builder.Services.AddScoped<ProductService>();
-// … otros servicios …
+builder.Services.AddScoped<MovementService>();
+builder.Services.AddScoped<DesignService>();
+builder.Services.AddScoped<MaterialTypeService>();
+builder.Services.AddScoped<MaterialService>();
+builder.Services.AddScoped<ReceiptService>();
+builder.Services.AddScoped<SizeService>();
+builder.Services.AddScoped<ProviderService>();
+builder.Services.AddScoped<PurchaseOrderService>();
 
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
@@ -108,8 +119,8 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(opts =>
 {
     opts.IdleTimeout = TimeSpan.FromMinutes(30);
-    opts.Cookie.HttpOnly = true;
-    opts.Cookie.IsEssential = true;
+    opts.Cookie.HttpOnly    = true;
+    opts.Cookie.IsEssential  = true;
 });
 
 // Forwarded headers para HTTPS detrás de proxy
@@ -125,9 +136,9 @@ var app = builder.Build();
 // Aplicar forwarded headers antes de auth
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders   = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
-    RequireHeaderSymmetry = false,
-    ForwardLimit       = null
+    ForwardedHeaders       = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+    RequireHeaderSymmetry  = false,
+    ForwardLimit           = null
 });
 
 // Ajuste de PublicOrigin en producción
@@ -137,13 +148,13 @@ if (!app.Environment.IsDevelopment())
     if (!string.IsNullOrEmpty(publicOrigin))
     {
         var uri = new Uri(publicOrigin);
-        app.Use((ctx, next) =>
+        app.Use(async (ctx, next) =>
         {
             ctx.Request.Scheme = uri.Scheme;
             ctx.Request.Host   = uri.IsDefaultPort
                                  ? new HostString(uri.Host)
                                  : new HostString(uri.Host, uri.Port);
-            return next();
+            await next();
         });
     }
 }
