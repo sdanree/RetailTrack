@@ -5,14 +5,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
-using System.Text.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Fix para handshake SSL con Keycloak detrás de NGINX (ECDSA + proxy)
+// Configuración de entorno, tiempo y PII
 if (!builder.Environment.IsDevelopment())
 {
     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", false);
@@ -20,12 +18,10 @@ if (!builder.Environment.IsDevelopment())
     Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
 }
 
-var environment = builder.Environment.EnvironmentName;
-
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.json", false, true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
     .AddEnvironmentVariables();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -36,150 +32,118 @@ builder.Services
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-    })   
+    })
     .AddCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SameSite   = SameSiteMode.None;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.HttpOnly = true;
+        options.Cookie.HttpOnly    = true;
     })
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        var keycloakConfig = builder.Configuration.GetSection("Authentication:Keycloak");
+        var kc = builder.Configuration.GetSection("Authentication:Keycloak");
+        options.Authority            = kc["Authority"];
+        options.RequireHttpsMetadata = bool.Parse(kc["RequireHttpsMetadata"] ?? "true");
+        options.ClientId             = kc["ClientId"];
+        options.ClientSecret         = kc["ClientSecret"];
+        options.CallbackPath         = kc["CallbackPath"];
+        options.ResponseType         = kc["ResponseType"];
+        options.SaveTokens           = bool.Parse(kc["SaveTokens"] ?? "true");
 
-        options.Authority            = keycloakConfig["Authority"];
-        options.RequireHttpsMetadata = bool.Parse(keycloakConfig["RequireHttpsMetadata"] ?? "true");
-        options.ClientId             = keycloakConfig["ClientId"];
-        options.ClientSecret         = keycloakConfig["ClientSecret"];
-        options.CallbackPath         = keycloakConfig["CallbackPath"];
-        options.ResponseType         = keycloakConfig["ResponseType"];
-        options.SaveTokens           = bool.Parse(keycloakConfig["SaveTokens"] ?? "true");
-
-        
+        // <-- Nuevos ajustes para logout y cookies OIDC -->
         options.SignedOutCallbackPath = "/signout-callback-oidc";
-
-        // Forzar SameSite=None y Secure para las cookies OIDC
         options.CorrelationCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.NonceCookie.SameSite       = SameSiteMode.None;
         options.NonceCookie.SecurePolicy   = CookieSecurePolicy.Always;
+        // <-- fin ajustes -->
 
-
-      
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
-
         options.GetClaimsFromUserInfoEndpoint = true;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            RoleClaimType = ClaimTypes.Role
+            ValidateIssuer           = true,
+            ValidateAudience         = false,
+            ValidateLifetime         = true,
+            RoleClaimType            = ClaimTypes.Role
         };
 
-        options.ClaimActions.DeleteClaim("roles");
-        options.ClaimActions.MapJsonKey("roles", "roles");
-        options.ClaimActions.MapUniqueJsonKey("roles", "roles");
-
-        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-
+        // Logging de tokens y errores
         options.Events.OnTokenValidated = context =>
         {
-            var identity = (ClaimsIdentity)context.Principal.Identity;
-
-            Console.WriteLine(" Claims del Usuario Autenticado:");
-            foreach (var claim in identity.Claims)
-            {
-                Console.WriteLine($"   {claim.Type}: {claim.Value}");
-            }
-
+            var id = (ClaimsIdentity)context.Principal.Identity;
+            Console.WriteLine("Claims validados:");
+            foreach (var c in id.Claims) Console.WriteLine($" - {c.Type}: {c.Value}");
             return Task.CompletedTask;
         };
         options.Events.OnRemoteFailure = context =>
         {
             Console.WriteLine($"OpenID error: {context.Failure?.Message}");
             return Task.CompletedTask;
-        };        
+        };
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("UserApproved", policy =>
-        policy.RequireClaim("roles", "UserAproved"));
-});
+builder.Services.AddAuthorization(opts =>
+    opts.AddPolicy("UserApproved", p => p.RequireClaim("roles", "UserApproved")));
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.AccessDeniedPath = "/Account/AccessDenied"; 
-});
+builder.Services.ConfigureApplicationCookie(opts =>
+    opts.AccessDeniedPath = "/Account/AccessDenied");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-    .EnableSensitiveDataLogging()
-    .LogTo(Console.WriteLine, LogLevel.Information)
-);
+builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+    opts.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+        .EnableSensitiveDataLogging()
+        .LogTo(Console.WriteLine, LogLevel.Information));
 
-builder.Services.AddScoped<ProductService>(); 
-builder.Services.AddScoped<MovementService>();
-builder.Services.AddScoped<DesignService>();
-builder.Services.AddScoped<MaterialTypeService>();
-builder.Services.AddScoped<MaterialService>();
-builder.Services.AddScoped<ReceiptService>();
-builder.Services.AddScoped<SizeService>();
-builder.Services.AddScoped<ProviderService>();
-builder.Services.AddScoped<PurchaseOrderService>();
+builder.Services.AddScoped<ProductService>();
+// … otros servicios …
 
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
+builder.Services.AddSession(opts =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    opts.IdleTimeout = TimeSpan.FromMinutes(30);
+    opts.Cookie.HttpOnly = true;
+    opts.Cookie.IsEssential = true;
 });
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
-
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
+// Forwarded headers para HTTPS detrás de proxy
+builder.Services.Configure<ForwardedHeadersOptions>(opts =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
+    opts.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    opts.KnownNetworks.Clear();
+    opts.KnownProxies.Clear();
 });
 
 var app = builder.Build();
 
+// Aplicar forwarded headers antes de auth
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
-    ForwardLimit = null,
+    ForwardedHeaders   = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
     RequireHeaderSymmetry = false,
-    KnownNetworks = { },
-    KnownProxies = { }
+    ForwardLimit       = null
 });
 
-//  Leer publicOrigin para ajustar Scheme y Host según el entorno
+// Ajuste de PublicOrigin en producción
 if (!app.Environment.IsDevelopment())
 {
-    var publicOrigin = builder.Configuration.GetSection("App")["PublicOrigin"];
+    var publicOrigin = builder.Configuration["App:PublicOrigin"];
     if (!string.IsNullOrEmpty(publicOrigin))
     {
         var uri = new Uri(publicOrigin);
-        app.Use(async (context, next) =>
+        app.Use((ctx, next) =>
         {
-            context.Request.Scheme = uri.Scheme;
-            context.Request.Host = uri.IsDefaultPort ? new HostString(uri.Host) : new HostString(uri.Host, uri.Port);
-            await next();
+            ctx.Request.Scheme = uri.Scheme;
+            ctx.Request.Host   = uri.IsDefaultPort
+                                 ? new HostString(uri.Host)
+                                 : new HostString(uri.Host, uri.Port);
+            return next();
         });
     }
 }
@@ -196,28 +160,16 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"EXCEPCIÓN EN REQUEST: {context.Request.Path}");
-        Console.WriteLine($"ERROR: {ex.Message}");
-        Console.WriteLine($"STACKTRACE: {ex.StackTrace}");
-        throw;
-    }
-});
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();

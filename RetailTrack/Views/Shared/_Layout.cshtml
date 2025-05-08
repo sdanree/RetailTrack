@@ -1,76 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - RetailTrack</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Tailwind CSS Compilado Localmente -->
-    <link href="~/css/output.css" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - RetailTrack</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="~/css/output.css" rel="stylesheet" />
 </head>
 <body>
-    <!-- Navbar con Bootstrap -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Home</a>
-            <a href="@Url.Action("Index", "Product")" class="navbar-brand">Productos</a>
-            <a href="@Url.Action("Index", "Design")" class="navbar-brand">Diseños</a>
-            <a href="@Url.Action("Index", "Material")" class="navbar-brand">Materiales</a>
-            <a href="@Url.Action("Index", "PurchaseOrder")" class="navbar-brand">Ordenes de Compra</a>
-            <a href="@Url.Action("Index", "Receipt")" class="navbar-brand">Facturas</a>
-            <a href="@Url.Action("Index","Settings")" class="navbar-brand">Configuración</a>
-            <div class="ms-auto d-flex align-items-center">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <span class="fw-bold text-white me-3">
-                        Bienvenido, @User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value
-                    </span>
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger">
-                            Cerrar Sesión
-                        </button>
-                    </form>
-                }
-                else
-                {
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">Iniciar Sesión</a>
-                }
-            </div>
-        </div>
-    </nav>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" asp-controller="Home" asp-action="Index">Home</a>
+      <a class="navbar-brand" asp-controller="Product" asp-action="Index">Productos</a>
+      <a class="navbar-brand" asp-controller="Design" asp-action="Index">Diseños</a>
+      <a class="navbar-brand" asp-controller="Material" asp-action="Index">Materiales</a>
+      <a class="navbar-brand" asp-controller="PurchaseOrder" asp-action="Index">Órdenes</a>
+      <a class="navbar-brand" asp-controller="Receipt" asp-action="Index">Facturas</a>
+      <a class="navbar-brand" asp-controller="Settings" asp-action="Index">Configuración</a>
 
-    <!-- Contenido Principal -->
-    <div class="container mt-4">
-        @RenderBody()
+      <div class="ms-auto d-flex align-items-center">
+        @if (User.Identity.IsAuthenticated)
+        {
+          <span class="text-white me-3">
+            Bienvenido, @User.FindFirstValue(ClaimTypes.Email)
+          </span>
+          <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        }
+        else
+        {
+          <a asp-controller="Account" asp-action="Login" class="btn btn-primary">Iniciar Sesión</a>
+        }
+      </div>
     </div>
+  </nav>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <div class="container mt-4">
+    @RenderBody()
+  </div>
 
-    <!-- Scripts Locales -->
-    <script>
-        var appSettings = {
-            createPartialUrl: '@Url.Action("CreatePartial", "Material")',
-            addMaterialUrl: '@Url.Action("AddMaterial", "Receipt")'
-        };
-    </script>
-    <script src="~/js/GetProvider.js"></script>
-    <script src="~/js/ProviderNew.js"></script>
-    <script src="~/js/GetMaterial.js"></script>
-    <script src="~/js/Receipt/showTabs.js"></script>
-    <script src="~/js/Receipt/receipt.js"></script>
-    <script src="~/js/Receipt/validateOrder.js"></script>
-    <script src="~/js/Receipt/invoiceOrders.js"></script>
-    <script src="~/js/Receipt/clearReceiptSession.js"></script>
-    <script src="~/js/Receipt/editReceiptLists.js"></script>
-
-    @RenderSection("Scripts", required: false)
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  @RenderSection("Scripts", required: false)
 </body>
 </html>
