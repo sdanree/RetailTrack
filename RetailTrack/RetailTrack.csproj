@@ -7,12 +7,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-<PropertyGroup>
+  <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
-</PropertyGroup>
+  </PropertyGroup>
 
   <ItemGroup>
+    <!-- Tus referencias existentes -->
     <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
@@ -24,11 +25,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="bootstrap" Version="5.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+
+    <!-- Nueva referencia para habilitar los ClaimActionCollection extensions -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.4" />
   </ItemGroup>
 
 </Project>
