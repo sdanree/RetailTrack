@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RetailTrack.Data;
 using RetailTrack.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Fix para handshake SSL con Keycloak detrás de NGINX (ECDSA + proxy)
+// Sólo para producción: deshabilita HTTP/2 y fuerza TLS1.2
 if (!builder.Environment.IsDevelopment())
 {
     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", false);
@@ -37,30 +36,20 @@ builder.Services
     })
     .AddCookie(options =>
     {
-        options.Cookie.SameSite   = SameSiteMode.None;
+        options.Cookie.SameSite = SameSiteMode.None;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.HttpOnly    = true;
+        options.Cookie.HttpOnly = true;
     })
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
         var kc = builder.Configuration.GetSection("Authentication:Keycloak");
-        var publicOrigin = builder.Configuration["App:PublicOrigin"]; // e.g. "https://retail-test.duckdns.org"
-
-        options.Authority            = kc["Authority"];
+        options.Authority = kc["Authority"];
         options.RequireHttpsMetadata = bool.Parse(kc["RequireHttpsMetadata"] ?? "true");
-        options.ClientId             = kc["ClientId"];
-        options.ClientSecret         = kc["ClientSecret"];
-        options.CallbackPath         = kc["CallbackPath"];
-        options.ResponseType         = kc["ResponseType"];
-        options.SaveTokens           = bool.Parse(kc["SaveTokens"] ?? "true");
-
-        // Ajustes para logout y cookies OIDC
-        options.SignedOutCallbackPath = "/signout-callback-oidc";
-        options.PostLogoutRedirectUri = $"{publicOrigin}/signout-callback-oidc";
-        options.CorrelationCookie.SameSite = SameSiteMode.None;
-        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.NonceCookie.SameSite       = SameSiteMode.None;
-        options.NonceCookie.SecurePolicy   = CookieSecurePolicy.Always;
+        options.ClientId = kc["ClientId"];
+        options.ClientSecret = kc["ClientSecret"];
+        options.CallbackPath = kc["CallbackPath"];
+        options.ResponseType = kc["ResponseType"];
+        options.SaveTokens = bool.Parse(kc["SaveTokens"] ?? "true");
 
         options.Scope.Add("openid");
         options.Scope.Add("profile");
@@ -70,60 +59,56 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            ValidateIssuer           = true,
-            ValidateAudience         = false,
-            ValidateLifetime         = true,
-            RoleClaimType            = ClaimTypes.Role
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(5),
+            RoleClaimType = ClaimTypes.Role
         };
 
-        options.Events.OnTokenValidated = context =>
+        // Mapeo de claims
+        options.ClaimActions.DeleteClaim("roles");
+        options.ClaimActions.MapJsonKey("roles", "roles");
+        options.ClaimActions.MapUniqueJsonKey("roles", "roles");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+
+        // Logs para debug
+        options.Events.OnTokenValidated = ctx =>
         {
-            var id = (ClaimsIdentity)context.Principal.Identity;
-            Console.WriteLine("Claims validados:");
+            var id = (ClaimsIdentity)ctx.Principal.Identity;
+            Console.WriteLine("=== Claims recibidos ===");
             foreach (var c in id.Claims)
-                Console.WriteLine($" - {c.Type}: {c.Value}");
+                Console.WriteLine($"  {c.Type}: {c.Value}");
             return Task.CompletedTask;
         };
-        options.Events.OnRemoteFailure = context =>
+        options.Events.OnRemoteFailure = ctx =>
         {
-            Console.WriteLine($"OpenID error: {context.Failure?.Message}");
+            Console.WriteLine($"OpenID error: {ctx.Failure?.Message}");
+            ctx.Response.Redirect("/Home/Error");
+            ctx.HandleResponse();
             return Task.CompletedTask;
         };
     });
 
-builder.Services.AddAuthorization(opts =>
-    opts.AddPolicy("UserApproved", p => p.RequireClaim("roles", "UserApproved")));
-
-builder.Services.ConfigureApplicationCookie(opts =>
-    opts.AccessDeniedPath = "/Account/AccessDenied");
-
-builder.Services.AddDbContext<ApplicationDbContext>(opts =>
-    opts.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-        .EnableSensitiveDataLogging()
-        .LogTo(Console.WriteLine, LogLevel.Information));
-
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<MovementService>();
-builder.Services.AddScoped<DesignService>();
-builder.Services.AddScoped<MaterialTypeService>();
-builder.Services.AddScoped<MaterialService>();
-builder.Services.AddScoped<ReceiptService>();
-builder.Services.AddScoped<SizeService>();
-builder.Services.AddScoped<ProviderService>();
-builder.Services.AddScoped<PurchaseOrderService>();
-
-builder.Services.AddControllersWithViews()
-    .AddRazorRuntimeCompilation();
-
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(opts =>
+builder.Services.AddAuthorization(o =>
 {
-    opts.IdleTimeout = TimeSpan.FromMinutes(30);
-    opts.Cookie.HttpOnly    = true;
-    opts.Cookie.IsEssential  = true;
+    o.AddPolicy("UserApproved", p => p.RequireClaim("roles", "UserAproved"));
 });
 
-// Forwarded headers para HTTPS detrás de proxy
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+builder.Services.AddDbContext<ApplicationDbContext>(o =>
+    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+     .EnableSensitiveDataLogging()
+     .LogTo(Console.WriteLine, LogLevel.Information)
+);
+
+// <-- Aquí registras tus servicios y MVC, sessions, logging, etc. -->
+
 builder.Services.Configure<ForwardedHeadersOptions>(opts =>
 {
     opts.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -133,34 +118,25 @@ builder.Services.Configure<ForwardedHeadersOptions>(opts =>
 
 var app = builder.Build();
 
-// Aplicar forwarded headers antes de auth
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders       = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
-    RequireHeaderSymmetry  = false,
-    ForwardLimit           = null
-});
+// **IMPORTANTE:** UseForwardedHeaders debe ir **antes** de UseAuthentication()
+app.UseForwardedHeaders();
 
-// Ajuste de PublicOrigin en producción
 if (!app.Environment.IsDevelopment())
 {
     var publicOrigin = builder.Configuration["App:PublicOrigin"];
-    if (!string.IsNullOrEmpty(publicOrigin))
+    if (!string.IsNullOrWhiteSpace(publicOrigin))
     {
         var uri = new Uri(publicOrigin);
         app.Use(async (ctx, next) =>
         {
             ctx.Request.Scheme = uri.Scheme;
-            ctx.Request.Host   = uri.IsDefaultPort
-                                 ? new HostString(uri.Host)
-                                 : new HostString(uri.Host, uri.Port);
+            ctx.Request.Host = uri.IsDefaultPort
+                ? new HostString(uri.Host)
+                : new HostString(uri.Host, uri.Port);
             await next();
         });
     }
-}
 
-if (!app.Environment.IsDevelopment())
-{
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
@@ -171,16 +147,13 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseSession();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
